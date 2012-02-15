@@ -1,6 +1,8 @@
 {BrunchApplication} = require 'helpers'
 {MainRouter} = require 'routers/main_router'
 {HomeView} = require 'views/home_view'
+{StringView} = require 'views/string_view'
+{Sample} = require 'collections/sample'
 
 class exports.Application extends BrunchApplication
   # This callback would be executed on document ready event.
@@ -9,5 +11,8 @@ class exports.Application extends BrunchApplication
   initialize: ->
     @router = new MainRouter
     @homeView = new HomeView
+    @sample = new Sample
+    @views = {}
+    @views.stringView = new StringView model: @sample
 
 window.app = new exports.Application
