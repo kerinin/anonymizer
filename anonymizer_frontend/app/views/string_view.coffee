@@ -17,4 +17,5 @@ class exports.StringView extends Backbone.View
 
   addAll: =>
     console.log("adding all chunks")
+    $("#string").empty()
     app.sample.each @addOne

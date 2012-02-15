@@ -24,4 +24,4 @@ class exports.ChunkView extends Backbone.View
 
   toggleAnonymize: ->
     console.log("toggling anonymize")
-    @model.toggle()
+    @model.toggleAnonymize()

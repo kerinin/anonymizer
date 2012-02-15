@@ -11355,57 +11355,6 @@ window.jQuery = window.$ = jQuery;
 
 }).call(this);
 (this.require.define({
-  "views/string_view": function(exports, require, module) {
-    (function() {
-  var ChunkView,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  ChunkView = require('views/chunk_view').ChunkView;
-
-  exports.StringView = (function(_super) {
-
-    __extends(StringView, _super);
-
-    function StringView() {
-      this.addAll = __bind(this.addAll, this);
-      StringView.__super__.constructor.apply(this, arguments);
-    }
-
-    StringView.prototype.initialize = function() {
-      app.sample.bind('add', this.addOne);
-      return app.sample.bind('reset', this.addAll);
-    };
-
-    StringView.prototype.render = function() {
-      console.log("rendering string view");
-      return this;
-    };
-
-    StringView.prototype.addOne = function(chunk) {
-      var view;
-      console.log("adding a chunk");
-      view = new ChunkView({
-        model: chunk
-      });
-      return this.$("#string").append(view.render().el);
-    };
-
-    StringView.prototype.addAll = function() {
-      console.log("adding all chunks");
-      return app.sample.each(this.addOne);
-    };
-
-    return StringView;
-
-  })(Backbone.View);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
   "views/chunk_view": function(exports, require, module) {
     (function() {
   var chunkTemplate,
@@ -11452,7 +11401,7 @@ window.jQuery = window.$ = jQuery;
 
     ChunkView.prototype.toggleAnonymize = function() {
       console.log("toggling anonymize");
-      return this.model.toggle();
+      return this.model.toggleAnonymize();
     };
 
     return ChunkView;
@@ -11479,10 +11428,36 @@ window.jQuery = window.$ = jQuery;
 
     HomeView.prototype.id = 'home-view';
 
+    HomeView.prototype.events = {
+      "click #reset": "resetString",
+      "click #next": "nextString"
+    };
+
     HomeView.prototype.render = function() {
       $(this.el).html(require('./templates/home'));
+      $(this.el).find('#string').empty();
       $(this.el).find('#string').html(app.views.stringView.render().el);
+      $(this.el).find('#search').html(app.views.searchView.render().el);
+      $(this.el).find('#replace').html(app.views.replaceView.render().el);
       return this;
+    };
+
+    HomeView.prototype.resetString = function() {
+      app.sample.models.forEach(function(chunk) {
+        chunk.set({
+          anonymize: false
+        });
+        return chunk.set({
+          collapse: false
+        });
+      });
+      return false;
+    };
+
+    HomeView.prototype.nextString = function() {
+      app.sample.reset();
+      app.sample.fetch();
+      return false;
     };
 
     return HomeView;
@@ -11494,9 +11469,139 @@ window.jQuery = window.$ = jQuery;
   }
 }));
 (this.require.define({
+  "views/replace_view": function(exports, require, module) {
+    (function() {
+  var replaceTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  replaceTemplate = require('./templates/replace');
+
+  exports.ReplaceView = (function(_super) {
+
+    __extends(ReplaceView, _super);
+
+    function ReplaceView() {
+      this.render = __bind(this.render, this);
+      ReplaceView.__super__.constructor.apply(this, arguments);
+    }
+
+    ReplaceView.prototype.initialize = function() {
+      return this.model.bind('all', this.render);
+    };
+
+    ReplaceView.prototype.render = function() {
+      console.log("rendering replace view");
+      this.$(this.el).html(replaceTemplate({
+        sample: this.model
+      }));
+      return this;
+    };
+
+    return ReplaceView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/search_view": function(exports, require, module) {
+    (function() {
+  var searchTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  searchTemplate = require('./templates/search');
+
+  exports.SearchView = (function(_super) {
+
+    __extends(SearchView, _super);
+
+    function SearchView() {
+      this.render = __bind(this.render, this);
+      SearchView.__super__.constructor.apply(this, arguments);
+    }
+
+    SearchView.prototype.initialize = function() {
+      return this.model.bind('all', this.render);
+    };
+
+    SearchView.prototype.render = function() {
+      console.log("rendering search view");
+      this.$(this.el).html(searchTemplate({
+        sample: this.model
+      }));
+      return this;
+    };
+
+    return SearchView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/string_view": function(exports, require, module) {
+    (function() {
+  var ChunkView,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  ChunkView = require('views/chunk_view').ChunkView;
+
+  exports.StringView = (function(_super) {
+
+    __extends(StringView, _super);
+
+    function StringView() {
+      this.addAll = __bind(this.addAll, this);
+      StringView.__super__.constructor.apply(this, arguments);
+    }
+
+    StringView.prototype.initialize = function() {
+      app.sample.bind('add', this.addOne);
+      return app.sample.bind('reset', this.addAll);
+    };
+
+    StringView.prototype.render = function() {
+      console.log("rendering string view");
+      return this;
+    };
+
+    StringView.prototype.addOne = function(chunk) {
+      var view;
+      console.log("adding a chunk");
+      view = new ChunkView({
+        model: chunk
+      });
+      return this.$("#string").append(view.render().el);
+    };
+
+    StringView.prototype.addAll = function() {
+      console.log("adding all chunks");
+      $("#string").empty();
+      return app.sample.each(this.addOne);
+    };
+
+    return StringView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
   "initialize": function(exports, require, module) {
     (function() {
-  var BrunchApplication, HomeView, MainRouter, Sample, StringView,
+  var BrunchApplication, HomeView, MainRouter, ReplaceView, Sample, SearchView, StringView,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -11507,6 +11612,10 @@ window.jQuery = window.$ = jQuery;
   HomeView = require('views/home_view').HomeView;
 
   StringView = require('views/string_view').StringView;
+
+  SearchView = require('views/search_view').SearchView;
+
+  ReplaceView = require('views/replace_view').ReplaceView;
 
   Sample = require('collections/sample').Sample;
 
@@ -11523,7 +11632,13 @@ window.jQuery = window.$ = jQuery;
       this.homeView = new HomeView;
       this.sample = new Sample;
       this.views = {};
-      return this.views.stringView = new StringView({
+      this.views.stringView = new StringView({
+        model: this.sample
+      });
+      this.views.searchView = new SearchView({
+        model: this.sample
+      });
+      return this.views.replaceView = new ReplaceView({
         model: this.sample
       });
     };
@@ -11565,41 +11680,6 @@ window.jQuery = window.$ = jQuery;
   }
 }));
 (this.require.define({
-  "collections/sample": function(exports, require, module) {
-    (function() {
-  var Chunk,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  Chunk = require('models/chunk').Chunk;
-
-  exports.Sample = (function(_super) {
-
-    __extends(Sample, _super);
-
-    function Sample() {
-      Sample.__super__.constructor.apply(this, arguments);
-    }
-
-    Sample.prototype.model = Chunk;
-
-    Sample.prototype.url = '/next';
-
-    Sample.prototype.original_text = function() {
-      return this.models.map(function(chunk) {
-        return chunk.get('content');
-      }).join(' ');
-    };
-
-    return Sample;
-
-  })(Backbone.Collection);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
   "models/chunk": function(exports, require, module) {
     (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -11611,19 +11691,43 @@ window.jQuery = window.$ = jQuery;
     __extends(Chunk, _super);
 
     function Chunk() {
-      this.toggle = __bind(this.toggle, this);
+      this.replaceText = __bind(this.replaceText, this);
+      this.toggleAnonymize = __bind(this.toggleAnonymize, this);
       Chunk.__super__.constructor.apply(this, arguments);
     }
 
     Chunk.prototype.defaults = {
       content: '',
-      anonymize: false
+      anonymize: false,
+      alias: '',
+      collapse: false
     };
 
-    Chunk.prototype.toggle = function() {
-      return this.set({
+    Chunk.prototype.toggleAnonymize = function() {
+      this.set({
         anonymize: !this.get('anonymize')
       });
+      return this.collection.groupChunks();
+    };
+
+    Chunk.prototype.searchText = function() {
+      if (this.get('anonymize') && this.get('collapse') !== true) {
+        return '(.*)';
+      } else if (!this.get('anonymize')) {
+        return this.get('content');
+      }
+    };
+
+    Chunk.prototype.replaceText = function() {
+      if (this.get('anonymize') && this.get('collapse') !== true) {
+        if (this.get('alias')) {
+          return "<" + (this.get('alias')) + ">";
+        } else {
+          return "<redacted>";
+        }
+      } else if (!this.get('anonymize')) {
+        return this.get('content');
+      }
     };
 
     return Chunk;
@@ -11649,7 +11753,8 @@ window.jQuery = window.$ = jQuery;
     }
 
     MainRouter.prototype.routes = {
-      '': 'home'
+      '': 'home',
+      'next': 'home'
     };
 
     MainRouter.prototype.home = function() {
@@ -11690,6 +11795,54 @@ window.jQuery = window.$ = jQuery;
     (function() {
     
       _print(this.chunk.get('content'));
+    
+      _print(_safe('\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "views/templates/replace": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(this.sample.replaceText());
     
       _print(_safe('\n'));
     
@@ -11760,6 +11913,54 @@ window.jQuery = window.$ = jQuery;
   }
 }));
 (this.require.define({
+  "views/templates/search": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(this.sample.searchText());
+    
+      _print(_safe('\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
   "views/templates/string": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
@@ -11805,5 +12006,89 @@ window.jQuery = window.$ = jQuery;
     return obj;
   })());
 };
+  }
+}));
+(this.require.define({
+  "collections/sample": function(exports, require, module) {
+    (function() {
+  var Chunk,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  Chunk = require('models/chunk').Chunk;
+
+  exports.Sample = (function(_super) {
+
+    __extends(Sample, _super);
+
+    function Sample() {
+      Sample.__super__.constructor.apply(this, arguments);
+    }
+
+    Sample.prototype.model = Chunk;
+
+    Sample.prototype.url = '/next';
+
+    Sample.prototype.originalText = function() {
+      return this.models.map(function(chunk) {
+        return chunk.get('content');
+      }).join(' ');
+    };
+
+    Sample.prototype.searchText = function() {
+      var chunk;
+      return "/" + (((function() {
+        var _i, _len, _ref, _results;
+        _ref = this.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          chunk = _ref[_i];
+          _results.push(chunk.searchText());
+        }
+        return _results;
+      }).call(this)).join(' ')) + "/";
+    };
+
+    Sample.prototype.replaceText = function() {
+      var chunk;
+      return "\"" + (((function() {
+        var _i, _len, _ref, _results;
+        _ref = this.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          chunk = _ref[_i];
+          _results.push(chunk.replaceText());
+        }
+        return _results;
+      }).call(this)).join(' ')) + "\"";
+    };
+
+    Sample.prototype.groupChunks = function() {
+      var prev;
+      prev = false;
+      return this.models.forEach(function(chunk) {
+        if (chunk.get('anonymize')) {
+          if (prev) {
+            chunk.set({
+              collapse: true
+            });
+          } else {
+            chunk.set({
+              collapse: false
+            });
+          }
+          return prev = true;
+        } else {
+          return prev = false;
+        }
+      });
+    };
+
+    return Sample;
+
+  })(Backbone.Collection);
+
+}).call(this);
+
   }
 }));

@@ -2,6 +2,8 @@
 {MainRouter} = require 'routers/main_router'
 {HomeView} = require 'views/home_view'
 {StringView} = require 'views/string_view'
+{SearchView} = require 'views/search_view'
+{ReplaceView} = require 'views/replace_view'
 {Sample} = require 'collections/sample'
 
 class exports.Application extends BrunchApplication
@@ -14,5 +16,7 @@ class exports.Application extends BrunchApplication
     @sample = new Sample
     @views = {}
     @views.stringView = new StringView model: @sample
+    @views.searchView = new SearchView model: @sample
+    @views.replaceView = new ReplaceView model: @sample
 
 window.app = new exports.Application
