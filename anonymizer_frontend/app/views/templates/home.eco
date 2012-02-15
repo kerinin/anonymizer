@@ -1,11 +1,33 @@
-<!-- START you can remove this -->
-<div id="content">
-  <h1>brunch</h1>
-  <h2>Welcome!</h2>
-  <ul>
-    <li><a href="http://brunch.io/#documentation">Documentation</a></li>
-    <li><a href="https://github.com/brunch/brunch/issues">Github Issues</a></li>
-    <li><a href="https://github.com/brunch/example-todos">Todos Example App</a></li>
-  </ul>
+<div id="string">
+  This is a string to be anonymized
 </div>
-<!-- END you can remove this -->
+
+<div id="filter">
+  <div id="search">
+    /this is a search/
+  </div>
+  &rArr;
+  <div id="replace">
+    'which will replace'
+  </div>
+</div>
+
+<div id="controls">
+  <a id="save" href="#save">Save</a>
+  <a id="reset" href="#reset">Reset</a>
+  <a id="next" href="#next">Next&rarr;</a>
+
+<div id="text">
+  <div id="original">
+    <ul>
+      <li>Example 1</li>
+      <li>Example 2</li>
+    </ul>
+  </div>
+  <div id="filtered">
+    <ul>
+      <li>Redacted 1</li>
+      <li>Redacted 2</li>
+    </ul>
+  </div>
+</div>

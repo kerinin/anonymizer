@@ -11499,7 +11499,7 @@ window.jQuery = window.$ = jQuery;
     };
     (function() {
     
-      _print(_safe('<!-- START you can remove this -->\n<div id="content">\n  <h1>brunch</h1>\n  <h2>Welcome!</h2>\n  <ul>\n    <li><a href="http://brunch.io/#documentation">Documentation</a></li>\n    <li><a href="https://github.com/brunch/brunch/issues">Github Issues</a></li>\n    <li><a href="https://github.com/brunch/example-todos">Todos Example App</a></li>\n  </ul>\n</div>\n<!-- END you can remove this -->\n'));
+      _print(_safe('<div id="string">\n  This is a string to be anonymized\n</div>\n\n<div id="filter">\n  <div id="search">\n    /this is a search/\n  </div>\n  &rArr;\n  <div id="replace">\n    \'which will replace\'\n  </div>\n</div>\n\n<div id="controls">\n  <a id="save" href="#save">Save</a>\n  <a id="reset" href="#reset">Reset</a>\n  <a id="next" href="#next">Next&rarr;</a>\n\n<div id="text">\n  <div id="original">\n    <ul>\n      <li>Example 1</li>\n      <li>Example 2</li>\n    </ul>\n  </div>\n  <div id="filtered">\n    <ul>\n      <li>Redacted 1</li>\n      <li>Redacted 2</li>\n    </ul>\n  </div>\n</div>\n'));
     
     }).call(this);
     
