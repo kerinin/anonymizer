@@ -2,7 +2,7 @@ class exports.Chunk extends Backbone.Model
   defaults:
     content: ''
     anonymize: false
-    alias: ''
+    alias: 'redacted'
     collapse: false
 
   toggleAnonymize: =>

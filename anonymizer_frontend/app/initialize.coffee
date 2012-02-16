@@ -22,7 +22,7 @@ class exports.Application extends BrunchApplication
     @views = {}
     @views.stringView = new StringView model: @sample
     @views.searchView = new SearchView model: @sample
-    @views.replaceView = new ReplaceView model: @sample
+    @views.replaceView = new ReplaceView collection: @sample
     @views.testView = new TestView collection: @test_results
 
 window.app = new exports.Application

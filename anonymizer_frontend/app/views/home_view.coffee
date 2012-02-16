@@ -13,7 +13,7 @@ class exports.HomeView extends Backbone.View
     $(@el).find('#string').empty()
     $(@el).find('#string').html( app.views.stringView.render().el )
     $(@el).find('#search').html( app.views.searchView.render().el )
-    $(@el).find('#replace').html( app.views.replaceView.render().el )
+    $(@el).find('#replace').replaceWith( app.views.replaceView.render().el )
     this
 
   resetString: ->

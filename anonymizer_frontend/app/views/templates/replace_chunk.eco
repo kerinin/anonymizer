@@ -1,0 +1,7 @@
+<% if !@chunk.get('collapse'): %>
+  <% if @chunk.get('anonymize'): %>
+    &lt;<input value='<%= @chunk.get('alias') %>'/>&gt;
+  <% else: %>
+    <%= @chunk.get('content') %>  
+  <% end %>
+<% end %>

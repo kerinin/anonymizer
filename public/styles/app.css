@@ -219,7 +219,8 @@ li{margin:0;padding:5px}
 #string .chunk{cursor:pointer;-webkit-touch-callout:none;-webkit-user-select:none;-khtml-user-select:none;-moz-user-select:none;-ms-user-select:none;-o-user-select:none;user-select:none}
 #string .chunk:hover{border-top:1px solid #ddd;border-bottom:1px solid #ddd}
 #string .chunk.anonymize{color:#f95a5a}
-#filter{font-weight:normal;font-size:18px;font-family:Monaco,Courier,monospace;margin-top:40px}
+#filter{font-weight:normal;font-size:18px;font-family:Monaco,Courier,monospace;margin-top:40px;}
+#filter #replace input{width:4em}
 #controls{font-size:14px;font-family:Helvetica,Arial,sans-serif;font-weight:bold;margin-top:40px;}
 #controls a{padding:8px 15px;margin:10px;border-radius:8px;}
 #controls a:hover{text-decoration:none;box-shadow:0 0 10px #aaa}
