@@ -1,5 +1,3 @@
-<tr>
-  <td class="raw"><%= @result.get 'raw' %></td>
-  <td class="divider">&rArr;</td>
-  <td class="redacted"><%= @result.get 'redacted' %></td>
-</tr>
+<td class="raw"><%= @result.get 'raw' %></td>
+<td class="divider">&rArr;</td>
+<td class="redacted"><%= @result.get 'redacted' %></td>

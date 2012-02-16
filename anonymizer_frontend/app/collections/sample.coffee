@@ -12,7 +12,7 @@ class exports.Sample extends Backbone.Collection
     .join()
 
   searchText: ->
-    (chunk.searchText() for chunk in @models).filter(Boolean).join('')
+    "^#{(chunk.searchText() for chunk in @models).filter(Boolean).join('')}$"
 
   replaceText: ->
     (chunk.replaceText() for chunk in @models).filter(Boolean).join('')

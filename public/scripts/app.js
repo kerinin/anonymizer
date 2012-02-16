@@ -11375,32 +11375,39 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     function TestView() {
       this.clear = __bind(this.clear, this);
       this.addAll = __bind(this.addAll, this);
+      this.addOne = __bind(this.addOne, this);
+      this.render = __bind(this.render, this);
       TestView.__super__.constructor.apply(this, arguments);
     }
 
     TestView.prototype.id = 'test';
 
+    TestView.prototype.tagName = 'table';
+
     TestView.prototype.initialize = function() {
-      app.sample.bind("change", this.getTestResults);
+      app.sample.bind("all", this.getTestResults);
       app.sample.bind("reset", this.clear);
       this.collection.bind('add', this.addOne);
       return this.collection.bind('reset', this.addAll);
     };
 
     TestView.prototype.render = function() {
-      return $(this.el).replaceWith(testTemplate);
+      $(this.el).replaceWith(testTemplate);
+      return this;
     };
 
     TestView.prototype.addOne = function(result) {
       var view;
+      console.log($(this.el));
       view = new ResultView({
         model: result
       });
+      console.log(view.render().el);
       return $(this.el).append(view.render().el);
     };
 
     TestView.prototype.addAll = function() {
-      this.render();
+      $(this.el).empty();
       return this.collection.models.forEach(this.addOne);
     };
 
@@ -11727,14 +11734,17 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       ResultView.__super__.constructor.apply(this, arguments);
     }
 
+    ResultView.prototype.tagName = 'tr';
+
     ResultView.prototype.initialize = function() {
       return this.model.bind('all', this.render);
     };
 
     ResultView.prototype.render = function() {
-      return $(this.el).html(resultTemplate({
+      $(this.el).html(resultTemplate({
         result: this.model
       }));
+      return this;
     };
 
     return ResultView;
@@ -11955,7 +11965,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     Sample.prototype.searchText = function() {
       var chunk;
-      return ((function() {
+      return "^" + (((function() {
         var _i, _len, _ref, _results;
         _ref = this.models;
         _results = [];
@@ -11964,7 +11974,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
           _results.push(chunk.searchText());
         }
         return _results;
-      }).call(this)).filter(Boolean).join('');
+      }).call(this)).filter(Boolean).join('')) + "$";
     };
 
     Sample.prototype.replaceText = function() {
@@ -12380,15 +12390,15 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
     (function() {
     
-      _print(_safe('<tr>\n  <td class="raw">'));
+      _print(_safe('<td class="raw">'));
     
       _print(this.result.get('raw'));
     
-      _print(_safe('</td>\n  <td class="divider">&rArr;</td>\n  <td class="redacted">'));
+      _print(_safe('</td>\n<td class="divider">&rArr;</td>\n<td class="redacted">'));
     
       _print(this.result.get('redacted'));
     
-      _print(_safe('</td>\n</tr>\n'));
+      _print(_safe('</td>\n'));
     
     }).call(this);
     

@@ -4,22 +4,26 @@ testTemplate = require './templates/test'
 class exports.TestView extends Backbone.View
   
   id: 'test'
+  tagName: 'table'
 
   initialize: ->
-    app.sample.bind "change", @getTestResults
+    app.sample.bind "all", @getTestResults
     app.sample.bind "reset", @clear
     @collection.bind 'add', @addOne
     @collection.bind 'reset', @addAll
 
-  render: ->
+  render: =>
     $(@el).replaceWith testTemplate
+    this
 
-  addOne: (result) ->
+  addOne: (result) =>
+    console.log $(@el)
     view = new ResultView model: result
+    console.log view.render().el
     $(@el).append( view.render().el )
 
   addAll: =>
-    @render()
+    $(@el).empty()
     @collection.models.forEach @addOne
 
   getTestResults: ->
