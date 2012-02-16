@@ -49,8 +49,10 @@ class exports.ChunkView extends Backbone.View
       post = new Chunk content: post_range.cloneContents().textContent
 
       chunkIndex = @model.collection.models.indexOf(@model)
-      @model.collection.add [pre,chunk,post]
-      @model.collection.remove(@model)
+      collection = @model.collection
+      collection.add ( item for item in [pre,chunk,post] when item.get("content") isnt '' )
+      collection.remove(@model)
+      collection.groupChunks()
       @remove
 
     selection.empty()

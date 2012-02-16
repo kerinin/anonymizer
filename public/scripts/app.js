@@ -11563,7 +11563,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
 
     ChunkView.prototype.createChunk = function() {
-      var chunk, chunkIndex, chunk_range, post, post_range, pre, pre_range, selection;
+      var chunk, chunkIndex, chunk_range, collection, item, post, post_range, pre, pre_range, selection;
       selection = window.getSelection();
       chunk_range = selection.getRangeAt(0);
       if (chunk_range.startContainer !== chunk_range.endContainer) {
@@ -11586,8 +11586,19 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
           content: post_range.cloneContents().textContent
         });
         chunkIndex = this.model.collection.models.indexOf(this.model);
-        this.model.collection.add([pre, chunk, post]);
-        this.model.collection.remove(this.model);
+        collection = this.model.collection;
+        collection.add((function() {
+          var _i, _len, _ref, _results;
+          _ref = [pre, chunk, post];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            item = _ref[_i];
+            if (item.get("content") !== '') _results.push(item);
+          }
+          return _results;
+        })());
+        collection.remove(this.model);
+        collection.groupChunks();
         this.remove;
       }
       return selection.empty();
