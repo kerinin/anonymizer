@@ -6,6 +6,6 @@ class exports.SearchView extends Backbone.View
     @model.bind 'all', @render
 
   render: =>
-    console.log("rendering search view")
     @$(@el).html searchTemplate sample: @model
     this
+

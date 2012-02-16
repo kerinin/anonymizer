@@ -16,18 +16,6 @@
   <a id="save" href="#save">Save</a>
   <a id="reset" href="#reset">Reset</a>
   <a id="next" href="#next">Next&rarr;</a>
-
-<div id="text">
-  <div id="original">
-    <ul>
-      <li>Example 1</li>
-      <li>Example 2</li>
-    </ul>
-  </div>
-  <div id="filtered">
-    <ul>
-      <li>Redacted 1</li>
-      <li>Redacted 2</li>
-    </ul>
-  </div>
 </div>
+
+<table id="test"></table>

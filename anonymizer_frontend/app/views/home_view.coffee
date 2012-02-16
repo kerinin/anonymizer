@@ -4,6 +4,8 @@ class exports.HomeView extends Backbone.View
   events:
     "click #reset": "resetString"
     "click #next": "nextString"
+    "click #save": "saveString"
+
 
   render: ->
     $(@el).html require('./templates/home')
@@ -22,7 +24,12 @@ class exports.HomeView extends Backbone.View
     return false
 
   nextString: ->
-    app.sample.reset()
+    app.sample.fetch()
+
+    return false
+  
+  saveString: ->
+    app.sample.save()
     app.sample.fetch()
 
     return false

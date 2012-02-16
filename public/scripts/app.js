@@ -11354,6 +11354,104 @@ window.jQuery = window.$ = jQuery;
   };
 
 }).call(this);
+//XRegExp 1.5.0 <xregexp.com> MIT License
+var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame")}(function(){XRegExp=function(w,r){var q=[],u=XRegExp.OUTSIDE_CLASS,x=0,p,s,v,t,y;if(XRegExp.isRegExp(w)){if(r!==undefined){throw TypeError("can't supply flags when constructing one RegExp from another")}return j(w)}if(g){throw Error("can't call the XRegExp constructor within token definition functions")}r=r||"";p={hasNamedCapture:false,captureNames:[],hasFlag:function(z){return r.indexOf(z)>-1},setFlag:function(z){r+=z}};while(x<w.length){s=o(w,x,u,p);if(s){q.push(s.output);x+=(s.match[0].length||1)}else{if(v=m.exec.call(i[u],w.slice(x))){q.push(v[0]);x+=v[0].length}else{t=w.charAt(x);if(t==="["){u=XRegExp.INSIDE_CLASS}else{if(t==="]"){u=XRegExp.OUTSIDE_CLASS}}q.push(t);x++}}}y=RegExp(q.join(""),m.replace.call(r,h,""));y._xregexp={source:w,captureNames:p.hasNamedCapture?p.captureNames:null};return y};XRegExp.version="1.5.0";XRegExp.INSIDE_CLASS=1;XRegExp.OUTSIDE_CLASS=2;var c=/\$(?:(\d\d?|[$&`'])|{([$\w]+)})/g,h=/[^gimy]+|([\s\S])(?=[\s\S]*\1)/g,n=/^(?:[?*+]|{\d+(?:,\d*)?})\??/,g=false,k=[],m={exec:RegExp.prototype.exec,test:RegExp.prototype.test,match:String.prototype.match,replace:String.prototype.replace,split:String.prototype.split},a=m.exec.call(/()??/,"")[1]===undefined,e=function(){var p=/^/g;m.test.call(p,"");return !p.lastIndex}(),f=function(){var p=/x/g;m.replace.call("x",p,"");return !p.lastIndex}(),b=RegExp.prototype.sticky!==undefined,i={};i[XRegExp.INSIDE_CLASS]=/^(?:\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S]))/;i[XRegExp.OUTSIDE_CLASS]=/^(?:\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??)/;XRegExp.addToken=function(s,r,q,p){k.push({pattern:j(s,"g"+(b?"y":"")),handler:r,scope:q||XRegExp.OUTSIDE_CLASS,trigger:p||null})};XRegExp.cache=function(r,p){var q=r+"/"+(p||"");return XRegExp.cache[q]||(XRegExp.cache[q]=XRegExp(r,p))};XRegExp.copyAsGlobal=function(p){return j(p,"g")};XRegExp.escape=function(p){return p.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")};XRegExp.execAt=function(s,r,t,q){r=j(r,"g"+((q&&b)?"y":""));r.lastIndex=t=t||0;var p=r.exec(s);if(q){return(p&&p.index===t)?p:null}else{return p}};XRegExp.freezeTokens=function(){XRegExp.addToken=function(){throw Error("can't run addToken after freezeTokens")}};XRegExp.isRegExp=function(p){return Object.prototype.toString.call(p)==="[object RegExp]"};XRegExp.iterate=function(u,p,v,s){var t=j(p,"g"),r=-1,q;while(q=t.exec(u)){v.call(s,q,++r,u,t);if(t.lastIndex===q.index){t.lastIndex++}}if(p.global){p.lastIndex=0}};XRegExp.matchChain=function(q,p){return function r(s,x){var v=p[x].regex?p[x]:{regex:p[x]},u=j(v.regex,"g"),w=[],t;for(t=0;t<s.length;t++){XRegExp.iterate(s[t],u,function(y){w.push(v.backref?(y[v.backref]||""):y[0])})}return((x===p.length-1)||!w.length)?w:r(w,x+1)}([q],0)};RegExp.prototype.apply=function(q,p){return this.exec(p[0])};RegExp.prototype.call=function(p,q){return this.exec(q)};RegExp.prototype.exec=function(t){var r=m.exec.apply(this,arguments),q,p;if(r){if(!a&&r.length>1&&l(r,"")>-1){p=RegExp(this.source,m.replace.call(d(this),"g",""));m.replace.call(t.slice(r.index),p,function(){for(var u=1;u<arguments.length-2;u++){if(arguments[u]===undefined){r[u]=undefined}}})}if(this._xregexp&&this._xregexp.captureNames){for(var s=1;s<r.length;s++){q=this._xregexp.captureNames[s-1];if(q){r[q]=r[s]}}}if(!e&&this.global&&!r[0].length&&(this.lastIndex>r.index)){this.lastIndex--}}return r};if(!e){RegExp.prototype.test=function(q){var p=m.exec.call(this,q);if(p&&this.global&&!p[0].length&&(this.lastIndex>p.index)){this.lastIndex--}return !!p}}String.prototype.match=function(q){if(!XRegExp.isRegExp(q)){q=RegExp(q)}if(q.global){var p=m.match.apply(this,arguments);q.lastIndex=0;return p}return q.exec(this)};String.prototype.replace=function(r,s){var t=XRegExp.isRegExp(r),q,p,u;if(t&&typeof s.valueOf()==="string"&&s.indexOf("${")===-1&&f){return m.replace.apply(this,arguments)}if(!t){r=r+""}else{if(r._xregexp){q=r._xregexp.captureNames}}if(typeof s==="function"){p=m.replace.call(this,r,function(){if(q){arguments[0]=new String(arguments[0]);for(var v=0;v<q.length;v++){if(q[v]){arguments[0][q[v]]=arguments[v+1]}}}if(t&&r.global){r.lastIndex=arguments[arguments.length-2]+arguments[0].length}return s.apply(null,arguments)})}else{u=this+"";p=m.replace.call(u,r,function(){var v=arguments;return m.replace.call(s,c,function(x,w,A){if(w){switch(w){case"$":return"$";case"&":return v[0];case"`":return v[v.length-1].slice(0,v[v.length-2]);case"'":return v[v.length-1].slice(v[v.length-2]+v[0].length);default:var y="";w=+w;if(!w){return x}while(w>v.length-3){y=String.prototype.slice.call(w,-1)+y;w=Math.floor(w/10)}return(w?v[w]||"":"$")+y}}else{var z=+A;if(z<=v.length-3){return v[z]}z=q?l(q,A):-1;return z>-1?v[z+1]:x}})})}if(t&&r.global){r.lastIndex=0}return p};String.prototype.split=function(u,p){if(!XRegExp.isRegExp(u)){return m.split.apply(this,arguments)}var w=this+"",r=[],v=0,t,q;if(p===undefined||+p<0){p=Infinity}else{p=Math.floor(+p);if(!p){return[]}}u=XRegExp.copyAsGlobal(u);while(t=u.exec(w)){if(u.lastIndex>v){r.push(w.slice(v,t.index));if(t.length>1&&t.index<w.length){Array.prototype.push.apply(r,t.slice(1))}q=t[0].length;v=u.lastIndex;if(r.length>=p){break}}if(u.lastIndex===t.index){u.lastIndex++}}if(v===w.length){if(!m.test.call(u,"")||q){r.push("")}}else{r.push(w.slice(v))}return r.length>p?r.slice(0,p):r};function j(r,q){if(!XRegExp.isRegExp(r)){throw TypeError("type RegExp expected")}var p=r._xregexp;r=XRegExp(r.source,d(r)+(q||""));if(p){r._xregexp={source:p.source,captureNames:p.captureNames?p.captureNames.slice(0):null}}return r}function d(p){return(p.global?"g":"")+(p.ignoreCase?"i":"")+(p.multiline?"m":"")+(p.extended?"x":"")+(p.sticky?"y":"")}function o(v,u,w,p){var r=k.length,y,s,x;g=true;try{while(r--){x=k[r];if((w&x.scope)&&(!x.trigger||x.trigger.call(p))){x.pattern.lastIndex=u;s=x.pattern.exec(v);if(s&&s.index===u){y={output:x.handler.call(p,s,w),match:s};break}}}}catch(q){throw q}finally{g=false}return y}function l(s,q,r){if(Array.prototype.indexOf){return s.indexOf(q,r)}for(var p=r||0;p<s.length;p++){if(s[p]===q){return p}}return -1}XRegExp.addToken(/\(\?#[^)]*\)/,function(p){return m.test.call(n,p.input.slice(p.index+p[0].length))?"":"(?:)"});XRegExp.addToken(/\((?!\?)/,function(){this.captureNames.push(null);return"("});XRegExp.addToken(/\(\?<([$\w]+)>/,function(p){this.captureNames.push(p[1]);this.hasNamedCapture=true;return"("});XRegExp.addToken(/\\k<([\w$]+)>/,function(q){var p=l(this.captureNames,q[1]);return p>-1?"\\"+(p+1)+(isNaN(q.input.charAt(q.index+q[0].length))?"":"(?:)"):q[0]});XRegExp.addToken(/\[\^?]/,function(p){return p[0]==="[]"?"\\b\\B":"[\\s\\S]"});XRegExp.addToken(/^\(\?([imsx]+)\)/,function(p){this.setFlag(p[1]);return""});XRegExp.addToken(/(?:\s+|#.*)+/,function(p){return m.test.call(n,p.input.slice(p.index+p[0].length))?"":"(?:)"},XRegExp.OUTSIDE_CLASS,function(){return this.hasFlag("x")});XRegExp.addToken(/\./,function(){return"[\\s\\S]"},XRegExp.OUTSIDE_CLASS,function(){return this.hasFlag("s")})})();
+(this.require.define({
+  "views/test_view": function(exports, require, module) {
+    (function() {
+  var ResultView, testTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  ResultView = require('views/result_view').ResultView;
+
+  testTemplate = require('./templates/test');
+
+  exports.TestView = (function(_super) {
+
+    __extends(TestView, _super);
+
+    function TestView() {
+      this.clear = __bind(this.clear, this);
+      this.addAll = __bind(this.addAll, this);
+      TestView.__super__.constructor.apply(this, arguments);
+    }
+
+    TestView.prototype.id = 'test';
+
+    TestView.prototype.initialize = function() {
+      app.sample.bind("change", this.getTestResults);
+      app.sample.bind("reset", this.clear);
+      this.collection.bind('add', this.addOne);
+      return this.collection.bind('reset', this.addAll);
+    };
+
+    TestView.prototype.render = function() {
+      return $('#test').replaceWith(testTemplate);
+    };
+
+    TestView.prototype.addOne = function(result) {
+      var view;
+      view = new ResultView({
+        model: result
+      });
+      return view.render();
+    };
+
+    TestView.prototype.addAll = function() {
+      this.render();
+      return this.collection.models.forEach(this.addOne);
+    };
+
+    TestView.prototype.getTestResults = function() {
+      return app.sample.test();
+    };
+
+    TestView.prototype.clear = function() {
+      return this.collection.reset();
+    };
+
+    return TestView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "routers/main_router": function(exports, require, module) {
+    (function() {
+  var __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  exports.MainRouter = (function(_super) {
+
+    __extends(MainRouter, _super);
+
+    function MainRouter() {
+      MainRouter.__super__.constructor.apply(this, arguments);
+    }
+
+    MainRouter.prototype.routes = {
+      '': 'home',
+      'next': 'home'
+    };
+
+    MainRouter.prototype.home = function() {
+      $('body').html(app.homeView.render().el);
+      return app.sample.fetch();
+    };
+
+    return MainRouter;
+
+  })(Backbone.Router);
+
+}).call(this);
+
+  }
+}));
 (this.require.define({
   "views/chunk_view": function(exports, require, module) {
     (function() {
@@ -11387,7 +11485,6 @@ window.jQuery = window.$ = jQuery;
     };
 
     ChunkView.prototype.render = function() {
-      console.log("rendering chunk view");
       this.$(this.el).html(chunkTemplate({
         chunk: this.model
       }));
@@ -11400,7 +11497,6 @@ window.jQuery = window.$ = jQuery;
     };
 
     ChunkView.prototype.toggleAnonymize = function() {
-      console.log("toggling anonymize");
       return this.model.toggleAnonymize();
     };
 
@@ -11430,7 +11526,8 @@ window.jQuery = window.$ = jQuery;
 
     HomeView.prototype.events = {
       "click #reset": "resetString",
-      "click #next": "nextString"
+      "click #next": "nextString",
+      "click #save": "saveString"
     };
 
     HomeView.prototype.render = function() {
@@ -11455,7 +11552,12 @@ window.jQuery = window.$ = jQuery;
     };
 
     HomeView.prototype.nextString = function() {
-      app.sample.reset();
+      app.sample.fetch();
+      return false;
+    };
+
+    HomeView.prototype.saveString = function() {
+      app.sample.save();
       app.sample.fetch();
       return false;
     };
@@ -11492,7 +11594,6 @@ window.jQuery = window.$ = jQuery;
     };
 
     ReplaceView.prototype.render = function() {
-      console.log("rendering replace view");
       this.$(this.el).html(replaceTemplate({
         sample: this.model
       }));
@@ -11500,6 +11601,43 @@ window.jQuery = window.$ = jQuery;
     };
 
     return ReplaceView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/result_view": function(exports, require, module) {
+    (function() {
+  var resultTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  resultTemplate = require('./templates/result');
+
+  exports.ResultView = (function(_super) {
+
+    __extends(ResultView, _super);
+
+    function ResultView() {
+      this.render = __bind(this.render, this);
+      ResultView.__super__.constructor.apply(this, arguments);
+    }
+
+    ResultView.prototype.initialize = function() {
+      return this.model.bind('all', this.render);
+    };
+
+    ResultView.prototype.render = function() {
+      return $("#test").append(resultTemplate({
+        result: this.model
+      }));
+    };
+
+    return ResultView;
 
   })(Backbone.View);
 
@@ -11531,7 +11669,6 @@ window.jQuery = window.$ = jQuery;
     };
 
     SearchView.prototype.render = function() {
-      console.log("rendering search view");
       this.$(this.el).html(searchTemplate({
         sample: this.model
       }));
@@ -11571,13 +11708,11 @@ window.jQuery = window.$ = jQuery;
     };
 
     StringView.prototype.render = function() {
-      console.log("rendering string view");
       return this;
     };
 
     StringView.prototype.addOne = function(chunk) {
       var view;
-      console.log("adding a chunk");
       view = new ChunkView({
         model: chunk
       });
@@ -11585,7 +11720,6 @@ window.jQuery = window.$ = jQuery;
     };
 
     StringView.prototype.addAll = function() {
-      console.log("adding all chunks");
       $("#string").empty();
       return app.sample.each(this.addOne);
     };
@@ -11601,7 +11735,7 @@ window.jQuery = window.$ = jQuery;
 (this.require.define({
   "initialize": function(exports, require, module) {
     (function() {
-  var BrunchApplication, HomeView, MainRouter, ReplaceView, Sample, SearchView, StringView,
+  var BrunchApplication, HomeView, MainRouter, ReplaceView, Sample, SearchView, StringView, TestResults, TestView,
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
@@ -11617,7 +11751,11 @@ window.jQuery = window.$ = jQuery;
 
   ReplaceView = require('views/replace_view').ReplaceView;
 
+  TestView = require('views/test_view').TestView;
+
   Sample = require('collections/sample').Sample;
+
+  TestResults = require('collections/test_results').TestResults;
 
   exports.Application = (function(_super) {
 
@@ -11631,6 +11769,7 @@ window.jQuery = window.$ = jQuery;
       this.router = new MainRouter;
       this.homeView = new HomeView;
       this.sample = new Sample;
+      this.test_results = new TestResults;
       this.views = {};
       this.views.stringView = new StringView({
         model: this.sample
@@ -11638,8 +11777,11 @@ window.jQuery = window.$ = jQuery;
       this.views.searchView = new SearchView({
         model: this.sample
       });
-      return this.views.replaceView = new ReplaceView({
+      this.views.replaceView = new ReplaceView({
         model: this.sample
+      });
+      return this.views.testView = new TestView({
+        collection: this.test_results
       });
     };
 
@@ -11680,6 +11822,155 @@ window.jQuery = window.$ = jQuery;
   }
 }));
 (this.require.define({
+  "collections/sample": function(exports, require, module) {
+    (function() {
+  var Chunk,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  Chunk = require('models/chunk').Chunk;
+
+  exports.Sample = (function(_super) {
+
+    __extends(Sample, _super);
+
+    function Sample() {
+      this.testCallback = __bind(this.testCallback, this);
+      Sample.__super__.constructor.apply(this, arguments);
+    }
+
+    Sample.prototype.model = Chunk;
+
+    Sample.prototype.url = '/next';
+
+    Sample.prototype.originalText = function() {
+      return this.models.map(function(chunk) {
+        return chunk.get('content');
+      }).join(' ');
+    };
+
+    Sample.prototype.searchText = function() {
+      var chunk;
+      return "" + (((function() {
+        var _i, _len, _ref, _results;
+        _ref = this.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          chunk = _ref[_i];
+          _results.push(chunk.searchText());
+        }
+        return _results;
+      }).call(this)).filter(Boolean).join(' '));
+    };
+
+    Sample.prototype.replaceText = function() {
+      var chunk;
+      return "" + (((function() {
+        var _i, _len, _ref, _results;
+        _ref = this.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          chunk = _ref[_i];
+          _results.push(chunk.replaceText());
+        }
+        return _results;
+      }).call(this)).filter(Boolean).join(' '));
+    };
+
+    Sample.prototype.groupChunks = function() {
+      var prev;
+      prev = false;
+      return this.models.forEach(function(chunk) {
+        if (chunk.get('anonymize')) {
+          if (prev) {
+            chunk.set({
+              collapse: true
+            });
+          } else {
+            chunk.set({
+              collapse: false
+            });
+          }
+          return prev = true;
+        } else {
+          return prev = false;
+        }
+      });
+    };
+
+    Sample.prototype.save = function() {
+      return this.post({
+        search: this.searchText(),
+        replace: this.replaceText()
+      }, "filters");
+    };
+
+    Sample.prototype.test = function() {
+      return this.post({
+        search: this.searchText(),
+        replace: this.replaceText()
+      }, "test_filter", this.testCallback);
+    };
+
+    Sample.prototype.testCallback = function(results) {
+      if (results['regex'] === ("" + (this.searchText()))) {
+        return app.test_results.reset(results['results']);
+      }
+    };
+
+    Sample.prototype.testFailback = function(results) {
+      return console.log(results);
+    };
+
+    Sample.prototype.post = function(data, url, callback, failback) {
+      return $.ajax({
+        type: "POST",
+        url: url,
+        data: JSON.stringify(data),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: callback,
+        failure: failback
+      });
+    };
+
+    return Sample;
+
+  })(Backbone.Collection);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "collections/test_results": function(exports, require, module) {
+    (function() {
+  var TestResult,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  TestResult = require('models/test_result').TestResult;
+
+  exports.TestResults = (function(_super) {
+
+    __extends(TestResults, _super);
+
+    function TestResults() {
+      TestResults.__super__.constructor.apply(this, arguments);
+    }
+
+    TestResults.prototype.model = TestResult;
+
+    return TestResults;
+
+  })(Backbone.Collection);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
   "models/chunk": function(exports, require, module) {
     (function() {
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
@@ -11714,7 +12005,7 @@ window.jQuery = window.$ = jQuery;
       if (this.get('anonymize') && this.get('collapse') !== true) {
         return '(.*)';
       } else if (!this.get('anonymize')) {
-        return this.get('content');
+        return XRegExp.escape(this.get('content'));
       }
     };
 
@@ -11739,32 +12030,27 @@ window.jQuery = window.$ = jQuery;
   }
 }));
 (this.require.define({
-  "routers/main_router": function(exports, require, module) {
+  "models/test_result": function(exports, require, module) {
     (function() {
   var __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  exports.MainRouter = (function(_super) {
+  exports.TestResult = (function(_super) {
 
-    __extends(MainRouter, _super);
+    __extends(TestResult, _super);
 
-    function MainRouter() {
-      MainRouter.__super__.constructor.apply(this, arguments);
+    function TestResult() {
+      TestResult.__super__.constructor.apply(this, arguments);
     }
 
-    MainRouter.prototype.routes = {
-      '': 'home',
-      'next': 'home'
+    TestResult.prototype.defaults = {
+      raw: null,
+      redacted: null
     };
 
-    MainRouter.prototype.home = function() {
-      $('body').html(app.homeView.render().el);
-      return app.sample.fetch();
-    };
+    return TestResult;
 
-    return MainRouter;
-
-  })(Backbone.Router);
+  })(Backbone.Model);
 
 }).call(this);
 
@@ -11819,54 +12105,6 @@ window.jQuery = window.$ = jQuery;
   }
 }));
 (this.require.define({
-  "views/templates/replace": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
-    (function() {
-    
-      _print(this.sample.replaceText());
-    
-      _print(_safe('\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
-  }
-}));
-(this.require.define({
   "views/templates/home": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
@@ -11890,7 +12128,111 @@ window.jQuery = window.$ = jQuery;
     };
     (function() {
     
-      _print(_safe('<div id="string">\n  This is a string to be anonymized\n</div>\n\n<div id="filter">\n  <div id="search">\n    /this is a search/\n  </div>\n  &rArr;\n  <div id="replace">\n    \'which will replace\'\n  </div>\n</div>\n\n<div id="controls">\n  <a id="save" href="#save">Save</a>\n  <a id="reset" href="#reset">Reset</a>\n  <a id="next" href="#next">Next&rarr;</a>\n\n<div id="text">\n  <div id="original">\n    <ul>\n      <li>Example 1</li>\n      <li>Example 2</li>\n    </ul>\n  </div>\n  <div id="filtered">\n    <ul>\n      <li>Redacted 1</li>\n      <li>Redacted 2</li>\n    </ul>\n  </div>\n</div>\n'));
+      _print(_safe('<div id="string">\n  This is a string to be anonymized\n</div>\n\n<div id="filter">\n  <div id="search">\n    /this is a search/\n  </div>\n  &rArr;\n  <div id="replace">\n    \'which will replace\'\n  </div>\n</div>\n\n<div id="controls">\n  <a id="save" href="#save">Save</a>\n  <a id="reset" href="#reset">Reset</a>\n  <a id="next" href="#next">Next&rarr;</a>\n</div>\n\n<table id="test"></table>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "views/templates/replace": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(_safe('"'));
+    
+      _print(this.sample.replaceText());
+    
+      _print(_safe('"\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "views/templates/result": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(_safe('<tr>\n  <td class="raw">'));
+    
+      _print(this.result.get('raw'));
+    
+      _print(_safe('</td>\n  <td class="divider">&rArr;</td>\n  <td class="redacted">'));
+    
+      _print(this.result.get('redacted'));
+    
+      _print(_safe('</td>\n</tr>\n'));
     
     }).call(this);
     
@@ -11936,9 +12278,11 @@ window.jQuery = window.$ = jQuery;
     };
     (function() {
     
+      _print(_safe('/'));
+    
       _print(this.sample.searchText());
     
-      _print(_safe('\n'));
+      _print(_safe('/\n'));
     
     }).call(this);
     
@@ -12009,86 +12353,48 @@ window.jQuery = window.$ = jQuery;
   }
 }));
 (this.require.define({
-  "collections/sample": function(exports, require, module) {
+  "views/templates/test": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
     (function() {
-  var Chunk,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  Chunk = require('models/chunk').Chunk;
-
-  exports.Sample = (function(_super) {
-
-    __extends(Sample, _super);
-
-    function Sample() {
-      Sample.__super__.constructor.apply(this, arguments);
-    }
-
-    Sample.prototype.model = Chunk;
-
-    Sample.prototype.url = '/next';
-
-    Sample.prototype.originalText = function() {
-      return this.models.map(function(chunk) {
-        return chunk.get('content');
-      }).join(' ');
-    };
-
-    Sample.prototype.searchText = function() {
-      var chunk;
-      return "/" + (((function() {
-        var _i, _len, _ref, _results;
-        _ref = this.models;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          chunk = _ref[_i];
-          _results.push(chunk.searchText());
-        }
-        return _results;
-      }).call(this)).join(' ')) + "/";
-    };
-
-    Sample.prototype.replaceText = function() {
-      var chunk;
-      return "\"" + (((function() {
-        var _i, _len, _ref, _results;
-        _ref = this.models;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          chunk = _ref[_i];
-          _results.push(chunk.replaceText());
-        }
-        return _results;
-      }).call(this)).join(' ')) + "\"";
-    };
-
-    Sample.prototype.groupChunks = function() {
-      var prev;
-      prev = false;
-      return this.models.forEach(function(chunk) {
-        if (chunk.get('anonymize')) {
-          if (prev) {
-            chunk.set({
-              collapse: true
-            });
-          } else {
-            chunk.set({
-              collapse: false
-            });
-          }
-          return prev = true;
-        } else {
-          return prev = false;
-        }
-      });
-    };
-
-    return Sample;
-
-  })(Backbone.Collection);
-
-}).call(this);
-
+    
+      _print(_safe('<table id="test">\n</table>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
   }
 }));

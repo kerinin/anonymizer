@@ -13,7 +13,6 @@ class exports.ChunkView extends Backbone.View
     @model.view = this
 
   render: =>
-    console.log("rendering chunk view")
     @$(@el).html chunkTemplate chunk: @model
     if @model.get('anonymize')
       @$(@el).addClass('anonymize')
@@ -23,5 +22,4 @@ class exports.ChunkView extends Backbone.View
     this
 
   toggleAnonymize: ->
-    console.log("toggling anonymize")
     @model.toggleAnonymize()

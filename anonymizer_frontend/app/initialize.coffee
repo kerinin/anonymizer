@@ -1,10 +1,14 @@
 {BrunchApplication} = require 'helpers'
 {MainRouter} = require 'routers/main_router'
+
 {HomeView} = require 'views/home_view'
 {StringView} = require 'views/string_view'
 {SearchView} = require 'views/search_view'
 {ReplaceView} = require 'views/replace_view'
+{TestView} = require 'views/test_view'
+
 {Sample} = require 'collections/sample'
+{TestResults} = require 'collections/test_results'
 
 class exports.Application extends BrunchApplication
   # This callback would be executed on document ready event.
@@ -14,9 +18,11 @@ class exports.Application extends BrunchApplication
     @router = new MainRouter
     @homeView = new HomeView
     @sample = new Sample
+    @test_results = new TestResults
     @views = {}
     @views.stringView = new StringView model: @sample
     @views.searchView = new SearchView model: @sample
     @views.replaceView = new ReplaceView model: @sample
+    @views.testView = new TestView collection: @test_results
 
 window.app = new exports.Application

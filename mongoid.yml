@@ -1,0 +1,6 @@
+development:
+  host: "localhost"
+  database: "filtermaker"
+
+host: "localhost"
+database: "anonymizer"

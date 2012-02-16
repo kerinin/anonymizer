@@ -1,1 +1,1 @@
-<%= @sample.replaceText() %>
+"<%= @sample.replaceText() %>"
