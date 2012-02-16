@@ -12,6 +12,10 @@ a, a:visited
 a:hover
   color #665248
 
+::selection
+  background #F95A5A
+  color white
+
 #home-view
   text-align center
 
@@ -21,7 +25,6 @@ a:hover
     -webkit-border-radius 4px
     -moz-border-radius 4px
     border-radius 4px
-
 
 
 /* Default font settings */
@@ -78,22 +81,10 @@ li
   margin-top 100px
   padding 0 5px
 
-  .chunk
-    cursor pointer
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    -o-user-select: none;
-    user-select: none;
-
-  .chunk:hover
-    border-top: 1px solid #ddd
-    border-bottom: 1px solid #ddd
-
   .chunk.anonymize
     color #F95A5A
+    border-left 1px dotted #F95A5A
+    border-right 1px dotted #F95A5A
 
 #filter
   font-weight normal

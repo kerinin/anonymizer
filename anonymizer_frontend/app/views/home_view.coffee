@@ -10,10 +10,10 @@ class exports.HomeView extends Backbone.View
   render: ->
     $(@el).html require('./templates/home')
     
-    $(@el).find('#string').empty()
-    $(@el).find('#string').html( app.views.stringView.render().el )
-    $(@el).find('#search').html( app.views.searchView.render().el )
-    $(@el).find('#replace').replaceWith( app.views.replaceView.render().el )
+    @$('#string').html( app.views.stringView.render().el )
+    @$('#search').html( app.views.searchView.render().el )
+    @$('#replace').replaceWith( app.views.replaceView.render().el )
+    @$('#test').replaceWith( app.views.testView.render().el )
     this
 
   resetString: ->

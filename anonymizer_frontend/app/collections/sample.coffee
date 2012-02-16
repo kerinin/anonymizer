@@ -9,13 +9,13 @@ class exports.Sample extends Backbone.Collection
   originalText: ->
     @models.map (chunk) ->
       chunk.get 'content'
-    .join(' ')
+    .join()
 
   searchText: ->
-    "#{(chunk.searchText() for chunk in @models).filter(Boolean).join(' ')}"
+    (chunk.searchText() for chunk in @models).filter(Boolean).join('')
 
   replaceText: ->
-    "#{(chunk.replaceText() for chunk in @models).filter(Boolean).join(' ')}"
+    (chunk.replaceText() for chunk in @models).filter(Boolean).join('')
 
   groupChunks: ->
     prev = false

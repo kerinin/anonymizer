@@ -12,11 +12,11 @@ class exports.TestView extends Backbone.View
     @collection.bind 'reset', @addAll
 
   render: ->
-    $('#test').replaceWith testTemplate
+    $(@el).replaceWith testTemplate
 
   addOne: (result) ->
     view = new ResultView model: result
-    view.render()
+    $(@el).append( view.render().el )
 
   addAll: =>
     @render()

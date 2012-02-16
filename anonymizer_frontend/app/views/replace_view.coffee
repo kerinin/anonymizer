@@ -8,7 +8,7 @@ class exports.ReplaceView extends Backbone.View
     @collection.bind 'all', @render
 
   render: =>
-    @$(@el).html replaceTemplate sample: @collection
+    @$(@el).html '<span>'
     @collection.models.forEach (chunk) =>
       view = new ChunkReplaceView model: chunk
       @$(@el).children("span").append view.render().el

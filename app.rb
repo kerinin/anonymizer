@@ -77,7 +77,8 @@ end
 get '/next' do
   query = Subject.where(:matched.ne => true)
   line = query.skip( rand(query.count) ).first.text
-  chunks = line.split(' ').map {|text| {:content => text}}
+  #chunks = line.split(' ').map {|text| {:content => text}}
+  chunks = {:content => line}
   
   content_type :json
   chunks.to_json

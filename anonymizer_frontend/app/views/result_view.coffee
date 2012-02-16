@@ -6,4 +6,4 @@ class exports.ResultView extends Backbone.View
     @model.bind 'all', @render
 
   render: =>
-    $("#test").append resultTemplate result: @model
+    $(@el).html resultTemplate result: @model
