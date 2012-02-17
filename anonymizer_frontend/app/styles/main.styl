@@ -1,3 +1,6 @@
+accent = #F95A5A
+shadow = #aaa
+
 body
   background #91A2C0
   font normal 18px "Helvetica Neue", Arial, Helvetica, sans-serif
@@ -6,14 +9,14 @@ ul
   list-style-type none
 
 a, a:visited
-  color #F95A5A
+  color accent
   text-decoration none
 
 a:hover
   color #665248
 
 ::selection
-  background #F95A5A
+  background accent
   color white
 
 #home-view
@@ -56,10 +59,10 @@ p
   margin 0 0 1.5em
 
 a:focus, a:hover
-  color #F95A5A
+  color accent
   text-decoration underline
 a
-  color #F95A5A
+  color accent
   text-decoration none
 
 /* Lists */
@@ -82,9 +85,9 @@ li
   padding 0 5px
 
   .chunk.anonymize
-    color #F95A5A
-    border-left 1px dotted #F95A5A
-    border-right 1px dotted #F95A5A
+    color accent
+    border-left 1px dotted accent
+    border-right 1px dotted accent
     cursor pointer
 
 #filter
@@ -109,13 +112,13 @@ li
     border-radius 8px
     &:hover
       text-decoration none
-      box-shadow 0px 0px 10px #aaa
+      box-shadow 0px 0px 10px shadow
 
   #save
-    background #F95A5A
+    background accent
     color white
   #reset, #next, #add
-    border 4px solid #F95A5A
+    border 4px solid accent
     padding 4px 11px
   #add
     position fixed
@@ -148,4 +151,22 @@ li
     text-align left
     width 47%
 
-    
+#chunk_edit_view
+  background rgba(255,255,255,.75)
+  z-index 1000
+  position absolute
+  left 0
+  top 0
+  right 0
+  bottom 0    
+
+  #container
+    margin-top 50px
+    background white
+    border 5px solid accent
+    border-radius 20px
+    box-shadow 0px 0px 20px shadow
+    width 400px
+    height auto
+    margin-left auto
+    margin-right auto

@@ -25,7 +25,9 @@ class exports.ChunkView extends Backbone.View
 
   handleMouseUp: ->
     if @model.get 'anonymize'
-      @toggleAnonymize()
+      #@toggleAnonymize()
+      app.router.navigate("/edit/chunk/#{@model.index()}", {trigger: true})
+      return false
     else
       @createChunk()
 
