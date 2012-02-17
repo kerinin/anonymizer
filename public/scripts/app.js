@@ -11750,8 +11750,11 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 (this.require.define({
   "routers/main_router": function(exports, require, module) {
     (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
+  var CreateView,
+    __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  CreateView = require('views/create/create_view').CreateView;
 
   exports.MainRouter = (function(_super) {
 
@@ -11767,7 +11770,9 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
 
     MainRouter.prototype.create = function() {
-      $('body').html(app.createView.render().el);
+      var view;
+      view = new CreateView;
+      $('body').html(view.render().el);
       return app.sample.fetch();
     };
 
@@ -11964,66 +11969,49 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "initialize": function(exports, require, module) {
-    (function() {
-  var BrunchApplication, CreateView, MainRouter, ReplaceView, Sample, SearchView, StringView, TestResults, TestView,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  BrunchApplication = require('helpers').BrunchApplication;
-
-  MainRouter = require('routers/main_router').MainRouter;
-
-  CreateView = require('views/create/create_view').CreateView;
-
-  StringView = require('views/create/_string_view').StringView;
-
-  SearchView = require('views/create/_search_view').SearchView;
-
-  ReplaceView = require('views/create/_replace_view').ReplaceView;
-
-  TestView = require('views/create/_test_view').TestView;
-
-  Sample = require('collections/sample').Sample;
-
-  TestResults = require('collections/test_results').TestResults;
-
-  exports.Application = (function(_super) {
-
-    __extends(Application, _super);
-
-    function Application() {
-      Application.__super__.constructor.apply(this, arguments);
-    }
-
-    Application.prototype.initialize = function() {
-      this.router = new MainRouter;
-      this.createView = new CreateView;
-      this.sample = new Sample;
-      this.test_results = new TestResults;
-      this.views = {};
-      this.views.stringView = new StringView({
-        model: this.sample
-      });
-      this.views.searchView = new SearchView({
-        model: this.sample
-      });
-      this.views.replaceView = new ReplaceView({
-        collection: this.sample
-      });
-      return this.views.testView = new TestView({
-        collection: this.test_results
-      });
+  "views/create/templates/create": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
     };
-
-    return Application;
-
-  })(BrunchApplication);
-
-  window.app = new exports.Application;
-
-}).call(this);
-
+    (function() {
+    
+      _print(_safe('<div id="string">\n  This is a string to be anonymized\n</div>\n\n<div id="filter">\n  <div id="search">\n    /this is a search/\n  </div>\n  <div style="font-size: 40px">&dArr;</div>\n  <div id="replace">\n    \'which will replace\'\n  </div>\n</div>\n\n<div id="controls">\n  <a id="reset" href="#reset">! Reset</a>\n  <a id="save" href="#save">Save</a>\n  <a id="next" href="#next">Next &rarr;</a>\n</div>\n\n<table id="test"></table>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
   }
 }));
 (this.require.define({
@@ -12228,8 +12216,17 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 (this.require.define({
   "views/create/create_view": function(exports, require, module) {
     (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
+  var ReplaceView, SearchView, StringView, TestView,
+    __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  StringView = require('views/create/_string_view').StringView;
+
+  SearchView = require('views/create/_search_view').SearchView;
+
+  ReplaceView = require('views/create/_replace_view').ReplaceView;
+
+  TestView = require('views/create/_test_view').TestView;
 
   exports.CreateView = (function(_super) {
 
@@ -12247,12 +12244,27 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       "click #save": "saveString"
     };
 
+    CreateView.prototype.initialize = function() {
+      this.stringView = new StringView({
+        model: app.sample
+      });
+      this.searchView = new SearchView({
+        model: app.sample
+      });
+      this.replaceView = new ReplaceView({
+        collection: app.sample
+      });
+      return this.testView = new TestView({
+        collection: app.test_results
+      });
+    };
+
     CreateView.prototype.render = function() {
       $(this.el).html(require('./templates/create'));
-      this.$('#string').html(app.views.stringView.render().el);
-      this.$('#search').html(app.views.searchView.render().el);
-      this.$('#replace').replaceWith(app.views.replaceView.render().el);
-      this.$('#test').replaceWith(app.views.testView.render().el);
+      this.$('#string').html(this.stringView.render().el);
+      this.$('#search').html(this.searchView.render().el);
+      this.$('#replace').replaceWith(this.replaceView.render().el);
+      this.$('#test').replaceWith(this.testView.render().el);
       return this;
     };
 
@@ -12640,48 +12652,41 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "views/create/templates/create": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
+  "initialize": function(exports, require, module) {
     (function() {
-    
-      _print(_safe('<div id="string">\n  This is a string to be anonymized\n</div>\n\n<div id="filter">\n  <div id="search">\n    /this is a search/\n  </div>\n  <div style="font-size: 40px">&dArr;</div>\n  <div id="replace">\n    \'which will replace\'\n  </div>\n</div>\n\n<div id="controls">\n  <a id="reset" href="#reset">! Reset</a>\n  <a id="save" href="#save">Save</a>\n  <a id="next" href="#next">Next &rarr;</a>\n</div>\n\n<table id="test"></table>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
+  var BrunchApplication, MainRouter, Sample, TestResults,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  BrunchApplication = require('helpers').BrunchApplication;
+
+  MainRouter = require('routers/main_router').MainRouter;
+
+  Sample = require('collections/sample').Sample;
+
+  TestResults = require('collections/test_results').TestResults;
+
+  exports.Application = (function(_super) {
+
+    __extends(Application, _super);
+
+    function Application() {
+      Application.__super__.constructor.apply(this, arguments);
+    }
+
+    Application.prototype.initialize = function() {
+      this.router = new MainRouter;
+      this.sample = new Sample;
+      return this.test_results = new TestResults;
+    };
+
+    return Application;
+
+  })(BrunchApplication);
+
+  window.app = new exports.Application;
+
+}).call(this);
+
   }
 }));

@@ -1,8 +1,11 @@
+{CreateView} = require 'views/create/create_view'
+
 class exports.MainRouter extends Backbone.Router
   routes :
     '': 'create'
     'create': 'create'
 
   create: ->
-    $('body').html app.createView.render().el
+    view = new CreateView
+    $('body').html view.render().el
     app.sample.fetch()

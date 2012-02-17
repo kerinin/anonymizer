@@ -1,3 +1,8 @@
+{StringView} = require 'views/create/_string_view'
+{SearchView} = require 'views/create/_search_view'
+{ReplaceView} = require 'views/create/_replace_view'
+{TestView} = require 'views/create/_test_view'
+
 class exports.CreateView extends Backbone.View
   id: 'home-view'
 
@@ -7,13 +12,20 @@ class exports.CreateView extends Backbone.View
     "click #save": "saveString"
 
 
+  initialize: ->
+    @stringView = new StringView model: app.sample
+    @searchView = new SearchView model: app.sample
+    @replaceView = new ReplaceView collection: app.sample
+    @testView = new TestView collection: app.test_results
+
   render: ->
     $(@el).html require('./templates/create')
     
-    @$('#string').html( app.views.stringView.render().el )
-    @$('#search').html( app.views.searchView.render().el )
-    @$('#replace').replaceWith( app.views.replaceView.render().el )
-    @$('#test').replaceWith( app.views.testView.render().el )
+    @$('#string').html( @stringView.render().el )
+    @$('#search').html( @searchView.render().el )
+    @$('#replace').replaceWith( @replaceView.render().el )
+    @$('#test').replaceWith( @testView.render().el )
+
     this
 
   resetString: ->
