@@ -7,7 +7,6 @@ class exports.Chunk extends Backbone.Model
 
   toggleAnonymize: =>
     @set anonymize: not @get 'anonymize'
-    @collection.groupChunks()
 
   searchText: ->
     if @get('anonymize') and @get('collapse') isnt true
@@ -21,3 +20,10 @@ class exports.Chunk extends Backbone.Model
     else if not @get 'anonymize'
       @get 'content'
 
+  index: =>
+    @collection.models.indexOf this
+
+  replaceWith: (chunks) ->
+    @collection.add chunks.reverse(), {at: @index(), silent: true}
+    @collection.remove this
+ 

@@ -32,35 +32,42 @@ class exports.ChunkView extends Backbone.View
   toggleAnonymize: ->
     @model.toggleAnonymize()
 
-  createChunk: ->
-    selection = window.getSelection()
-    chunk_range = selection.getRangeAt(0)
+  getRangeFromSelection: ->
+    window.getSelection().getRangeAt(0)
+
+  clearSelection: ->
+    window.getSelection().empty()
+
+  rangeCrossesChunks: (range) ->
+    range.startContainer isnt range.endContainer
+
+  getTextFromRange: (range) ->
+    range.cloneContents().textContent
+
+  getTextBeforeRange: (range) ->
+    pre_range = range.cloneRange()
+    pre_range.setStartBefore(range.startContainer)
+    pre_range.setEnd(range.startContainer, range.startOffset)
+    @getTextFromRange pre_range
+
+  getTextAfterRange: (range) ->
+    post_range = range.cloneRange()
+    post_range.setEndAfter(range.endContainer)
+    post_range.setStart(range.endContainer, range.endOffset)
+    @getTextFromRange post_range
     
-    if chunk_range.startContainer isnt chunk_range.endContainer
-      # selection crosses an anonymized chunk (or worse)
-      #
+  createChunk: ->
+    chunk_range = @getRangeFromSelection()
+
+    if @rangeCrossesChunks(chunk_range)
       alert("NO! don't select the red bits")
     else
-      pre_range = chunk_range.cloneRange()
-      pre_range.setStartBefore(chunk_range.startContainer)
-      pre_range.setEnd(chunk_range.startContainer, chunk_range.startOffset)
-      
-      post_range = chunk_range.cloneRange()
-      post_range.setEndAfter(chunk_range.endContainer)
-      post_range.setStart(chunk_range.endContainer, chunk_range.endOffset)
+      pre = new Chunk content: @getTextBeforeRange(chunk_range)
+      chunk = new Chunk content: @getTextFromRange(chunk_range), anonymize: true
+      post = new Chunk content: @getTextAfterRange(chunk_range)
 
-      pre = new Chunk content: pre_range.cloneContents().textContent
-      chunk = new Chunk content: chunk_range.cloneContents().textContent, anonymize: true
-      post = new Chunk content: post_range.cloneContents().textContent
-
-      chunkIndex = @model.collection.models.indexOf(@model)
-      collection = @model.collection
-      collection.add ( item for item in [pre,chunk,post] when item.get("content") isnt '' )
-      collection.remove(@model)
-      collection.groupChunks()
+      @model.replaceWith( ( i for i in [pre,chunk,post] when i.get("content") isnt '') )
       @remove
-
-    selection.empty()
 
   remove: ->
     $(@el).remove()

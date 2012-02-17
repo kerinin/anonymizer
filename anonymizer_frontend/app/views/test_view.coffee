@@ -17,9 +17,7 @@ class exports.TestView extends Backbone.View
     this
 
   addOne: (result) =>
-    console.log $(@el)
     view = new ResultView model: result
-    console.log view.render().el
     $(@el).append( view.render().el )
 
   addAll: =>

@@ -16,5 +16,4 @@ class exports.ChunkReplaceView extends Backbone.View
 
   updateAlias: ->
     if @model.get('anonymize')
-      console.log "upadte alias"
       @model.set alias: @$('input').val()

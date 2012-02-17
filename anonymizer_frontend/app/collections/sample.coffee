@@ -6,6 +6,11 @@ class exports.Sample extends Backbone.Collection
 
   url: '/next'
 
+  initialize: =>
+    @bind 'add', this.groupChunks
+    @bind 'remove', this.groupChunks
+    @bind 'change:anonymize', this.groupChunks
+
   originalText: ->
     @models.map (chunk) ->
       chunk.get 'content'
@@ -17,17 +22,11 @@ class exports.Sample extends Backbone.Collection
   replaceText: ->
     (chunk.replaceText() for chunk in @models).filter(Boolean).join('')
 
-  groupChunks: ->
-    prev = false
-    @models.forEach (chunk) ->
-      if chunk.get 'anonymize'
-        if prev
-          chunk.set collapse: true
-        else
-          chunk.set collapse: false
-        prev = true
-      else
-        prev = false
+  groupChunks: =>
+    [0..(@length-1)].forEach (i) =>
+      if i>0 and @at(i-1) and @at(i) and @at(i-1).get('anonymize') is @at(i).get('anonymize')
+        @at(i-1).set content: @at(i-1).get('content') + @at(i).get('content')
+        @remove @at(i)
 
   save: ->
     @post 
