@@ -6,6 +6,8 @@ class Filter
 
   field :search, type: String
   field :replace, type: String
+  index :search
+  index :replace
 
   def regex
     Regexp.new search

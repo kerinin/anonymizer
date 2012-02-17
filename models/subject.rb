@@ -5,4 +5,5 @@ class Subject
   
   field :text, :type => String
   field :matched, :type => Boolean, :default => false
+  index :matched
 end

@@ -217,7 +217,7 @@ a{color:#f95a5a;text-decoration:none}
 ul,ol{margin:0;padding:0;list-style-type:none}
 li{margin:0;padding:5px}
 #string{font-weight:normal;font-size:36px;font-family:Helvetica,Arial,sans-serif;line-height:50px;margin-top:100px;padding:0 5px;}
-#string .chunk.anonymize{color:#f95a5a;border-left:1px dotted #f95a5a;border-right:1px dotted #f95a5a}
+#string .chunk.anonymize{color:#f95a5a;border-left:1px dotted #f95a5a;border-right:1px dotted #f95a5a;cursor:pointer}
 #filter{font-weight:normal;font-size:18px;font-family:Monaco,Courier,monospace;margin-top:40px;}
 #filter #replace input{width:4em}
 #controls{font-size:14px;font-family:Helvetica,Arial,sans-serif;font-weight:bold;margin-top:40px;}
@@ -229,9 +229,9 @@ li{margin:0;padding:5px}
 #test{font-weight:normal;font-size:14px;font-family:Helvetica,Arial,sans-serif;width:90%;margin-left:auto;margin-right:auto;margin-top:80px;}
 #test table{margin-left:auto;margin-right:auto}
 #test td{padding-bottom:10px}
-#test .raw{text-align:right;width:47%}
+#test .raw,#test .search{text-align:right;width:47%}
 #test .divider{width:20px}
-#test .redacted{text-align:left;width:47%}
+#test .redacted,#test .replace{text-align:left;width:47%}
 /* ==|== non-semantic helper classes ========================================
    Please define your styles before this section.
    ========================================================================== */

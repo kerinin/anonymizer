@@ -11,9 +11,13 @@
     #home-view
       %h1 Defined Filters
 
-      #text
-        -@filters.each do |filter|
-          %p="#{filter.search} => #{filter.replace}"
+      #test
+        %table
+          -@filters.each do |filter|
+            %tr
+              %td.search= filter.search
+              %td.divider &rArr;
+              %td.replace= filter.replace
 
       #controls
         %a{:id => 'add', :href => '/'}add more

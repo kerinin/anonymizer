@@ -96,7 +96,7 @@ post '/filters' do
 end
 
 get '/filters' do
-  @filters = Filter.all
+  @filters = Filter.order_by([:replace => :asc])
   haml :filters
 end
 
