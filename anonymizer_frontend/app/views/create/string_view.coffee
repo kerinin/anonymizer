@@ -1,4 +1,4 @@
-{ChunkView} = require 'views/chunk_view'
+{ChunkView} = require 'views/create/chunk_view'
 
 class exports.StringView extends Backbone.View
 

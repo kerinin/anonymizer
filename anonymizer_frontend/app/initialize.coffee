@@ -1,11 +1,11 @@
 {BrunchApplication} = require 'helpers'
 {MainRouter} = require 'routers/main_router'
 
-{HomeView} = require 'views/home_view'
-{StringView} = require 'views/string_view'
-{SearchView} = require 'views/search_view'
-{ReplaceView} = require 'views/replace_view'
-{TestView} = require 'views/test_view'
+{HomeView} = require 'views/create/home_view'
+{StringView} = require 'views/create/string_view'
+{SearchView} = require 'views/create/search_view'
+{ReplaceView} = require 'views/create/replace_view'
+{TestView} = require 'views/create/test_view'
 
 {Sample} = require 'collections/sample'
 {TestResults} = require 'collections/test_results'
