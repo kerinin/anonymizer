@@ -11882,66 +11882,49 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "initialize": function(exports, require, module) {
-    (function() {
-  var BrunchApplication, HomeView, MainRouter, ReplaceView, Sample, SearchView, StringView, TestResults, TestView,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  BrunchApplication = require('helpers').BrunchApplication;
-
-  MainRouter = require('routers/main_router').MainRouter;
-
-  HomeView = require('views/home_view').HomeView;
-
-  StringView = require('views/string_view').StringView;
-
-  SearchView = require('views/search_view').SearchView;
-
-  ReplaceView = require('views/replace_view').ReplaceView;
-
-  TestView = require('views/test_view').TestView;
-
-  Sample = require('collections/sample').Sample;
-
-  TestResults = require('collections/test_results').TestResults;
-
-  exports.Application = (function(_super) {
-
-    __extends(Application, _super);
-
-    function Application() {
-      Application.__super__.constructor.apply(this, arguments);
-    }
-
-    Application.prototype.initialize = function() {
-      this.router = new MainRouter;
-      this.homeView = new HomeView;
-      this.sample = new Sample;
-      this.test_results = new TestResults;
-      this.views = {};
-      this.views.stringView = new StringView({
-        model: this.sample
-      });
-      this.views.searchView = new SearchView({
-        model: this.sample
-      });
-      this.views.replaceView = new ReplaceView({
-        collection: this.sample
-      });
-      return this.views.testView = new TestView({
-        collection: this.test_results
-      });
+  "views/templates/test": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
     };
-
-    return Application;
-
-  })(BrunchApplication);
-
-  window.app = new exports.Application;
-
-}).call(this);
-
+    (function() {
+    
+      _print(_safe('<table id="test">\n</table>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
   }
 }));
 (this.require.define({
@@ -12043,7 +12026,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
         for (var _i = 0, _ref = this.length - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; 0 <= _ref ? _i++ : _i--){ _results.push(_i); }
         return _results;
       }).apply(this).forEach(function(i) {
-        if (i > 0 && _this.at(i - 1) && _this.at(i) && _this.at(i - 1).get('anonymize') === _this.at(i).get('anonymize')) {
+        if (i > 0 && _this.at(i - 1) && _this.at(i) && !_this.at(i - 1).get('anonymize') && !_this.at(i).get('anonymize')) {
           _this.at(i - 1).set({
             content: _this.at(i - 1).get('content') + _this.at(i).get('content')
           });
@@ -12135,8 +12118,8 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     __extends(Chunk, _super);
 
     function Chunk() {
+      this.anonymizedIndex = __bind(this.anonymizedIndex, this);
       this.index = __bind(this.index, this);
-      this.replaceText = __bind(this.replaceText, this);
       this.toggleAnonymize = __bind(this.toggleAnonymize, this);
       Chunk.__super__.constructor.apply(this, arguments);
     }
@@ -12145,7 +12128,11 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       content: '',
       anonymize: false,
       alias: 'redacted',
-      collapse: false
+      collapse: false,
+      type: 'glob',
+      options: [],
+      optional: false,
+      pass_through: false
     };
 
     Chunk.prototype.toggleAnonymize = function() {
@@ -12155,8 +12142,56 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
 
     Chunk.prototype.searchText = function() {
+      var match, matcher;
       if (this.get('anonymize') && this.get('collapse') !== true) {
-        return '(.*)';
+        matcher = (function() {
+          switch (this.get('type')) {
+            case 'set':
+              return "(" + (((function() {
+                var _i, _len, _ref, _results;
+                _ref = this.get("options");
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  match = _ref[_i];
+                  _results.push("(?:" + (XRegExp.escape(match)) + ")");
+                }
+                return _results;
+              }).call(this)).join('|')) + ")";
+            case 'char-set':
+              return "(" + (((function() {
+                var _i, _len, _ref, _results;
+                _ref = this.get("options");
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  match = _ref[_i];
+                  _results.push(XRegExp.escape(match));
+                }
+                return _results;
+              }).call(this)).join('|')) + ")";
+            case 'literal':
+              return "(?:" + (XRegExp.escape(this.get('content'))) + ")";
+            case 'numeric':
+              return '(\d*)';
+            case 'glob-excl':
+              return "([^" + (((function() {
+                var _i, _len, _ref, _results;
+                _ref = this.get("options");
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  match = _ref[_i];
+                  _results.push(XRegExp.escape(match));
+                }
+                return _results;
+              }).call(this)).join('|')) + "]*)";
+            default:
+              return '(.*)';
+          }
+        }).call(this);
+        if (this.get("optional")) {
+          return "" + matcher + "?";
+        } else {
+          return matcher;
+        }
       } else if (!this.get('anonymize')) {
         return XRegExp.escape(this.get('content'));
       }
@@ -12164,10 +12199,10 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     Chunk.prototype.replaceText = function() {
       if (this.get('anonymize') && this.get('collapse') !== true) {
-        if (this.get('alias')) {
-          return "<" + (this.get('alias')) + ">";
+        if (this.get("pass_through")) {
+          return "\\" + (this.anonymizedIndex() + 1);
         } else {
-          return "<redacted>";
+          return "<" + (this.get("alias")) + ">";
         }
       } else if (!this.get('anonymize')) {
         return this.get('content');
@@ -12176,6 +12211,20 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     Chunk.prototype.index = function() {
       return this.collection.models.indexOf(this);
+    };
+
+    Chunk.prototype.anonymizedIndex = function() {
+      var i;
+      return ((function() {
+        var _i, _len, _ref, _results;
+        _ref = this.collection.models;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          i = _ref[_i];
+          if (i.get("anonymize")) _results.push(i);
+        }
+        return _results;
+      }).call(this)).indexOf(this);
     };
 
     Chunk.prototype.replaceWith = function(chunks) {
@@ -12386,13 +12435,17 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     (function() {
     
       if (!this.chunk.get('collapse')) {
-        if (this.chunk.get('anonymize')) {
-          _print(_safe('&lt;<input value=\''));
+        _print(_safe('\n  '));
+        if (this.chunk.get('anonymize') && !this.chunk.get('pass_through')) {
+          _print(_safe('\n    &lt;<input value=\''));
           _print(this.chunk.get('alias'));
-          _print(_safe('\'/>&gt;'));
+          _print(_safe('\'/>&gt;\n  '));
         } else {
-          _print(this.chunk.get('content'));
+          _print(_safe('\n    '));
+          _print(this.chunk.replaceText());
+          _print(_safe('\n  '));
         }
+        _print(_safe('\n'));
       }
     
       _print(_safe('\n'));
@@ -12472,6 +12525,54 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
+  "views/templates/string": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(this.sample.original_text());
+    
+      _print(_safe('\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
   "views/templates/search": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
@@ -12522,96 +12623,65 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "views/templates/test": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
+  "initialize": function(exports, require, module) {
     (function() {
-    
-      _print(_safe('<table id="test">\n</table>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
-  }
-}));
-(this.require.define({
-  "views/templates/string": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
+  var BrunchApplication, HomeView, MainRouter, ReplaceView, Sample, SearchView, StringView, TestResults, TestView,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  BrunchApplication = require('helpers').BrunchApplication;
+
+  MainRouter = require('routers/main_router').MainRouter;
+
+  HomeView = require('views/home_view').HomeView;
+
+  StringView = require('views/string_view').StringView;
+
+  SearchView = require('views/search_view').SearchView;
+
+  ReplaceView = require('views/replace_view').ReplaceView;
+
+  TestView = require('views/test_view').TestView;
+
+  Sample = require('collections/sample').Sample;
+
+  TestResults = require('collections/test_results').TestResults;
+
+  exports.Application = (function(_super) {
+
+    __extends(Application, _super);
+
+    function Application() {
+      Application.__super__.constructor.apply(this, arguments);
+    }
+
+    Application.prototype.initialize = function() {
+      this.router = new MainRouter;
+      this.homeView = new HomeView;
+      this.sample = new Sample;
+      this.test_results = new TestResults;
+      this.views = {};
+      this.views.stringView = new StringView({
+        model: this.sample
+      });
+      this.views.searchView = new SearchView({
+        model: this.sample
+      });
+      this.views.replaceView = new ReplaceView({
+        collection: this.sample
+      });
+      return this.views.testView = new TestView({
+        collection: this.test_results
+      });
     };
-    (function() {
-    
-      _print(this.sample.original_text());
-    
-      _print(_safe('\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
+
+    return Application;
+
+  })(BrunchApplication);
+
+  window.app = new exports.Application;
+
+}).call(this);
+
   }
 }));

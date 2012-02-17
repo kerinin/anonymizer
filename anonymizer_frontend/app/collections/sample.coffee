@@ -24,7 +24,7 @@ class exports.Sample extends Backbone.Collection
 
   groupChunks: =>
     [0..(@length-1)].forEach (i) =>
-      if i>0 and @at(i-1) and @at(i) and @at(i-1).get('anonymize') is @at(i).get('anonymize')
+      if i>0 and @at(i-1) and @at(i) and !@at(i-1).get('anonymize') and !@at(i).get('anonymize')
         @at(i-1).set content: @at(i-1).get('content') + @at(i).get('content')
         @remove @at(i)
 
