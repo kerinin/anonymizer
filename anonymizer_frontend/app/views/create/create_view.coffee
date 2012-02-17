@@ -1,4 +1,4 @@
-class exports.HomeView extends Backbone.View
+class exports.CreateView extends Backbone.View
   id: 'home-view'
 
   events:
@@ -8,7 +8,7 @@ class exports.HomeView extends Backbone.View
 
 
   render: ->
-    $(@el).html require('./templates/home')
+    $(@el).html require('./templates/create')
     
     @$('#string').html( app.views.stringView.render().el )
     @$('#search').html( app.views.searchView.render().el )

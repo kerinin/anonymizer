@@ -1,5 +1,5 @@
-{ChunkReplaceView} = require 'views/create/chunk_replace_view'
-replaceTemplate = require './templates/replace'
+{ChunkReplaceView} = require 'views/create/_chunk_replace_view'
+replaceTemplate = require './templates/_replace'
 
 class exports.ReplaceView extends Backbone.View
   id: "replace"

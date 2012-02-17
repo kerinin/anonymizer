@@ -1,4 +1,4 @@
-resultTemplate = require './templates/result'
+resultTemplate = require './templates/_result'
 
 class exports.ResultView extends Backbone.View
 

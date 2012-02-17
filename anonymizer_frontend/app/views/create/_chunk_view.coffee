@@ -1,5 +1,5 @@
 {Chunk} = require 'models/chunk'
-chunkTemplate = require './templates/chunk'
+chunkTemplate = require './templates/_chunk'
 
 class exports.ChunkView extends Backbone.View
 

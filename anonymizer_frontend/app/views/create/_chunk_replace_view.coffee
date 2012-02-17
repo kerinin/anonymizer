@@ -1,4 +1,4 @@
-chunkReplaceTemplate = require './templates/replace_chunk'
+chunkReplaceTemplate = require './templates/_replace_chunk'
 
 class exports.ChunkReplaceView extends Backbone.View
   tagName: 'span'

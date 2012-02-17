@@ -1,4 +1,4 @@
-searchTemplate = require './templates/search'
+searchTemplate = require './templates/_search'
 
 class exports.SearchView extends Backbone.View
 

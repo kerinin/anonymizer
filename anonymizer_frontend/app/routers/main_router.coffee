@@ -1,8 +1,8 @@
 class exports.MainRouter extends Backbone.Router
   routes :
-    '': 'home'
-    'next': 'home'
+    '': 'create'
+    'create': 'create'
 
-  home: ->
-    $('body').html app.homeView.render().el
+  create: ->
+    $('body').html app.createView.render().el
     app.sample.fetch()

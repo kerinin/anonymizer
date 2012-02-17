@@ -1,11 +1,11 @@
 {BrunchApplication} = require 'helpers'
 {MainRouter} = require 'routers/main_router'
 
-{HomeView} = require 'views/create/home_view'
-{StringView} = require 'views/create/string_view'
-{SearchView} = require 'views/create/search_view'
-{ReplaceView} = require 'views/create/replace_view'
-{TestView} = require 'views/create/test_view'
+{CreateView} = require 'views/create/create_view'
+{StringView} = require 'views/create/_string_view'
+{SearchView} = require 'views/create/_search_view'
+{ReplaceView} = require 'views/create/_replace_view'
+{TestView} = require 'views/create/_test_view'
 
 {Sample} = require 'collections/sample'
 {TestResults} = require 'collections/test_results'
@@ -16,7 +16,7 @@ class exports.Application extends BrunchApplication
   # group things by their type e.g. `@views = {}; @views.home = new HomeView`.
   initialize: ->
     @router = new MainRouter
-    @homeView = new HomeView
+    @createView = new CreateView
     @sample = new Sample
     @test_results = new TestResults
     @views = {}

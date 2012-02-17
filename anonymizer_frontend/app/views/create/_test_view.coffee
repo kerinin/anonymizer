@@ -1,5 +1,5 @@
-{ResultView} = require 'views/create/result_view'
-testTemplate = require './templates/test'
+{ResultView} = require 'views/create/_result_view'
+testTemplate = require './templates/_test'
 
 class exports.TestView extends Backbone.View
   
