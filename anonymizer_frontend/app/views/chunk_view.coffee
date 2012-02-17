@@ -7,8 +7,7 @@ class exports.ChunkView extends Backbone.View
   className: 'chunk'
 
   events: 
-    #'click': 'toggleAnonymize'
-    'mouseup ': 'createChunk'
+    'mouseup': 'handleMouseUp'
 
   initialize: ->
     @model.bind 'all', @render
@@ -23,6 +22,12 @@ class exports.ChunkView extends Backbone.View
       @$(@el).removeClass('anonymize')
 
     this
+
+  handleMouseUp: ->
+    if @model.get 'anonymize'
+      @toggleAnonymize()
+    else
+      @createChunk()
 
   toggleAnonymize: ->
     @model.toggleAnonymize()

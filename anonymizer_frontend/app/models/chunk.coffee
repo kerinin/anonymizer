@@ -14,7 +14,6 @@ class exports.Chunk extends Backbone.Model
       '(.*)'
     else if not @get 'anonymize'
       XRegExp.escape @get 'content'
-      @get 'content'
         
   replaceText: =>
     if @get('anonymize') and @get('collapse') isnt true
