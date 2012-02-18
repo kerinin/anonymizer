@@ -1,6 +1,7 @@
 accent = #F95A5A
 shadow = #aaa
 light = #bbb
+extra_light = #eee
 
 body
   background #91A2C0
@@ -94,6 +95,11 @@ li
     border-right 1px dotted accent
     cursor pointer
 
+  span:hover
+    background extra_light
+  span.anonymize:hover
+    background white
+
 #filter
   font-weight normal
   font-size 18px
@@ -128,6 +134,13 @@ li
 
 #controls
   margin-top 40px
+
+  #stats
+    margin-top 20px
+    display block
+    font-weight normal
+    color light
+    font-size 12px
 
 #test
   font-weight normal

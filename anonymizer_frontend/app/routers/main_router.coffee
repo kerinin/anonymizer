@@ -16,9 +16,12 @@ class exports.MainRouter extends Backbone.Router
     app.sample.fetch()
 
   edit: =>
-    view = new EditView sample: app.sample, test_results: app.test_results, router: this
-    $('body').empty()
-    $('body').html view.render().el
+    if app.sample.length == 0
+      @navigate("/new", {trigger: true})
+    else
+      view = new EditView sample: app.sample, test_results: app.test_results, router: this
+      $('body').empty()
+      $('body').html view.render().el
 
   chunk_edit: (id) =>
     # Make sure the requested chunk can be edited

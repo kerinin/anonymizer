@@ -11450,13 +11450,19 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     MainRouter.prototype.edit = function() {
       var view;
-      view = new EditView({
-        sample: app.sample,
-        test_results: app.test_results,
-        router: this
-      });
-      $('body').empty();
-      return $('body').html(view.render().el);
+      if (app.sample.length === 0) {
+        return this.navigate("/new", {
+          trigger: true
+        });
+      } else {
+        view = new EditView({
+          sample: app.sample,
+          test_results: app.test_results,
+          router: this
+        });
+        $('body').empty();
+        return $('body').html(view.render().el);
+      }
     };
 
     MainRouter.prototype.chunk_edit = function(id) {
@@ -11530,6 +11536,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     __extends(Sample, _super);
 
     function Sample() {
+      this.parse = __bind(this.parse, this);
       this.groupChunks = __bind(this.groupChunks, this);
       this.initialize = __bind(this.initialize, this);
       Sample.__super__.constructor.apply(this, arguments);
@@ -11613,6 +11620,12 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
         success: callback,
         failure: failback
       });
+    };
+
+    Sample.prototype.parse = function(response) {
+      this.percentMatched = response['percent_matched'];
+      this.filterCount = response['filter_count'];
+      return response['chunks'];
     };
 
     return Sample;
@@ -12173,42 +12186,49 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "initialize": function(exports, require, module) {
-    (function() {
-  var BrunchApplication, MainRouter, Sample, TestResults,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  BrunchApplication = require('helpers').BrunchApplication;
-
-  MainRouter = require('routers/main_router').MainRouter;
-
-  Sample = require('collections/sample').Sample;
-
-  TestResults = require('collections/test_results').TestResults;
-
-  exports.Application = (function(_super) {
-
-    __extends(Application, _super);
-
-    function Application() {
-      Application.__super__.constructor.apply(this, arguments);
-    }
-
-    Application.prototype.initialize = function() {
-      this.router = new MainRouter;
-      this.sample = new Sample;
-      return this.test_results = new TestResults(this.sample);
+  "views/edit/templates/test/_error": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
     };
-
-    return Application;
-
-  })(BrunchApplication);
-
-  window.app = new exports.Application;
-
-}).call(this);
-
+    (function() {
+    
+      _print(_safe('<tr>\n  <td class="error">There was an error while testing this string on the server.</td>\n</tr>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
   }
 }));
 (this.require.define({
@@ -12354,107 +12374,6 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "views/edit/edit_view": function(exports, require, module) {
-    (function() {
-  var ReplaceView, SearchView, StringView, TestView, editTemplate,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  StringView = require('views/edit/_string_view').StringView;
-
-  SearchView = require('views/edit/_search_view').SearchView;
-
-  ReplaceView = require('views/edit/_replace_view').ReplaceView;
-
-  TestView = require('views/edit/_test_view').TestView;
-
-  editTemplate = require('./templates/edit');
-
-  exports.EditView = (function(_super) {
-
-    __extends(EditView, _super);
-
-    function EditView() {
-      this.saveString = __bind(this.saveString, this);
-      this.nextString = __bind(this.nextString, this);
-      this.resetString = __bind(this.resetString, this);
-      this.render = __bind(this.render, this);
-      this.initialize = __bind(this.initialize, this);
-      EditView.__super__.constructor.apply(this, arguments);
-    }
-
-    EditView.prototype.id = 'home-view';
-
-    EditView.prototype.events = {
-      "click #reset": "resetString",
-      "click #save": "saveString"
-    };
-
-    EditView.prototype.initialize = function() {
-      this.router = this.options['router'];
-      this.sample = this.options['sample'];
-      this.test_results = this.options['test_results'];
-      this.stringView = new StringView({
-        sample: this.sample,
-        router: this.router
-      });
-      this.searchView = new SearchView({
-        sample: this.sample,
-        router: this.router
-      });
-      this.replaceView = new ReplaceView({
-        sample: this.sample,
-        router: this.router
-      });
-      return this.testView = new TestView({
-        test_results: this.test_results,
-        sample: this.sample,
-        router: this.router
-      });
-    };
-
-    EditView.prototype.render = function() {
-      $(this.el).html(editTemplate());
-      this.$('#string').html(this.stringView.render().el);
-      this.$('#search').html(this.searchView.render().el);
-      this.$('#replace').replaceWith(this.replaceView.render().el);
-      this.$('#test').replaceWith(this.testView.render().el);
-      return this;
-    };
-
-    EditView.prototype.resetString = function() {
-      this.sample.models.forEach(function(chunk) {
-        chunk.set({
-          anonymize: false
-        });
-        return chunk.set({
-          collapse: false
-        });
-      });
-      return false;
-    };
-
-    EditView.prototype.nextString = function() {
-      this.sample.fetch();
-      return false;
-    };
-
-    EditView.prototype.saveString = function() {
-      this.sample.save();
-      this.sample.fetch();
-      return false;
-    };
-
-    return EditView;
-
-  })(Backbone.View);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
   "views/edit/_test_view": function(exports, require, module) {
     (function() {
   var ResultView, testEmptyTemplate, testErrorTemplate, testWaitingTemplate,
@@ -12523,6 +12442,110 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
 
     return TestView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/edit/edit_view": function(exports, require, module) {
+    (function() {
+  var ReplaceView, SearchView, StringView, TestView, editTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  StringView = require('views/edit/_string_view').StringView;
+
+  SearchView = require('views/edit/_search_view').SearchView;
+
+  ReplaceView = require('views/edit/_replace_view').ReplaceView;
+
+  TestView = require('views/edit/_test_view').TestView;
+
+  editTemplate = require('./templates/edit');
+
+  exports.EditView = (function(_super) {
+
+    __extends(EditView, _super);
+
+    function EditView() {
+      this.saveString = __bind(this.saveString, this);
+      this.nextString = __bind(this.nextString, this);
+      this.resetString = __bind(this.resetString, this);
+      this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
+      EditView.__super__.constructor.apply(this, arguments);
+    }
+
+    EditView.prototype.id = 'home-view';
+
+    EditView.prototype.events = {
+      "click #reset": "resetString",
+      "click #save": "saveString"
+    };
+
+    EditView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      this.test_results = this.options['test_results'];
+      this.stringView = new StringView({
+        sample: this.sample,
+        router: this.router
+      });
+      this.searchView = new SearchView({
+        sample: this.sample,
+        router: this.router
+      });
+      this.replaceView = new ReplaceView({
+        sample: this.sample,
+        router: this.router
+      });
+      this.testView = new TestView({
+        test_results: this.test_results,
+        sample: this.sample,
+        router: this.router
+      });
+      return this.sample.bind('reset', this.render);
+    };
+
+    EditView.prototype.render = function() {
+      $(this.el).html(editTemplate({
+        sample: this.sample
+      }));
+      this.$('#string').html(this.stringView.render().el);
+      this.$('#search').html(this.searchView.render().el);
+      this.$('#replace').replaceWith(this.replaceView.render().el);
+      this.$('#test').replaceWith(this.testView.render().el);
+      return this;
+    };
+
+    EditView.prototype.resetString = function() {
+      this.sample.models.forEach(function(chunk) {
+        chunk.set({
+          anonymize: false
+        });
+        return chunk.set({
+          collapse: false
+        });
+      });
+      return false;
+    };
+
+    EditView.prototype.nextString = function() {
+      this.sample.fetch();
+      return false;
+    };
+
+    EditView.prototype.saveString = function() {
+      this.sample.save();
+      this.sample.fetch();
+      return false;
+    };
+
+    return EditView;
 
   })(Backbone.View);
 
@@ -12808,7 +12831,15 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
     (function() {
     
-      _print(_safe('<div id="string">\n  This is a string to be anonymized\n</div>\n\n<div id="filter">\n  <div id="search">\n    /this is a search/\n  </div>\n  <div style="font-size: 40px">&dArr;</div>\n  <div id="replace">\n    \'which will replace\'\n  </div>\n</div>\n\n<div id="controls" class="controls">\n  <a id="reset" href="#reset">! Reset</a>\n  <a id="save" href="#save" class="bold">Save</a>\n  <a id="next" href="#/new">Next &rarr;</a>\n</div>\n\n<table id="test"></table>\n'));
+      _print(_safe('<div id="string">\n  This is a string to be anonymized\n</div>\n\n<div id="filter">\n  <div id="search">\n    /this is a search/\n  </div>\n  <div style="font-size: 40px">&dArr;</div>\n  <div id="replace">\n    \'which will replace\'\n  </div>\n</div>\n\n<div id="controls" class="controls">\n  <a id="reset" href="#reset">! Reset</a>\n  <a id="save" href="#save" class="bold">Save</a>\n  <a id="next" href="#/new">Next &rarr;</a>\n  <span id="stats">'));
+    
+      _print(this.sample.percentMatched);
+    
+      _print(_safe(' matched using '));
+    
+      _print(this.sample.filterCount);
+    
+      _print(_safe(' filters</span>\n</div>\n\n<table id="test"></table>\n'));
     
     }).call(this);
     
@@ -12923,52 +12954,6 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "views/edit/templates/test/_error": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
-    (function() {
-    
-      _print(_safe('<tr>\n  <td class="error">There was an error while testing this string on the server.</td>\n</tr>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
-  }
-}));
-(this.require.define({
   "views/edit/templates/test/_waiting": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
@@ -13012,5 +12997,44 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     return obj;
   })());
 };
+  }
+}));
+(this.require.define({
+  "initialize": function(exports, require, module) {
+    (function() {
+  var BrunchApplication, MainRouter, Sample, TestResults,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  BrunchApplication = require('helpers').BrunchApplication;
+
+  MainRouter = require('routers/main_router').MainRouter;
+
+  Sample = require('collections/sample').Sample;
+
+  TestResults = require('collections/test_results').TestResults;
+
+  exports.Application = (function(_super) {
+
+    __extends(Application, _super);
+
+    function Application() {
+      Application.__super__.constructor.apply(this, arguments);
+    }
+
+    Application.prototype.initialize = function() {
+      this.router = new MainRouter;
+      this.sample = new Sample;
+      return this.test_results = new TestResults(this.sample);
+    };
+
+    return Application;
+
+  })(BrunchApplication);
+
+  window.app = new exports.Application;
+
+}).call(this);
+
   }
 }));

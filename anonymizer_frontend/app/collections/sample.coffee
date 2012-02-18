@@ -44,3 +44,7 @@ class exports.Sample extends Backbone.Collection
       success: callback,
       failure: failback
 
+  parse: (response) =>
+    @percentMatched = response['percent_matched']
+    @filterCount = response['filter_count']
+    response['chunks']

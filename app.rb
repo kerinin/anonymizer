@@ -9,6 +9,7 @@ require "mongoid"
 require "filter"
 require "oauth"
 require "gmail_xoauth"
+require "active_support"
 
 source_path = 'input.txt'
 filters_path = 'filters.txt'
@@ -78,10 +79,14 @@ get '/next' do
   query = Subject.where(:matched.ne => true)
   line = query.skip( rand(query.count) ).first.text
   #chunks = line.split(' ').map {|text| {:content => text}}
+
+  puts "#{query.count} in query, #{Subject.count} total"
+
+  percent_matched = sprintf "%.1f%", 100 * ((Subject.count - query.count) / Subject.count.to_f)
   chunks = {:content => line}
   
   content_type :json
-  chunks.to_json
+  {:chunks => chunks, :percent_matched => percent_matched, :filter_count => Filter.count}.to_json
 end
 
 post '/filters' do
@@ -90,9 +95,10 @@ post '/filters' do
 
   puts "#{Subject.where(:text => filter.regex).count} matches"
   puts "#{Subject.where(:matched.ne => true).count} unmatched to start"
+
   # mark any subject lines this matches
   Subject.where(:text => filter.regex).update_all(:matched => true)
-  puts "#{Subject.where(:matched.ne => true).count} unmatched to now"
+  puts "#{Subject.where(:matched.ne => true).count} unmatched now"
 end
 
 get '/filters' do

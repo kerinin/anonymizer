@@ -16,6 +16,7 @@
   <a id="reset" href="#reset">! Reset</a>
   <a id="save" href="#save" class="bold">Save</a>
   <a id="next" href="#/new">Next &rarr;</a>
+  <span id="stats"><%= @sample.percentMatched %> matched using <%= @sample.filterCount %> filters</span>
 </div>
 
 <table id="test"></table>

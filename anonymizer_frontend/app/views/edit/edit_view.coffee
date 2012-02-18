@@ -23,8 +23,10 @@ class exports.EditView extends Backbone.View
     @replaceView = new ReplaceView sample: @sample, router: @router
     @testView = new TestView test_results: @test_results, sample: @sample, router: @router
 
+    @sample.bind 'reset', @render
+
   render: =>
-    $(@el).html editTemplate()
+    $(@el).html editTemplate sample: @sample
     
     @$('#string').html( @stringView.render().el )
     @$('#search').html( @searchView.render().el )
