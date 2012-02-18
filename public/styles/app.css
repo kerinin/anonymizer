@@ -224,11 +224,11 @@ li{margin:0;padding:5px}
 #filter{font-weight:normal;font-size:18px;font-family:Inconsolata,Monaco,Courier,monospace;margin-top:40px;}
 #filter #replace input{width:4em}
 .controls{font-size:14px;font-family:Helvetica,Arial,sans-serif;font-weight:bold;}
-.controls a{padding:8px 15px;margin:10px;border-radius:8px;border:4px solid #f95a5a;padding:4px 11px;}
-.controls a:hover{text-decoration:none;box-shadow:0 0 10px #aaa}
-.controls a.bold{padding:8px 15px;background:#f95a5a;color:#fff;border:none}
-#controls{margin-top:40px;}
-#controls #stats{margin-top:20px;display:block;font-weight:normal;color:#bbb;font-size:12px}
+.controls a,.controls span{color:#f95a5a;cursor:pointer;padding:8px 15px;margin:10px;border-radius:8px;border:4px solid #f95a5a;padding:4px 11px;}
+.controls a:hover,.controls span:hover{text-decoration:none;box-shadow:0 0 10px #aaa}
+.controls a.bold,.controls span.bold{padding:8px 15px;background:#f95a5a;color:#fff;border:none}
+#controls{margin-top:40px}
+#stats{margin-top:20px;display:block;font-weight:normal;color:#bbb;font-size:12px}
 #test{font-weight:normal;font-size:14px;font-family:Helvetica,Arial,sans-serif;vertical-align:middle;line-height:20px;width:90%;margin-left:auto;margin-right:auto;margin-top:80px;}
 #test table{margin-left:auto;margin-right:auto}
 #test td{padding-bottom:10px}

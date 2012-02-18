@@ -13,10 +13,11 @@
 </div>
 
 <div id="controls" class="controls">
-  <a id="reset" href="#reset">! Reset</a>
-  <a id="save" href="#save" class="bold">Save</a>
+  <span id="reset">! Reset</span>
+  <span id="save" class="bold">Save</span>
   <a id="next" href="#/new">Next &rarr;</a>
-  <span id="stats"><%= @sample.percentMatched %> matched using <%= @sample.filterCount %> filters</span>
 </div>
+
+<p id="stats"><%= @sample.percentMatched %> matched using <%= @sample.filterCount %> filters</span>
 
 <table id="test"></table>

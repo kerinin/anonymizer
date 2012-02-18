@@ -26,14 +26,10 @@ class exports.ChunkView extends Backbone.View
 
   handleMouseUp: =>
     if @chunk.get 'anonymize'
-      #@toggleAnonymize()
       app.router.navigate("/edit/chunk/#{@chunk.index()}", {trigger: true})
       return false
     else
       @createChunk()
-
-  toggleAnonymize: =>
-    @chunk.toggleAnonymize()
 
   getRangeFromSelection: =>
     window.getSelection().getRangeAt(0)

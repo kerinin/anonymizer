@@ -17,7 +17,6 @@ class exports.TestView extends Backbone.View
     @test_results.bind 'all', @render
 
   render: =>
-    console.log "rendering test results in state #{@test_results.state}"
     @$(@el).empty()
 
     switch @test_results.state

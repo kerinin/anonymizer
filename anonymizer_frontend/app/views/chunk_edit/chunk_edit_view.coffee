@@ -2,11 +2,13 @@ chunkEditTemplate = require('./templates/chunk_edit')
 
 class exports.ChunkEditView extends Backbone.View
   id: 'chunk_edit_view'
+  tagName: 'form'
 
   events:
     'click': 'noOp'
     'click .save': 'saveAndClose'
     'click .cancel': 'close'
+    'submit': 'saveAndClose'
 
   initialize: =>
     @router = @options['router']

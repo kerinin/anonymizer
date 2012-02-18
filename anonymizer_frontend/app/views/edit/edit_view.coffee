@@ -6,11 +6,12 @@ editTemplate = require('./templates/edit')
 
 class exports.EditView extends Backbone.View
   id: 'home-view'
+  tagName: 'form'
 
   events:
     "click #reset": "resetString"
-    #"click #next": "nextString"
     "click #save": "saveString"
+    "submit": "saveString"
 
 
   initialize: =>
