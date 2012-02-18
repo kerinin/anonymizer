@@ -3,18 +3,22 @@
 class exports.StringView extends Backbone.View
 
   initialize: ->
-    app.sample.bind 'all', @addAll
+    @router = @options['router']
+    @sample = @options['sample']
 
-  render: ->
+    @sample.bind 'all', @addAll
+
+  render: =>
+    @addAll()
     this
 
-  addOne: (chunk) ->
-    view = new ChunkView model: chunk
-    $("#string").append view.render().el
+  addOne: (chunk) =>
+    view = new ChunkView chunk: chunk
+    @$(@el).append view.render().el
 
   addAll: =>
-    $("#string").empty()
-    app.sample.each @addOne
+    @remove()
+    @sample.models.forEach @addOne
 
-  remvoe: ->
-    $(@el).remove()
+  remove: ->
+    @$(@el).empty()

@@ -9,6 +9,10 @@ Installation
 
 You'll need `node` and `npm` installed before you start.  Google it.
 
+Install gem dependencies
+
+    bundle install
+
 Install brunch
 
     npm install brunch

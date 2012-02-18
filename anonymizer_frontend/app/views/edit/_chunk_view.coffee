@@ -1,5 +1,4 @@
 {Chunk} = require 'models/chunk'
-chunkTemplate = require './templates/_chunk'
 
 class exports.ChunkView extends Backbone.View
 
@@ -10,29 +9,31 @@ class exports.ChunkView extends Backbone.View
     'mouseup': 'handleMouseUp'
 
   initialize: ->
-    @model.bind 'all', @render
-    @model.bind 'remove', @remove
-    @model.view = this
+    @router = @options['router']
+    @chunk = @options['chunk']
+
+    @chunk.bind 'all', @render
+    @chunk.bind 'remove', @remove
+    @chunk.view = this
 
   render: =>
-    @$(@el).text @model.get("content")
-    if @model.get('anonymize')
+    @$(@el).text @chunk.get("content")
+    if @chunk.get('anonymize')
       @$(@el).addClass('anonymize')
     else
       @$(@el).removeClass('anonymize')
-
     this
 
   handleMouseUp: ->
-    if @model.get 'anonymize'
+    if @chunk.get 'anonymize'
       #@toggleAnonymize()
-      app.router.navigate("/edit/chunk/#{@model.index()}", {trigger: true})
+      app.router.navigate("/edit/chunk/#{@chunk.index()}", {trigger: true})
       return false
     else
       @createChunk()
 
   toggleAnonymize: ->
-    @model.toggleAnonymize()
+    @chunk.toggleAnonymize()
 
   getRangeFromSelection: ->
     window.getSelection().getRangeAt(0)
@@ -68,8 +69,8 @@ class exports.ChunkView extends Backbone.View
       chunk = new Chunk content: @getTextFromRange(chunk_range), anonymize: true
       post = new Chunk content: @getTextAfterRange(chunk_range)
 
-      @model.replaceWith( ( i for i in [pre,chunk,post] when i.get("content") isnt '') )
+      @chunk.replaceWith( ( i for i in [pre,chunk,post] when i.get("content") isnt '') )
       @remove
 
   remove: ->
-    $(@el).remove()
+    @$(@el).remove()

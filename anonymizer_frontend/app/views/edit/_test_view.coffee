@@ -6,26 +6,30 @@ class exports.TestView extends Backbone.View
   id: 'test'
   tagName: 'table'
 
-  initialize: ->
-    app.sample.bind "all", @getTestResults
-    app.sample.bind "reset", @clear
-    @collection.bind 'add', @addOne
-    @collection.bind 'reset', @addAll
+  initialize: =>
+    @router = @options['router']
+    @sample = @options['sample']
+    @test_results = @options['test_results']
+
+    @sample.bind "all", @getTestResults
+    @sample.bind "reset", @clear
+    @test_results.bind 'add', @addOne
+    @test_results.bind 'reset', @addAll
 
   render: =>
-    $(@el).replaceWith testTemplate
+    @$(@el).replaceWith testTemplate
     this
 
-  addOne: (result) =>
-    view = new ResultView model: result
-    $(@el).append( view.render().el )
+  addOne: (test_result) =>
+    view = new ResultView test_result: test_result
+    @$(@el).append( view.render().el )
 
   addAll: =>
-    $(@el).empty()
-    @collection.models.forEach @addOne
+    @$(@el).empty()
+    @test_results.models.forEach @addOne
 
-  getTestResults: ->
-    app.sample.test()
+  getTestResults: =>
+    @sample.test()
 
   clear: =>
-    @collection.reset()
+    @test_results.reset()

@@ -11357,46 +11357,132 @@ window.jQuery = window.$ = jQuery;
 //XRegExp 1.5.0 <xregexp.com> MIT License
 var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame")}(function(){XRegExp=function(w,r){var q=[],u=XRegExp.OUTSIDE_CLASS,x=0,p,s,v,t,y;if(XRegExp.isRegExp(w)){if(r!==undefined){throw TypeError("can't supply flags when constructing one RegExp from another")}return j(w)}if(g){throw Error("can't call the XRegExp constructor within token definition functions")}r=r||"";p={hasNamedCapture:false,captureNames:[],hasFlag:function(z){return r.indexOf(z)>-1},setFlag:function(z){r+=z}};while(x<w.length){s=o(w,x,u,p);if(s){q.push(s.output);x+=(s.match[0].length||1)}else{if(v=m.exec.call(i[u],w.slice(x))){q.push(v[0]);x+=v[0].length}else{t=w.charAt(x);if(t==="["){u=XRegExp.INSIDE_CLASS}else{if(t==="]"){u=XRegExp.OUTSIDE_CLASS}}q.push(t);x++}}}y=RegExp(q.join(""),m.replace.call(r,h,""));y._xregexp={source:w,captureNames:p.hasNamedCapture?p.captureNames:null};return y};XRegExp.version="1.5.0";XRegExp.INSIDE_CLASS=1;XRegExp.OUTSIDE_CLASS=2;var c=/\$(?:(\d\d?|[$&`'])|{([$\w]+)})/g,h=/[^gimy]+|([\s\S])(?=[\s\S]*\1)/g,n=/^(?:[?*+]|{\d+(?:,\d*)?})\??/,g=false,k=[],m={exec:RegExp.prototype.exec,test:RegExp.prototype.test,match:String.prototype.match,replace:String.prototype.replace,split:String.prototype.split},a=m.exec.call(/()??/,"")[1]===undefined,e=function(){var p=/^/g;m.test.call(p,"");return !p.lastIndex}(),f=function(){var p=/x/g;m.replace.call("x",p,"");return !p.lastIndex}(),b=RegExp.prototype.sticky!==undefined,i={};i[XRegExp.INSIDE_CLASS]=/^(?:\\(?:[0-3][0-7]{0,2}|[4-7][0-7]?|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S]))/;i[XRegExp.OUTSIDE_CLASS]=/^(?:\\(?:0(?:[0-3][0-7]{0,2}|[4-7][0-7]?)?|[1-9]\d*|x[\dA-Fa-f]{2}|u[\dA-Fa-f]{4}|c[A-Za-z]|[\s\S])|\(\?[:=!]|[?*+]\?|{\d+(?:,\d*)?}\??)/;XRegExp.addToken=function(s,r,q,p){k.push({pattern:j(s,"g"+(b?"y":"")),handler:r,scope:q||XRegExp.OUTSIDE_CLASS,trigger:p||null})};XRegExp.cache=function(r,p){var q=r+"/"+(p||"");return XRegExp.cache[q]||(XRegExp.cache[q]=XRegExp(r,p))};XRegExp.copyAsGlobal=function(p){return j(p,"g")};XRegExp.escape=function(p){return p.replace(/[-[\]{}()*+?.,\\^$|#\s]/g,"\\$&")};XRegExp.execAt=function(s,r,t,q){r=j(r,"g"+((q&&b)?"y":""));r.lastIndex=t=t||0;var p=r.exec(s);if(q){return(p&&p.index===t)?p:null}else{return p}};XRegExp.freezeTokens=function(){XRegExp.addToken=function(){throw Error("can't run addToken after freezeTokens")}};XRegExp.isRegExp=function(p){return Object.prototype.toString.call(p)==="[object RegExp]"};XRegExp.iterate=function(u,p,v,s){var t=j(p,"g"),r=-1,q;while(q=t.exec(u)){v.call(s,q,++r,u,t);if(t.lastIndex===q.index){t.lastIndex++}}if(p.global){p.lastIndex=0}};XRegExp.matchChain=function(q,p){return function r(s,x){var v=p[x].regex?p[x]:{regex:p[x]},u=j(v.regex,"g"),w=[],t;for(t=0;t<s.length;t++){XRegExp.iterate(s[t],u,function(y){w.push(v.backref?(y[v.backref]||""):y[0])})}return((x===p.length-1)||!w.length)?w:r(w,x+1)}([q],0)};RegExp.prototype.apply=function(q,p){return this.exec(p[0])};RegExp.prototype.call=function(p,q){return this.exec(q)};RegExp.prototype.exec=function(t){var r=m.exec.apply(this,arguments),q,p;if(r){if(!a&&r.length>1&&l(r,"")>-1){p=RegExp(this.source,m.replace.call(d(this),"g",""));m.replace.call(t.slice(r.index),p,function(){for(var u=1;u<arguments.length-2;u++){if(arguments[u]===undefined){r[u]=undefined}}})}if(this._xregexp&&this._xregexp.captureNames){for(var s=1;s<r.length;s++){q=this._xregexp.captureNames[s-1];if(q){r[q]=r[s]}}}if(!e&&this.global&&!r[0].length&&(this.lastIndex>r.index)){this.lastIndex--}}return r};if(!e){RegExp.prototype.test=function(q){var p=m.exec.call(this,q);if(p&&this.global&&!p[0].length&&(this.lastIndex>p.index)){this.lastIndex--}return !!p}}String.prototype.match=function(q){if(!XRegExp.isRegExp(q)){q=RegExp(q)}if(q.global){var p=m.match.apply(this,arguments);q.lastIndex=0;return p}return q.exec(this)};String.prototype.replace=function(r,s){var t=XRegExp.isRegExp(r),q,p,u;if(t&&typeof s.valueOf()==="string"&&s.indexOf("${")===-1&&f){return m.replace.apply(this,arguments)}if(!t){r=r+""}else{if(r._xregexp){q=r._xregexp.captureNames}}if(typeof s==="function"){p=m.replace.call(this,r,function(){if(q){arguments[0]=new String(arguments[0]);for(var v=0;v<q.length;v++){if(q[v]){arguments[0][q[v]]=arguments[v+1]}}}if(t&&r.global){r.lastIndex=arguments[arguments.length-2]+arguments[0].length}return s.apply(null,arguments)})}else{u=this+"";p=m.replace.call(u,r,function(){var v=arguments;return m.replace.call(s,c,function(x,w,A){if(w){switch(w){case"$":return"$";case"&":return v[0];case"`":return v[v.length-1].slice(0,v[v.length-2]);case"'":return v[v.length-1].slice(v[v.length-2]+v[0].length);default:var y="";w=+w;if(!w){return x}while(w>v.length-3){y=String.prototype.slice.call(w,-1)+y;w=Math.floor(w/10)}return(w?v[w]||"":"$")+y}}else{var z=+A;if(z<=v.length-3){return v[z]}z=q?l(q,A):-1;return z>-1?v[z+1]:x}})})}if(t&&r.global){r.lastIndex=0}return p};String.prototype.split=function(u,p){if(!XRegExp.isRegExp(u)){return m.split.apply(this,arguments)}var w=this+"",r=[],v=0,t,q;if(p===undefined||+p<0){p=Infinity}else{p=Math.floor(+p);if(!p){return[]}}u=XRegExp.copyAsGlobal(u);while(t=u.exec(w)){if(u.lastIndex>v){r.push(w.slice(v,t.index));if(t.length>1&&t.index<w.length){Array.prototype.push.apply(r,t.slice(1))}q=t[0].length;v=u.lastIndex;if(r.length>=p){break}}if(u.lastIndex===t.index){u.lastIndex++}}if(v===w.length){if(!m.test.call(u,"")||q){r.push("")}}else{r.push(w.slice(v))}return r.length>p?r.slice(0,p):r};function j(r,q){if(!XRegExp.isRegExp(r)){throw TypeError("type RegExp expected")}var p=r._xregexp;r=XRegExp(r.source,d(r)+(q||""));if(p){r._xregexp={source:p.source,captureNames:p.captureNames?p.captureNames.slice(0):null}}return r}function d(p){return(p.global?"g":"")+(p.ignoreCase?"i":"")+(p.multiline?"m":"")+(p.extended?"x":"")+(p.sticky?"y":"")}function o(v,u,w,p){var r=k.length,y,s,x;g=true;try{while(r--){x=k[r];if((w&x.scope)&&(!x.trigger||x.trigger.call(p))){x.pattern.lastIndex=u;s=x.pattern.exec(v);if(s&&s.index===u){y={output:x.handler.call(p,s,w),match:s};break}}}}catch(q){throw q}finally{g=false}return y}function l(s,q,r){if(Array.prototype.indexOf){return s.indexOf(q,r)}for(var p=r||0;p<s.length;p++){if(s[p]===q){return p}}return -1}XRegExp.addToken(/\(\?#[^)]*\)/,function(p){return m.test.call(n,p.input.slice(p.index+p[0].length))?"":"(?:)"});XRegExp.addToken(/\((?!\?)/,function(){this.captureNames.push(null);return"("});XRegExp.addToken(/\(\?<([$\w]+)>/,function(p){this.captureNames.push(p[1]);this.hasNamedCapture=true;return"("});XRegExp.addToken(/\\k<([\w$]+)>/,function(q){var p=l(this.captureNames,q[1]);return p>-1?"\\"+(p+1)+(isNaN(q.input.charAt(q.index+q[0].length))?"":"(?:)"):q[0]});XRegExp.addToken(/\[\^?]/,function(p){return p[0]==="[]"?"\\b\\B":"[\\s\\S]"});XRegExp.addToken(/^\(\?([imsx]+)\)/,function(p){this.setFlag(p[1]);return""});XRegExp.addToken(/(?:\s+|#.*)+/,function(p){return m.test.call(n,p.input.slice(p.index+p[0].length))?"":"(?:)"},XRegExp.OUTSIDE_CLASS,function(){return this.hasFlag("x")});XRegExp.addToken(/\./,function(){return"[\\s\\S]"},XRegExp.OUTSIDE_CLASS,function(){return this.hasFlag("s")})})();
 (this.require.define({
-  "views/edit/_replace_view": function(exports, require, module) {
+  "views/edit/_chunk_view": function(exports, require, module) {
     (function() {
-  var ChunkReplaceView, replaceTemplate,
+  var Chunk,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  ChunkReplaceView = require('views/edit/_chunk_replace_view').ChunkReplaceView;
+  Chunk = require('models/chunk').Chunk;
 
-  replaceTemplate = require('./templates/_replace');
+  exports.ChunkView = (function(_super) {
 
-  exports.ReplaceView = (function(_super) {
+    __extends(ChunkView, _super);
 
-    __extends(ReplaceView, _super);
-
-    function ReplaceView() {
+    function ChunkView() {
       this.render = __bind(this.render, this);
-      ReplaceView.__super__.constructor.apply(this, arguments);
+      ChunkView.__super__.constructor.apply(this, arguments);
     }
 
-    ReplaceView.prototype.id = "replace";
+    ChunkView.prototype.tagName = 'span';
 
-    ReplaceView.prototype.initialize = function() {
-      return this.collection.bind('all', this.render);
+    ChunkView.prototype.className = 'chunk';
+
+    ChunkView.prototype.events = {
+      'mouseup': 'handleMouseUp'
     };
 
-    ReplaceView.prototype.render = function() {
-      var _this = this;
-      this.$(this.el).html('<span>');
-      this.collection.models.forEach(function(chunk) {
-        var view;
-        view = new ChunkReplaceView({
-          model: chunk
-        });
-        return _this.$(_this.el).children("span").append(view.render().el);
-      });
+    ChunkView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.chunk = this.options['chunk'];
+      this.chunk.bind('all', this.render);
+      this.chunk.bind('remove', this.remove);
+      return this.chunk.view = this;
+    };
+
+    ChunkView.prototype.render = function() {
+      this.$(this.el).text(this.chunk.get("content"));
+      if (this.chunk.get('anonymize')) {
+        this.$(this.el).addClass('anonymize');
+      } else {
+        this.$(this.el).removeClass('anonymize');
+      }
       return this;
     };
 
-    return ReplaceView;
+    ChunkView.prototype.handleMouseUp = function() {
+      if (this.chunk.get('anonymize')) {
+        app.router.navigate("/edit/chunk/" + (this.chunk.index()), {
+          trigger: true
+        });
+        return false;
+      } else {
+        return this.createChunk();
+      }
+    };
+
+    ChunkView.prototype.toggleAnonymize = function() {
+      return this.chunk.toggleAnonymize();
+    };
+
+    ChunkView.prototype.getRangeFromSelection = function() {
+      return window.getSelection().getRangeAt(0);
+    };
+
+    ChunkView.prototype.clearSelection = function() {
+      return window.getSelection().empty();
+    };
+
+    ChunkView.prototype.rangeCrossesChunks = function(range) {
+      return range.startContainer !== range.endContainer;
+    };
+
+    ChunkView.prototype.getTextFromRange = function(range) {
+      return range.cloneContents().textContent;
+    };
+
+    ChunkView.prototype.getTextBeforeRange = function(range) {
+      var pre_range;
+      pre_range = range.cloneRange();
+      pre_range.setStartBefore(range.startContainer);
+      pre_range.setEnd(range.startContainer, range.startOffset);
+      return this.getTextFromRange(pre_range);
+    };
+
+    ChunkView.prototype.getTextAfterRange = function(range) {
+      var post_range;
+      post_range = range.cloneRange();
+      post_range.setEndAfter(range.endContainer);
+      post_range.setStart(range.endContainer, range.endOffset);
+      return this.getTextFromRange(post_range);
+    };
+
+    ChunkView.prototype.createChunk = function() {
+      var chunk, chunk_range, i, post, pre;
+      chunk_range = this.getRangeFromSelection();
+      if (this.rangeCrossesChunks(chunk_range)) {
+        return alert("NO! don't select the red bits");
+      } else {
+        pre = new Chunk({
+          content: this.getTextBeforeRange(chunk_range)
+        });
+        chunk = new Chunk({
+          content: this.getTextFromRange(chunk_range),
+          anonymize: true
+        });
+        post = new Chunk({
+          content: this.getTextAfterRange(chunk_range)
+        });
+        this.chunk.replaceWith((function() {
+          var _i, _len, _ref, _results;
+          _ref = [pre, chunk, post];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            i = _ref[_i];
+            if (i.get("content") !== '') _results.push(i);
+          }
+          return _results;
+        })());
+        return this.remove;
+      }
+    };
+
+    ChunkView.prototype.remove = function() {
+      return this.$(this.el).remove();
+    };
+
+    return ChunkView;
 
   })(Backbone.View);
 
@@ -11407,9 +11493,12 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 (this.require.define({
   "routers/main_router": function(exports, require, module) {
     (function() {
-  var ChunkEditView, EditView,
+  var ChunkEditView, EditView, NewView,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  NewView = require('views/new/new_view').NewView;
 
   EditView = require('views/edit/edit_view').EditView;
 
@@ -11420,21 +11509,40 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     __extends(MainRouter, _super);
 
     function MainRouter() {
+      this.chunk_edit = __bind(this.chunk_edit, this);
+      this.edit = __bind(this.edit, this);
+      this["new"] = __bind(this["new"], this);
       MainRouter.__super__.constructor.apply(this, arguments);
     }
 
     MainRouter.prototype.routes = {
-      '': 'edit',
+      '': 'new',
       '/edit/chunk/:id': 'chunk_edit',
-      '/edit': 'edit'
+      '/edit': 'edit',
+      '/new': 'new'
+    };
+
+    MainRouter.prototype["new"] = function() {
+      var view;
+      app.sample.reset();
+      view = new NewView({
+        collection: app.sample,
+        router: this
+      });
+      $('body').empty();
+      $('body').html(view.render().el);
+      return app.sample.fetch();
     };
 
     MainRouter.prototype.edit = function() {
       var view;
-      view = new EditView;
+      view = new EditView({
+        sample: app.sample,
+        test_results: app.test_results,
+        router: this
+      });
       $('body').empty();
-      $('body').html(view.render().el);
-      return app.sample.fetch();
+      return $('body').html(view.render().el);
     };
 
     MainRouter.prototype.chunk_edit = function(id) {
@@ -11444,9 +11552,14 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
           trigger: true
         });
       } else {
-        baseView = new EditView;
+        baseView = new EditView({
+          sample: app.sample,
+          test_results: app.test_results,
+          router: this
+        });
         view = new ChunkEditView({
-          model: app.sample.at(id)
+          chunk: app.sample.at(id),
+          router: this
         });
         $('body').empty();
         $('body').html(baseView.render().el);
@@ -11808,9 +11921,12 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 (this.require.define({
   "views/chunk_edit/chunk_edit_view": function(exports, require, module) {
     (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+  var chunkEditTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  chunkEditTemplate = require('./templates/chunk_edit');
 
   exports.ChunkEditView = (function(_super) {
 
@@ -11832,26 +11948,36 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       'click .cancel': 'close'
     };
 
+    ChunkEditView.prototype.initialize = function() {
+      var _this = this;
+      this.router(function() {
+        return _this.options['router'];
+      });
+      return this.chunk(function() {
+        return _this.options['chunk'];
+      });
+    };
+
     ChunkEditView.prototype.render = function() {
-      this.$(this.el).html(require('./templates/chunk_edit'));
-      this.$("input:radio[name=type][value=" + (this.model.get("type")) + "]").attr("checked", true);
+      this.$(this.el).html(chunkEditTemplate());
+      this.$("input:radio[name=type][value=" + (this.chunk.get("type")) + "]").attr("checked", true);
       return this;
     };
 
     ChunkEditView.prototype.setType = function() {
-      return this.model.set({
+      return this.chunk.set({
         type: this.$('input[name=type]:checked').val()
       });
     };
 
     ChunkEditView.prototype.setOptional = function() {
-      return this.model.set({
+      return this.chunk.set({
         optional: this.$('input[name=optional]').val()
       });
     };
 
     ChunkEditView.prototype.setPassThrough = function() {
-      return this.model.set({
+      return this.chunk.set({
         pass_through: this.$('input[name=pass_through]').val()
       });
     };
@@ -11864,7 +11990,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
 
     ChunkEditView.prototype.close = function() {
-      return app.router.navigate("/edit", {
+      return this.router.navigate("/edit", {
         trigger: true
       });
     };
@@ -11872,140 +11998,6 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     ChunkEditView.prototype.noOp = function() {};
 
     return ChunkEditView;
-
-  })(Backbone.View);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "views/edit/_chunk_view": function(exports, require, module) {
-    (function() {
-  var Chunk, chunkTemplate,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  Chunk = require('models/chunk').Chunk;
-
-  chunkTemplate = require('./templates/_chunk');
-
-  exports.ChunkView = (function(_super) {
-
-    __extends(ChunkView, _super);
-
-    function ChunkView() {
-      this.render = __bind(this.render, this);
-      ChunkView.__super__.constructor.apply(this, arguments);
-    }
-
-    ChunkView.prototype.tagName = 'span';
-
-    ChunkView.prototype.className = 'chunk';
-
-    ChunkView.prototype.events = {
-      'mouseup': 'handleMouseUp'
-    };
-
-    ChunkView.prototype.initialize = function() {
-      this.model.bind('all', this.render);
-      this.model.bind('remove', this.remove);
-      return this.model.view = this;
-    };
-
-    ChunkView.prototype.render = function() {
-      this.$(this.el).text(this.model.get("content"));
-      if (this.model.get('anonymize')) {
-        this.$(this.el).addClass('anonymize');
-      } else {
-        this.$(this.el).removeClass('anonymize');
-      }
-      return this;
-    };
-
-    ChunkView.prototype.handleMouseUp = function() {
-      if (this.model.get('anonymize')) {
-        app.router.navigate("/edit/chunk/" + (this.model.index()), {
-          trigger: true
-        });
-        return false;
-      } else {
-        return this.createChunk();
-      }
-    };
-
-    ChunkView.prototype.toggleAnonymize = function() {
-      return this.model.toggleAnonymize();
-    };
-
-    ChunkView.prototype.getRangeFromSelection = function() {
-      return window.getSelection().getRangeAt(0);
-    };
-
-    ChunkView.prototype.clearSelection = function() {
-      return window.getSelection().empty();
-    };
-
-    ChunkView.prototype.rangeCrossesChunks = function(range) {
-      return range.startContainer !== range.endContainer;
-    };
-
-    ChunkView.prototype.getTextFromRange = function(range) {
-      return range.cloneContents().textContent;
-    };
-
-    ChunkView.prototype.getTextBeforeRange = function(range) {
-      var pre_range;
-      pre_range = range.cloneRange();
-      pre_range.setStartBefore(range.startContainer);
-      pre_range.setEnd(range.startContainer, range.startOffset);
-      return this.getTextFromRange(pre_range);
-    };
-
-    ChunkView.prototype.getTextAfterRange = function(range) {
-      var post_range;
-      post_range = range.cloneRange();
-      post_range.setEndAfter(range.endContainer);
-      post_range.setStart(range.endContainer, range.endOffset);
-      return this.getTextFromRange(post_range);
-    };
-
-    ChunkView.prototype.createChunk = function() {
-      var chunk, chunk_range, i, post, pre;
-      chunk_range = this.getRangeFromSelection();
-      if (this.rangeCrossesChunks(chunk_range)) {
-        return alert("NO! don't select the red bits");
-      } else {
-        pre = new Chunk({
-          content: this.getTextBeforeRange(chunk_range)
-        });
-        chunk = new Chunk({
-          content: this.getTextFromRange(chunk_range),
-          anonymize: true
-        });
-        post = new Chunk({
-          content: this.getTextAfterRange(chunk_range)
-        });
-        this.model.replaceWith((function() {
-          var _i, _len, _ref, _results;
-          _ref = [pre, chunk, post];
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            i = _ref[_i];
-            if (i.get("content") !== '') _results.push(i);
-          }
-          return _results;
-        })());
-        return this.remove;
-      }
-    };
-
-    ChunkView.prototype.remove = function() {
-      return $(this.el).remove();
-    };
-
-    return ChunkView;
 
   })(Backbone.View);
 
@@ -12039,20 +12031,22 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
 
     ChunkReplaceView.prototype.initialize = function() {
-      this.tagName = (this.model.get('anonymize') ? 'input' : 'span');
-      return this.model.bind('all', this.render);
+      this.router = this.options['router'];
+      this.chunk = this.options['chunk'];
+      this.tagName = (this.chunk.get('anonymize') ? 'input' : 'span');
+      return this.chunk.bind('all', this.render);
     };
 
     ChunkReplaceView.prototype.render = function() {
       this.$(this.el).html(chunkReplaceTemplate({
-        chunk: this.model
+        chunk: this.chunk
       }));
       return this;
     };
 
     ChunkReplaceView.prototype.updateAlias = function() {
-      if (this.model.get('anonymize')) {
-        return this.model.set({
+      if (this.chunk.get('anonymize')) {
+        return this.chunk.set({
           alias: this.$('input').val()
         });
       }
@@ -12106,6 +12100,54 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
+  "views/edit/_replace_view": function(exports, require, module) {
+    (function() {
+  var ChunkReplaceView,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  ChunkReplaceView = require('views/edit/_chunk_replace_view').ChunkReplaceView;
+
+  exports.ReplaceView = (function(_super) {
+
+    __extends(ReplaceView, _super);
+
+    function ReplaceView() {
+      this.render = __bind(this.render, this);
+      ReplaceView.__super__.constructor.apply(this, arguments);
+    }
+
+    ReplaceView.prototype.id = "replace";
+
+    ReplaceView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      return this.sample.bind('all', this.render);
+    };
+
+    ReplaceView.prototype.render = function() {
+      var _this = this;
+      this.$(this.el).html('<span>');
+      this.sample.models.forEach(function(chunk) {
+        var view;
+        view = new ChunkReplaceView({
+          chunk: chunk
+        });
+        return _this.$(_this.el).children("span").append(view.render().el);
+      });
+      return this;
+    };
+
+    return ReplaceView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
   "views/edit/_result_view": function(exports, require, module) {
     (function() {
   var resultTemplate,
@@ -12127,12 +12169,14 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     ResultView.prototype.tagName = 'tr';
 
     ResultView.prototype.initialize = function() {
-      return this.model.bind('all', this.render);
+      this.router = this.options['router'];
+      this.test_result = this.options['test_result'];
+      return this.test_result.bind('all', this.render);
     };
 
     ResultView.prototype.render = function() {
-      $(this.el).html(resultTemplate({
-        result: this.model
+      this.$(this.el).html(resultTemplate({
+        test_result: this.test_result
       }));
       return this;
     };
@@ -12165,12 +12209,14 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     }
 
     SearchView.prototype.initialize = function() {
-      return this.model.bind('all', this.render);
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      return this.sample.bind('all', this.render);
     };
 
     SearchView.prototype.render = function() {
       this.$(this.el).html(searchTemplate({
-        sample: this.model
+        sample: this.sample
       }));
       return this;
     };
@@ -12199,35 +12245,143 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     function StringView() {
       this.addAll = __bind(this.addAll, this);
+      this.addOne = __bind(this.addOne, this);
+      this.render = __bind(this.render, this);
       StringView.__super__.constructor.apply(this, arguments);
     }
 
     StringView.prototype.initialize = function() {
-      return app.sample.bind('all', this.addAll);
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      return this.sample.bind('all', this.addAll);
     };
 
     StringView.prototype.render = function() {
+      this.addAll();
       return this;
     };
 
     StringView.prototype.addOne = function(chunk) {
       var view;
       view = new ChunkView({
-        model: chunk
+        chunk: chunk
       });
-      return $("#string").append(view.render().el);
+      return this.$(this.el).append(view.render().el);
     };
 
     StringView.prototype.addAll = function() {
-      $("#string").empty();
-      return app.sample.each(this.addOne);
+      this.remove();
+      return this.sample.models.forEach(this.addOne);
     };
 
-    StringView.prototype.remvoe = function() {
-      return $(this.el).remove();
+    StringView.prototype.remove = function() {
+      return this.$(this.el).empty();
     };
 
     return StringView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/edit/edit_view": function(exports, require, module) {
+    (function() {
+  var ReplaceView, SearchView, StringView, TestView, editTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  StringView = require('views/edit/_string_view').StringView;
+
+  SearchView = require('views/edit/_search_view').SearchView;
+
+  ReplaceView = require('views/edit/_replace_view').ReplaceView;
+
+  TestView = require('views/edit/_test_view').TestView;
+
+  editTemplate = require('./templates/edit');
+
+  exports.EditView = (function(_super) {
+
+    __extends(EditView, _super);
+
+    function EditView() {
+      this.saveString = __bind(this.saveString, this);
+      this.nextString = __bind(this.nextString, this);
+      this.resetString = __bind(this.resetString, this);
+      this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
+      EditView.__super__.constructor.apply(this, arguments);
+    }
+
+    EditView.prototype.id = 'home-view';
+
+    EditView.prototype.events = {
+      "click #reset": "resetString",
+      "click #save": "saveString"
+    };
+
+    EditView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      this.test_results = this.options['test_results'];
+      this.stringView = new StringView({
+        sample: this.sample,
+        router: this.router
+      });
+      this.searchView = new SearchView({
+        sample: this.sample,
+        router: this.router
+      });
+      this.replaceView = new ReplaceView({
+        sample: this.sample,
+        router: this.router
+      });
+      return this.testView = new TestView({
+        test_results: this.test_results,
+        sample: this.sample,
+        router: this.router
+      });
+    };
+
+    EditView.prototype.render = function() {
+      $(this.el).html(editTemplate());
+      console.log("before render");
+      this.$('#string').html(this.stringView.render().el);
+      console.log(this.stringView.el);
+      this.$('#search').html(this.searchView.render().el);
+      this.$('#replace').replaceWith(this.replaceView.render().el);
+      this.$('#test').replaceWith(this.testView.render().el);
+      return this;
+    };
+
+    EditView.prototype.resetString = function() {
+      this.sample.models.forEach(function(chunk) {
+        chunk.set({
+          anonymize: false
+        });
+        return chunk.set({
+          collapse: false
+        });
+      });
+      return false;
+    };
+
+    EditView.prototype.nextString = function() {
+      this.sample.fetch();
+      return false;
+    };
+
+    EditView.prototype.saveString = function() {
+      this.sample.save();
+      this.sample.fetch();
+      return false;
+    };
+
+    return EditView;
 
   })(Backbone.View);
 
@@ -12253,9 +12407,11 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     function TestView() {
       this.clear = __bind(this.clear, this);
+      this.getTestResults = __bind(this.getTestResults, this);
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
       this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
       TestView.__super__.constructor.apply(this, arguments);
     }
 
@@ -12264,36 +12420,39 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     TestView.prototype.tagName = 'table';
 
     TestView.prototype.initialize = function() {
-      app.sample.bind("all", this.getTestResults);
-      app.sample.bind("reset", this.clear);
-      this.collection.bind('add', this.addOne);
-      return this.collection.bind('reset', this.addAll);
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      this.test_results = this.options['test_results'];
+      this.sample.bind("all", this.getTestResults);
+      this.sample.bind("reset", this.clear);
+      this.test_results.bind('add', this.addOne);
+      return this.test_results.bind('reset', this.addAll);
     };
 
     TestView.prototype.render = function() {
-      $(this.el).replaceWith(testTemplate);
+      this.$(this.el).replaceWith(testTemplate);
       return this;
     };
 
-    TestView.prototype.addOne = function(result) {
+    TestView.prototype.addOne = function(test_result) {
       var view;
       view = new ResultView({
-        model: result
+        test_result: test_result
       });
-      return $(this.el).append(view.render().el);
+      return this.$(this.el).append(view.render().el);
     };
 
     TestView.prototype.addAll = function() {
-      $(this.el).empty();
-      return this.collection.models.forEach(this.addOne);
+      this.$(this.el).empty();
+      return this.test_results.models.forEach(this.addOne);
     };
 
     TestView.prototype.getTestResults = function() {
-      return app.sample.test();
+      return this.sample.test();
     };
 
     TestView.prototype.clear = function() {
-      return this.collection.reset();
+      return this.test_results.reset();
     };
 
     return TestView;
@@ -12305,84 +12464,41 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "views/edit/edit_view": function(exports, require, module) {
+  "views/new/new_view": function(exports, require, module) {
     (function() {
-  var ReplaceView, SearchView, StringView, TestView,
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  StringView = require('views/edit/_string_view').StringView;
+  exports.NewView = (function(_super) {
 
-  SearchView = require('views/edit/_search_view').SearchView;
+    __extends(NewView, _super);
 
-  ReplaceView = require('views/edit/_replace_view').ReplaceView;
-
-  TestView = require('views/edit/_test_view').TestView;
-
-  exports.EditView = (function(_super) {
-
-    __extends(EditView, _super);
-
-    function EditView() {
-      EditView.__super__.constructor.apply(this, arguments);
+    function NewView() {
+      this.navigateToEdit = __bind(this.navigateToEdit, this);
+      this.render = __bind(this.render, this);
+      NewView.__super__.constructor.apply(this, arguments);
     }
 
-    EditView.prototype.id = 'home-view';
+    NewView.prototype.id = 'new-view';
 
-    EditView.prototype.events = {
-      "click #reset": "resetString",
-      "click #next": "nextString",
-      "click #save": "saveString"
+    NewView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      return this.collection.bind('all', this.navigateToEdit);
     };
 
-    EditView.prototype.initialize = function() {
-      this.stringView = new StringView({
-        model: app.sample
-      });
-      this.searchView = new SearchView({
-        model: app.sample
-      });
-      this.replaceView = new ReplaceView({
-        collection: app.sample
-      });
-      return this.testView = new TestView({
-        collection: app.test_results
-      });
-    };
-
-    EditView.prototype.render = function() {
-      $(this.el).html(require('./templates/edit'));
-      this.$('#string').html(this.stringView.render().el);
-      this.$('#search').html(this.searchView.render().el);
-      this.$('#replace').replaceWith(this.replaceView.render().el);
-      this.$('#test').replaceWith(this.testView.render().el);
+    NewView.prototype.render = function() {
+      this.$(this.el).html(require('./templates/new'));
       return this;
     };
 
-    EditView.prototype.resetString = function() {
-      app.sample.models.forEach(function(chunk) {
-        chunk.set({
-          anonymize: false
-        });
-        return chunk.set({
-          collapse: false
-        });
+    NewView.prototype.navigateToEdit = function() {
+      return this.router.navigate('/edit', {
+        trigger: true
       });
-      return false;
     };
 
-    EditView.prototype.nextString = function() {
-      app.sample.fetch();
-      return false;
-    };
-
-    EditView.prototype.saveString = function() {
-      app.sample.save();
-      app.sample.fetch();
-      return false;
-    };
-
-    return EditView;
+    return NewView;
 
   })(Backbone.View);
 
@@ -12415,100 +12531,6 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     (function() {
     
       _print(_safe('<div id="container">\n  <h1>Edit Filter</h1>\n\n  <p>\n    <input id="type_glob" type="radio" name="type" value="glob"/> <label for="type_glob"> Match Anything <span class="example">(.*)</span></label>\n  </p>\n\n  <p>\n    <input id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>\n  </p>\n\n  <p>\n    <input id="type_char-set" type="radio" name="type" value="char-set"/> <label for="type_car-set"> Match a set of characters <span class="example">(f|b)</span></label>\n  </p>\n\n  <p>\n    <input id="type_literal" type="radio" name="type" value="literal"/> <label for="type_literal"> Match a specific value <span class="example">"foo"</span></label>\n  </p>\n\n  <p>\n    <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numeric characters <span class="example">123</span></label>\n  </p>\n\n  <p>\n    <input id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!\')\'</span></label>\n  </p>\n\n  <hr/>\n\n  <p>\n    <input id="optional" type="checkbox"> <label for="optional">Optional</label>\n    <input id="pass_through" type="checkbox"> <label for="pass_through">Include matched content in redaction</label>\n  </p>\n\n  <hr/>\n\n  <p>\n    <button class="save">Save Changes</button>\n    or\n    <a href="#/create">Cancel</a>\n  </p>\n</div>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
-  }
-}));
-(this.require.define({
-  "views/edit/templates/_chunk": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
-    (function() {
-    
-      _print(this.chunk.get('content'));
-    
-      _print(_safe('\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
-  }
-}));
-(this.require.define({
-  "views/edit/templates/_replace": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
-    (function() {
-    
-      _print(_safe('<span></span>\n'));
     
     }).call(this);
     
@@ -12616,11 +12638,11 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     
       _print(_safe('<td class="raw">'));
     
-      _print(this.result.get('raw'));
+      _print(this.test_result.get('raw'));
     
       _print(_safe('</td>\n<td class="divider">&rArr;</td>\n<td class="redacted">'));
     
-      _print(this.result.get('redacted'));
+      _print(this.test_result.get('redacted'));
     
       _print(_safe('</td>\n'));
     
@@ -12695,7 +12717,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "views/edit/templates/_string": function(exports, require, module) {
+  "views/edit/templates/_test": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
     if (typeof value === 'undefined' && value == null)
@@ -12718,9 +12740,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
     (function() {
     
-      _print(this.sample.original_text());
-    
-      _print(_safe('\n'));
+      _print(_safe('<table id="test">\n</table>\n'));
     
     }).call(this);
     
@@ -12766,7 +12786,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
     (function() {
     
-      _print(_safe('<div id="string">\n  This is a string to be anonymized\n</div>\n\n<div id="filter">\n  <div id="search">\n    /this is a search/\n  </div>\n  <div style="font-size: 40px">&dArr;</div>\n  <div id="replace">\n    \'which will replace\'\n  </div>\n</div>\n\n<div id="controls">\n  <a id="reset" href="#reset">! Reset</a>\n  <a id="save" href="#save">Save</a>\n  <a id="next" href="#next">Next &rarr;</a>\n</div>\n\n<table id="test"></table>\n'));
+      _print(_safe('<div id="string">\n  This is a string to be anonymized\n</div>\n\n<div id="filter">\n  <div id="search">\n    /this is a search/\n  </div>\n  <div style="font-size: 40px">&dArr;</div>\n  <div id="replace">\n    \'which will replace\'\n  </div>\n</div>\n\n<div id="controls">\n  <a id="reset" href="#reset">! Reset</a>\n  <a id="save" href="#save">Save</a>\n  <a id="next" href="#/new">Next &rarr;</a>\n</div>\n\n<table id="test"></table>\n'));
     
     }).call(this);
     
@@ -12789,7 +12809,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "views/edit/templates/_test": function(exports, require, module) {
+  "views/new/templates/new": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
     if (typeof value === 'undefined' && value == null)
@@ -12812,7 +12832,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
     (function() {
     
-      _print(_safe('<table id="test">\n</table>\n'));
+      _print(_safe('<h1>Getting a new sample from the server...</h1>\n'));
     
     }).call(this);
     

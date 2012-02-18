@@ -7,13 +7,16 @@ class exports.ChunkReplaceView extends Backbone.View
     'blur input': 'updateAlias'
 
   initialize: ->
-    @tagName = (if @model.get('anonymize') then 'input' else 'span')
-    @model.bind 'all', @render
+    @router = @options['router']
+    @chunk = @options['chunk']
+
+    @tagName = (if @chunk.get('anonymize') then 'input' else 'span')
+    @chunk.bind 'all', @render
 
   render: =>
-    @$(@el).html chunkReplaceTemplate chunk: @model
+    @$(@el).html chunkReplaceTemplate chunk: @chunk
     this
 
   updateAlias: ->
-    if @model.get('anonymize')
-      @model.set alias: @$('input').val()
+    if @chunk.get('anonymize')
+      @chunk.set alias: @$('input').val()

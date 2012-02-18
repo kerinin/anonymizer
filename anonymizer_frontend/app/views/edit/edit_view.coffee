@@ -2,46 +2,53 @@
 {SearchView} = require 'views/edit/_search_view'
 {ReplaceView} = require 'views/edit/_replace_view'
 {TestView} = require 'views/edit/_test_view'
+editTemplate = require('./templates/edit')
 
 class exports.EditView extends Backbone.View
   id: 'home-view'
 
   events:
     "click #reset": "resetString"
-    "click #next": "nextString"
+    #"click #next": "nextString"
     "click #save": "saveString"
 
 
-  initialize: ->
-    @stringView = new StringView model: app.sample
-    @searchView = new SearchView model: app.sample
-    @replaceView = new ReplaceView collection: app.sample
-    @testView = new TestView collection: app.test_results
+  initialize: =>
+    @router = @options['router']
+    @sample = @options['sample']
+    @test_results = @options['test_results']
 
-  render: ->
-    $(@el).html require('./templates/edit')
+    @stringView = new StringView sample: @sample, router: @router
+    @searchView = new SearchView sample: @sample, router: @router
+    @replaceView = new ReplaceView sample: @sample, router: @router
+    @testView = new TestView test_results: @test_results, sample: @sample, router: @router
+
+  render: =>
+    $(@el).html editTemplate()
     
+    console.log "before render"
     @$('#string').html( @stringView.render().el )
+    console.log @stringView.el
     @$('#search').html( @searchView.render().el )
     @$('#replace').replaceWith( @replaceView.render().el )
     @$('#test').replaceWith( @testView.render().el )
 
     this
 
-  resetString: ->
-    app.sample.models.forEach (chunk) ->
+  resetString: =>
+    @sample.models.forEach (chunk) ->
       chunk.set anonymize: false
       chunk.set collapse: false
 
     return false
 
-  nextString: ->
-    app.sample.fetch()
+  nextString: =>
+    @sample.fetch()
 
     return false
   
-  saveString: ->
-    app.sample.save()
-    app.sample.fetch()
+  saveString: =>
+    @sample.save()
+    @sample.fetch()
 
     return false
