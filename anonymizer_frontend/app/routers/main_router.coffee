@@ -10,7 +10,6 @@ class exports.MainRouter extends Backbone.Router
     '/new': 'new'
 
   new: =>
-    app.sample.reset()
     view = new NewView(collection: app.sample, router: this)
     $('body').empty()
     $('body').html view.render().el

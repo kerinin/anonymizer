@@ -8,7 +8,7 @@ class exports.ChunkView extends Backbone.View
   events: 
     'mouseup': 'handleMouseUp'
 
-  initialize: ->
+  initialize: =>
     @router = @options['router']
     @chunk = @options['chunk']
 
@@ -24,7 +24,7 @@ class exports.ChunkView extends Backbone.View
       @$(@el).removeClass('anonymize')
     this
 
-  handleMouseUp: ->
+  handleMouseUp: =>
     if @chunk.get 'anonymize'
       #@toggleAnonymize()
       app.router.navigate("/edit/chunk/#{@chunk.index()}", {trigger: true})
@@ -32,34 +32,34 @@ class exports.ChunkView extends Backbone.View
     else
       @createChunk()
 
-  toggleAnonymize: ->
+  toggleAnonymize: =>
     @chunk.toggleAnonymize()
 
-  getRangeFromSelection: ->
+  getRangeFromSelection: =>
     window.getSelection().getRangeAt(0)
 
-  clearSelection: ->
+  clearSelection: =>
     window.getSelection().empty()
 
-  rangeCrossesChunks: (range) ->
+  rangeCrossesChunks: (range) =>
     range.startContainer isnt range.endContainer
 
-  getTextFromRange: (range) ->
+  getTextFromRange: (range) =>
     range.cloneContents().textContent
 
-  getTextBeforeRange: (range) ->
+  getTextBeforeRange: (range) =>
     pre_range = range.cloneRange()
     pre_range.setStartBefore(range.startContainer)
     pre_range.setEnd(range.startContainer, range.startOffset)
     @getTextFromRange pre_range
 
-  getTextAfterRange: (range) ->
+  getTextAfterRange: (range) =>
     post_range = range.cloneRange()
     post_range.setEndAfter(range.endContainer)
     post_range.setStart(range.endContainer, range.endOffset)
     @getTextFromRange post_range
     
-  createChunk: ->
+  createChunk: =>
     chunk_range = @getRangeFromSelection()
 
     if @rangeCrossesChunks(chunk_range)
@@ -72,5 +72,5 @@ class exports.ChunkView extends Backbone.View
       @chunk.replaceWith( ( i for i in [pre,chunk,post] when i.get("content") isnt '') )
       @remove
 
-  remove: ->
+  remove: =>
     @$(@el).remove()

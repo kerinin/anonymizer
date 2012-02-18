@@ -11371,7 +11371,18 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     __extends(ChunkView, _super);
 
     function ChunkView() {
+      this.remove = __bind(this.remove, this);
+      this.createChunk = __bind(this.createChunk, this);
+      this.getTextAfterRange = __bind(this.getTextAfterRange, this);
+      this.getTextBeforeRange = __bind(this.getTextBeforeRange, this);
+      this.getTextFromRange = __bind(this.getTextFromRange, this);
+      this.rangeCrossesChunks = __bind(this.rangeCrossesChunks, this);
+      this.clearSelection = __bind(this.clearSelection, this);
+      this.getRangeFromSelection = __bind(this.getRangeFromSelection, this);
+      this.toggleAnonymize = __bind(this.toggleAnonymize, this);
+      this.handleMouseUp = __bind(this.handleMouseUp, this);
       this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
       ChunkView.__super__.constructor.apply(this, arguments);
     }
 
@@ -11524,7 +11535,6 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     MainRouter.prototype["new"] = function() {
       var view;
-      app.sample.reset();
       view = new NewView({
         collection: app.sample,
         router: this
@@ -11933,10 +11943,14 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     __extends(ChunkEditView, _super);
 
     function ChunkEditView() {
+      this.noOp = __bind(this.noOp, this);
+      this.close = __bind(this.close, this);
+      this.saveAndClose = __bind(this.saveAndClose, this);
       this.setPassThrough = __bind(this.setPassThrough, this);
       this.setOptional = __bind(this.setOptional, this);
       this.setType = __bind(this.setType, this);
       this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
       ChunkEditView.__super__.constructor.apply(this, arguments);
     }
 
@@ -12020,7 +12034,9 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     __extends(ChunkReplaceView, _super);
 
     function ChunkReplaceView() {
+      this.updateAlias = __bind(this.updateAlias, this);
       this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
       ChunkReplaceView.__super__.constructor.apply(this, arguments);
     }
 
@@ -12115,6 +12131,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     function ReplaceView() {
       this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
       ReplaceView.__super__.constructor.apply(this, arguments);
     }
 
@@ -12163,6 +12180,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     function ResultView() {
       this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
       ResultView.__super__.constructor.apply(this, arguments);
     }
 
@@ -12205,6 +12223,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     function SearchView() {
       this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
       SearchView.__super__.constructor.apply(this, arguments);
     }
 
@@ -12247,6 +12266,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
       this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
       StringView.__super__.constructor.apply(this, arguments);
     }
 
@@ -12349,9 +12369,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     EditView.prototype.render = function() {
       $(this.el).html(editTemplate());
-      console.log("before render");
       this.$('#string').html(this.stringView.render().el);
-      console.log(this.stringView.el);
       this.$('#search').html(this.searchView.render().el);
       this.$('#replace').replaceWith(this.replaceView.render().el);
       this.$('#test').replaceWith(this.testView.render().el);
@@ -12477,6 +12495,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     function NewView() {
       this.navigateToEdit = __bind(this.navigateToEdit, this);
       this.render = __bind(this.render, this);
+      this.initialize = __bind(this.initialize, this);
       NewView.__super__.constructor.apply(this, arguments);
     }
 
@@ -12484,7 +12503,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     NewView.prototype.initialize = function() {
       this.router = this.options['router'];
-      return this.collection.bind('all', this.navigateToEdit);
+      return this.collection.bind('reset', this.navigateToEdit);
     };
 
     NewView.prototype.render = function() {

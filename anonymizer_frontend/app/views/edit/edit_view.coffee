@@ -26,9 +26,7 @@ class exports.EditView extends Backbone.View
   render: =>
     $(@el).html editTemplate()
     
-    console.log "before render"
     @$('#string').html( @stringView.render().el )
-    console.log @stringView.el
     @$('#search').html( @searchView.render().el )
     @$('#replace').replaceWith( @replaceView.render().el )
     @$('#test').replaceWith( @testView.render().el )

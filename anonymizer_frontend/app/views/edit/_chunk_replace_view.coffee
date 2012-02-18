@@ -6,7 +6,7 @@ class exports.ChunkReplaceView extends Backbone.View
   events:
     'blur input': 'updateAlias'
 
-  initialize: ->
+  initialize: =>
     @router = @options['router']
     @chunk = @options['chunk']
 
@@ -17,6 +17,6 @@ class exports.ChunkReplaceView extends Backbone.View
     @$(@el).html chunkReplaceTemplate chunk: @chunk
     this
 
-  updateAlias: ->
+  updateAlias: =>
     if @chunk.get('anonymize')
       @chunk.set alias: @$('input').val()

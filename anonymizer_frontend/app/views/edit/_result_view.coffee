@@ -4,7 +4,7 @@ class exports.ResultView extends Backbone.View
 
   tagName: 'tr'
 
-  initialize: ->
+  initialize: =>
     @router = @options['router']
     @test_result = @options['test_result']
 

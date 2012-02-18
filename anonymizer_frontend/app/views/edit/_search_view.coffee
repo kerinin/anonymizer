@@ -2,7 +2,7 @@ searchTemplate = require './templates/_search'
 
 class exports.SearchView extends Backbone.View
 
-  initialize: ->
+  initialize: =>
     @router = @options['router']
     @sample = @options['sample']
 

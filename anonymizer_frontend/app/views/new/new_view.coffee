@@ -1,10 +1,10 @@
 class exports.NewView extends Backbone.View
   id: 'new-view'
 
-  initialize: ->
+  initialize: =>
     @router = @options['router']
     
-    @collection.bind 'all', @navigateToEdit
+    @collection.bind 'reset', @navigateToEdit
 
   render: =>
     @$(@el).html require('./templates/new')

@@ -8,7 +8,7 @@ class exports.ChunkEditView extends Backbone.View
     'click .save': 'saveAndClose'
     'click .cancel': 'close'
 
-  initialize: ->
+  initialize: =>
     @router => @options['router']
     @chunk => @options['chunk']
 
@@ -26,14 +26,14 @@ class exports.ChunkEditView extends Backbone.View
   setPassThrough: =>
     @chunk.set pass_through: @$('input[name=pass_through]').val()
 
-  saveAndClose: ->
+  saveAndClose: =>
     @setType()
     @setOptional()
     @setPassThrough()
     @close()
 
-  close: ->
+  close: =>
     @router.navigate("/edit", {trigger: true})  # NOTE: this is going to reset the sample
 
-  noOp: ->
+  noOp: =>
 

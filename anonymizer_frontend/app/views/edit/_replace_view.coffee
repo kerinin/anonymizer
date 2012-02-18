@@ -3,7 +3,7 @@
 class exports.ReplaceView extends Backbone.View
   id: "replace"
 
-  initialize: ->
+  initialize: =>
     @router = @options['router']
     @sample = @options['sample']
 

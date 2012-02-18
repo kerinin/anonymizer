@@ -2,7 +2,7 @@
 
 class exports.StringView extends Backbone.View
 
-  initialize: ->
+  initialize: =>
     @router = @options['router']
     @sample = @options['sample']
 
