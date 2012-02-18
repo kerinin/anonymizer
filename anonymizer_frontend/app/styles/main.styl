@@ -104,35 +104,37 @@ li
   #replace input
     width 4em
 
-#controls
+.controls
   font-size 14px
   font-family Helvetica, Arial, sans-serif
   font-weight bold
-  
-  margin-top 40px
+
   a
     padding 8px 15px
     margin 10px
     border-radius 8px
+    border 4px solid accent
+    padding 4px 11px
+
     &:hover
       text-decoration none
       box-shadow 0px 0px 10px shadow
 
-  #save
+  a.bold
+    padding 8px 15px
     background accent
     color white
-  #reset, #next, #add
-    border 4px solid accent
-    padding 4px 11px
-  #add
-    position fixed
-    right 20px
-    top 50px
+    border none
+
+#controls
+  margin-top 40px
 
 #test
   font-weight normal
   font-size 14px
   font-family Helvetica, Arial, sans-serif
+  vertical-align middle
+  line-height 20px
 
   width 90%
   margin-left auto
@@ -146,6 +148,9 @@ li
   td
     padding-bottom 10px
 
+  .count
+    color light
+    font-size 12px
   .raw, .search
     text-align right
     width 47%
@@ -181,3 +186,15 @@ li
 
     .example
       color light
+
+  .controls, .options
+    text-align center
+
+  .controls
+    margin 40px 0
+
+#new-view
+  text-align center
+  margin-top 50px
+  h2
+    margin-bottom 60px

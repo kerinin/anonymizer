@@ -22,7 +22,7 @@ class exports.MainRouter extends Backbone.Router
 
   chunk_edit: (id) =>
     # Make sure the requested chunk can be edited
-    if not app.sample or app.sample.length < id or not app.sample.at(id).get("anonymize")
+    if not app.sample or not app.sample.at(id) or not app.sample.at(id).get("anonymize")
       @navigate("/edit", {trigger: true})
     else
       baseView = new EditView sample: app.sample, test_results: app.test_results, router: this

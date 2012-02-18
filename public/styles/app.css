@@ -221,15 +221,15 @@ li{margin:0;padding:5px}
 #string .chunk.anonymize{color:#f95a5a;border-left:1px dotted #f95a5a;border-right:1px dotted #f95a5a;cursor:pointer}
 #filter{font-weight:normal;font-size:18px;font-family:Monaco,Courier,monospace;margin-top:40px;}
 #filter #replace input{width:4em}
-#controls{font-size:14px;font-family:Helvetica,Arial,sans-serif;font-weight:bold;margin-top:40px;}
-#controls a{padding:8px 15px;margin:10px;border-radius:8px;}
-#controls a:hover{text-decoration:none;box-shadow:0 0 10px #aaa}
-#controls #save{background:#f95a5a;color:#fff}
-#controls #reset,#controls #next,#controls #add{border:4px solid #f95a5a;padding:4px 11px}
-#controls #add{position:fixed;right:20px;top:50px}
-#test{font-weight:normal;font-size:14px;font-family:Helvetica,Arial,sans-serif;width:90%;margin-left:auto;margin-right:auto;margin-top:80px;}
+.controls{font-size:14px;font-family:Helvetica,Arial,sans-serif;font-weight:bold;}
+.controls a{padding:8px 15px;margin:10px;border-radius:8px;border:4px solid #f95a5a;padding:4px 11px;}
+.controls a:hover{text-decoration:none;box-shadow:0 0 10px #aaa}
+.controls a.bold{padding:8px 15px;background:#f95a5a;color:#fff;border:none}
+#controls{margin-top:40px}
+#test{font-weight:normal;font-size:14px;font-family:Helvetica,Arial,sans-serif;vertical-align:middle;line-height:20px;width:90%;margin-left:auto;margin-right:auto;margin-top:80px;}
 #test table{margin-left:auto;margin-right:auto}
 #test td{padding-bottom:10px}
+#test .count{color:#bbb;font-size:12px}
 #test .raw,#test .search{text-align:right;width:47%}
 #test .divider{width:20px}
 #test .redacted,#test .replace{text-align:left;width:47%}
@@ -237,6 +237,10 @@ li{margin:0;padding:5px}
 #chunk_edit_view #container{padding:10px 40px;margin-top:50px;background:#fff;border:5px solid #f95a5a;border-radius:20px;box-shadow:0 0 20px #aaa;width:400px;height:auto;margin-left:auto;margin-right:auto;}
 #chunk_edit_view #container label{margin-right:2em}
 #chunk_edit_view #container .example{color:#bbb}
+#chunk_edit_view .controls,#chunk_edit_view .options{text-align:center}
+#chunk_edit_view .controls{margin:40px 0}
+#new-view{text-align:center;margin-top:50px;}
+#new-view h2{margin-bottom:60px}
 /* ==|== non-semantic helper classes ========================================
    Please define your styles before this section.
    ========================================================================== */

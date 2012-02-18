@@ -1,5 +1,8 @@
 {ResultView} = require 'views/edit/_result_view'
-testTemplate = require './templates/_test'
+
+testWaitingTemplate = require './templates/test/_waiting'
+testEmptyTemplate = require './templates/test/_empty'
+testErrorTemplate = require './templates/test/_error'
 
 class exports.TestView extends Backbone.View
   
@@ -11,25 +14,27 @@ class exports.TestView extends Backbone.View
     @sample = @options['sample']
     @test_results = @options['test_results']
 
-    @sample.bind "all", @getTestResults
-    @sample.bind "reset", @clear
-    @test_results.bind 'add', @addOne
-    @test_results.bind 'reset', @addAll
+    @test_results.bind 'all', @render
 
   render: =>
-    @$(@el).replaceWith testTemplate
-    this
-
-  addOne: (test_result) =>
-    view = new ResultView test_result: test_result
-    @$(@el).append( view.render().el )
-
-  addAll: =>
+    console.log "rendering test results in state #{@test_results.state}"
     @$(@el).empty()
-    @test_results.models.forEach @addOne
 
-  getTestResults: =>
-    @sample.test()
+    switch @test_results.state
+      # when idle, do nothing
+      when 'waiting'
+        @$(@el).html testWaitingTemplate()
+      when 'empty'
+        @$(@el).html testEmptyTemplate()
+      when 'error'
+        @$(@el).html testErrorTemplate()
+      when 'recieved'
+        if @test_results.length == @test_results.resultCount
+          @$(@el).append $("<tr><td class='count', colspan=3>#{@test_results.resultCount} matches found</td></tr>")
+        else
+          @$(@el).append $("<tr><td class='count', colspan=3>#{@test_results.resultCount} matches found, showing #{@test_results.length}</td></tr>")
+        @test_results.models.forEach (test_result) =>
+          view = new ResultView test_result: test_result
+          @$(@el).append view.render().el
 
-  clear: =>
-    @test_results.reset()
+    this

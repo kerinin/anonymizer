@@ -11,6 +11,6 @@ class exports.Application extends BrunchApplication
   initialize: ->
     @router = new MainRouter
     @sample = new Sample
-    @test_results = new TestResults
+    @test_results = new TestResults @sample
 
 window.app = new exports.Application

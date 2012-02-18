@@ -9,8 +9,8 @@ class exports.ChunkEditView extends Backbone.View
     'click .cancel': 'close'
 
   initialize: =>
-    @router => @options['router']
-    @chunk => @options['chunk']
+    @router = @options['router']
+    @chunk = @options['chunk']
 
   render: =>
     @$(@el).html chunkEditTemplate()

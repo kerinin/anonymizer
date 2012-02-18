@@ -34,21 +34,6 @@ class exports.Sample extends Backbone.Collection
       replace: @replaceText()
     , "filters"
 
-  test: ->
-    @post
-      search: @searchText(),
-      replace: @replaceText()
-    , "test_filter", @testCallback
-
-  testCallback: (results) =>
-    # This conditional is a sanity check to ensure that we don't
-    # end up with stale responses being shown
-    if results['regex'] is "#{@searchText()}"
-      app.test_results.reset(results['results'])
-
-  testFailback: (results) ->
-    console.log(results)
-
   post: (data, url, callback, failback) ->
     $.ajax
       type: "POST",

@@ -1,6 +1,8 @@
 <div id="container">
   <h1>Edit Filter</h1>
 
+  <hr/>
+
   <p>
     <input id="type_glob" type="radio" name="type" value="glob"/> <label for="type_glob"> Match Anything <span class="example">(.*)</span></label>
   </p>
@@ -27,16 +29,16 @@
 
   <hr/>
 
-  <p>
+  <p class="options">
     <input id="optional" type="checkbox"> <label for="optional">Optional</label>
     <input id="pass_through" type="checkbox"> <label for="pass_through">Include matched content in redaction</label>
   </p>
 
   <hr/>
 
-  <p>
-    <button class="save">Save Changes</button>
+  <p class="controls">
+    <a href="#/edit" class="save bold">Save Changes</a>
     or
-    <a href="#/create">Cancel</a>
+    <a href="#/edit" class="cancel">Cancel</a>
   </p>
 </div>
