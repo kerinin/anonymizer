@@ -1,14 +1,14 @@
-{CreateView} = require 'views/create/create_view'
+{EditView} = require 'views/edit/edit_view'
 {ChunkEditView} = require 'views/chunk_edit/chunk_edit_view'
 
 class exports.MainRouter extends Backbone.Router
   routes :
-    '': 'create'
-    '/create': 'create'
+    '': 'edit'
     '/edit/chunk/:id': 'chunk_edit'
+    '/edit': 'edit'
 
-  create: ->
-    view = new CreateView
+  edit: ->
+    view = new EditView
     $('body').empty()
     $('body').html view.render().el
     app.sample.fetch()
@@ -16,10 +16,10 @@ class exports.MainRouter extends Backbone.Router
   chunk_edit: (id) ->
     # Make sure the requested chunk can be edited
     if not app.sample or app.sample.length < id or not app.sample.at(id).get("anonymize")
-      @navigate("/create", {trigger: true})
+      @navigate("/edit", {trigger: true})
     else
-      baseView = new CreateView
-      view = new ChunkEditView
+      baseView = new EditView
+      view = new ChunkEditView model: app.sample.at(id)
 
       # This view is intended to be a 'pop-up', so render the 'base view'
       # for context, then render this view

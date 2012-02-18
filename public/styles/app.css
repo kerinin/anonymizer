@@ -204,6 +204,7 @@ body{background:#91a2c0;font:normal 18px "Helvetica Neue",Arial,Helvetica,sans-s
 ul{list-style-type:none}
 a,a:visited{color:#f95a5a;text-decoration:none}
 a:hover{color:#665248}
+hr{height:1px}
 ::selection{background:#f95a5a;color:#fff}
 #home-view{text-align:center;}
 #home-view #content{background:#fff;padding:20px;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px}
@@ -233,7 +234,9 @@ li{margin:0;padding:5px}
 #test .divider{width:20px}
 #test .redacted,#test .replace{text-align:left;width:47%}
 #chunk_edit_view{background:rgba(255,255,255,0.75);z-index:1000;position:absolute;left:0;top:0;right:0;bottom:0;}
-#chunk_edit_view #container{margin-top:50px;background:#fff;border:5px solid #f95a5a;border-radius:20px;box-shadow:0 0 20px #aaa;width:400px;height:auto;margin-left:auto;margin-right:auto}
+#chunk_edit_view #container{padding:10px 40px;margin-top:50px;background:#fff;border:5px solid #f95a5a;border-radius:20px;box-shadow:0 0 20px #aaa;width:400px;height:auto;margin-left:auto;margin-right:auto;}
+#chunk_edit_view #container label{margin-right:2em}
+#chunk_edit_view #container .example{color:#bbb}
 /* ==|== non-semantic helper classes ========================================
    Please define your styles before this section.
    ========================================================================== */
