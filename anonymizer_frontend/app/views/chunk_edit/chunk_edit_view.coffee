@@ -15,16 +15,18 @@ class exports.ChunkEditView extends Backbone.View
   render: =>
     @$(@el).html chunkEditTemplate()
     @$("input:radio[name=type][value=#{@chunk.get("type")}]").attr("checked", true)
+    @$("input[name=optional]").attr("checked", @chunk.get("optional"))
+    @$("input[name=pass_through]").attr("checked", @chunk.get("pass_through"))
     this
 
   setType: =>
     @chunk.set type: @$('input[name=type]:checked').val()
 
   setOptional: =>
-    @chunk.set optional: @$('input[name=optional]').val()
+    @chunk.set optional: @$('input[name=optional]').is(":checked")
 
   setPassThrough: =>
-    @chunk.set pass_through: @$('input[name=pass_through]').val()
+    @chunk.set pass_through: @$('input[name=pass_through]').is(":checked")
 
   saveAndClose: =>
     @setType()

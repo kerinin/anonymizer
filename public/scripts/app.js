@@ -11798,7 +11798,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
             case 'literal':
               return "(?:" + (XRegExp.escape(this.get('content'))) + ")";
             case 'numeric':
-              return '(\d*)';
+              return '([\\.|\\d]*)';
             case 'glob-excl':
               return "([^" + (((function() {
                 var _i, _len, _ref, _results;
@@ -11939,6 +11939,8 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     ChunkEditView.prototype.render = function() {
       this.$(this.el).html(chunkEditTemplate());
       this.$("input:radio[name=type][value=" + (this.chunk.get("type")) + "]").attr("checked", true);
+      this.$("input[name=optional]").attr("checked", this.chunk.get("optional"));
+      this.$("input[name=pass_through]").attr("checked", this.chunk.get("pass_through"));
       return this;
     };
 
@@ -11950,13 +11952,13 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     ChunkEditView.prototype.setOptional = function() {
       return this.chunk.set({
-        optional: this.$('input[name=optional]').val()
+        optional: this.$('input[name=optional]').is(":checked")
       });
     };
 
     ChunkEditView.prototype.setPassThrough = function() {
       return this.chunk.set({
-        pass_through: this.$('input[name=pass_through]').val()
+        pass_through: this.$('input[name=pass_through]').is(":checked")
       });
     };
 
@@ -12186,49 +12188,42 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "views/edit/templates/test/_error": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
+  "initialize": function(exports, require, module) {
     (function() {
-    
-      _print(_safe('<tr>\n  <td class="error">There was an error while testing this string on the server.</td>\n</tr>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
+  var BrunchApplication, MainRouter, Sample, TestResults,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  BrunchApplication = require('helpers').BrunchApplication;
+
+  MainRouter = require('routers/main_router').MainRouter;
+
+  Sample = require('collections/sample').Sample;
+
+  TestResults = require('collections/test_results').TestResults;
+
+  exports.Application = (function(_super) {
+
+    __extends(Application, _super);
+
+    function Application() {
+      Application.__super__.constructor.apply(this, arguments);
+    }
+
+    Application.prototype.initialize = function() {
+      this.router = new MainRouter;
+      this.sample = new Sample;
+      return this.test_results = new TestResults(this.sample);
+    };
+
+    return Application;
+
+  })(BrunchApplication);
+
+  window.app = new exports.Application;
+
+}).call(this);
+
   }
 }));
 (this.require.define({
@@ -12621,7 +12616,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
     (function() {
     
-      _print(_safe('<div id="container">\n  <h1>Edit Filter</h1>\n\n  <hr/>\n\n  <p>\n    <input id="type_glob" type="radio" name="type" value="glob"/> <label for="type_glob"> Match Anything <span class="example">(.*)</span></label>\n  </p>\n\n  <p>\n    <input id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>\n  </p>\n\n  <p>\n    <input id="type_char-set" type="radio" name="type" value="char-set"/> <label for="type_car-set"> Match a set of characters <span class="example">(f|b)</span></label>\n  </p>\n\n  <p>\n    <input id="type_literal" type="radio" name="type" value="literal"/> <label for="type_literal"> Match a specific value <span class="example">"foo"</span></label>\n  </p>\n\n  <p>\n    <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numeric characters <span class="example">123</span></label>\n  </p>\n\n  <p>\n    <input id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!\')\'</span></label>\n  </p>\n\n  <hr/>\n\n  <p class="options">\n    <input id="optional" type="checkbox"> <label for="optional">Optional</label>\n    <input id="pass_through" type="checkbox"> <label for="pass_through">Include matched content in redaction</label>\n  </p>\n\n  <hr/>\n\n  <p class="controls">\n    <a href="#/edit" class="save bold">Save Changes</a>\n    or\n    <a href="#/edit" class="cancel">Cancel</a>\n  </p>\n</div>\n'));
+      _print(_safe('<div id="container">\n  <h1>Edit Filter</h1>\n\n  <hr/>\n\n  <p>\n    <input id="type_glob" type="radio" name="type" value="glob"/> <label for="type_glob"> Match Anything <span class="example">(.*)</span></label>\n  </p>\n\n  <p>\n    <input id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>\n  </p>\n\n  <p>\n    <input id="type_char-set" type="radio" name="type" value="char-set"/> <label for="type_car-set"> Match a set of characters <span class="example">(f|b)</span></label>\n  </p>\n\n  <p>\n    <input id="type_literal" type="radio" name="type" value="literal"/> <label for="type_literal"> Match a specific value <span class="example">"foo"</span></label>\n  </p>\n\n  <p>\n    <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numers <span class="example">1.23</span></label>\n  </p>\n\n  <p>\n    <input id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!\')\'</span></label>\n  </p>\n\n  <hr/>\n\n  <p class="options">\n    <input name="optional" type="checkbox"> <label for="optional">Optional</label>\n    <input name="pass_through" type="checkbox"> <label for="pass_through">Include matched content in redaction</label>\n  </p>\n\n  <hr/>\n\n  <p class="controls">\n    <a href="#/edit" class="save bold">Save Changes</a>\n    or\n    <a href="#/edit" class="cancel">Cancel</a>\n  </p>\n</div>\n'));
     
     }).call(this);
     
@@ -13000,41 +12995,48 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "initialize": function(exports, require, module) {
-    (function() {
-  var BrunchApplication, MainRouter, Sample, TestResults,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  BrunchApplication = require('helpers').BrunchApplication;
-
-  MainRouter = require('routers/main_router').MainRouter;
-
-  Sample = require('collections/sample').Sample;
-
-  TestResults = require('collections/test_results').TestResults;
-
-  exports.Application = (function(_super) {
-
-    __extends(Application, _super);
-
-    function Application() {
-      Application.__super__.constructor.apply(this, arguments);
-    }
-
-    Application.prototype.initialize = function() {
-      this.router = new MainRouter;
-      this.sample = new Sample;
-      return this.test_results = new TestResults(this.sample);
+  "views/edit/templates/test/_error": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
     };
-
-    return Application;
-
-  })(BrunchApplication);
-
-  window.app = new exports.Application;
-
-}).call(this);
-
+    (function() {
+    
+      _print(_safe('<tr>\n  <td class="error">There was an error while testing this string on the server.</td>\n</tr>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
   }
 }));

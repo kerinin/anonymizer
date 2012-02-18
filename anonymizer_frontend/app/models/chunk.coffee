@@ -35,7 +35,7 @@ class exports.Chunk extends Backbone.Model
         # -> (?:foo)
         when 'literal' then "(?:#{XRegExp.escape @get('content')})"
         # -> (\d*)
-        when 'numeric' then '(\d*)'
+        when 'numeric' then '([\\.|\\d]*)'
         # -> ([^A|b|\$]*)
         when 'glob-excl' then "([^#{(XRegExp.escape match for match in @get("options")).join('|')}]*)"
         else '(.*)'

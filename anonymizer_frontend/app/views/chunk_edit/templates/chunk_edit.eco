@@ -20,7 +20,7 @@
   </p>
 
   <p>
-    <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numeric characters <span class="example">123</span></label>
+    <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numers <span class="example">1.23</span></label>
   </p>
 
   <p>
@@ -30,8 +30,8 @@
   <hr/>
 
   <p class="options">
-    <input id="optional" type="checkbox"> <label for="optional">Optional</label>
-    <input id="pass_through" type="checkbox"> <label for="pass_through">Include matched content in redaction</label>
+    <input name="optional" type="checkbox"> <label for="optional">Optional</label>
+    <input name="pass_through" type="checkbox"> <label for="pass_through">Include matched content in redaction</label>
   </p>
 
   <hr/>
