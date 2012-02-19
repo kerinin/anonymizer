@@ -26,10 +26,21 @@ class exports.ChunkView extends Backbone.View
 
   handleMouseUp: =>
     if @chunk.get 'anonymize'
-      app.router.navigate("/edit/chunk/#{@chunk.index()}", {trigger: true})
+      @router.navigate("/edit/chunk/#{@chunk.index()}", {trigger: true})
       return false
     else
-      @createChunk()
+      chunk_range = @getRangeFromSelection()
+
+      if @rangeIsEmpty(chunk_range)
+        return false
+      else if @rangeCrossesChunks(chunk_range)
+        alert("NO! don't select the red bits")
+      else
+        chunk = @createChunkFrom(chunk_range)
+        @router.navigate("/edit/chunk/#{chunk.index()}", {trigger: true})
+
+  rangeIsEmpty: (range) =>
+    not @rangeCrossesChunks(range) and range.startOffset == range.endOffset
 
   getRangeFromSelection: =>
     window.getSelection().getRangeAt(0)
@@ -55,18 +66,14 @@ class exports.ChunkView extends Backbone.View
     post_range.setStart(range.endContainer, range.endOffset)
     @getTextFromRange post_range
     
-  createChunk: =>
-    chunk_range = @getRangeFromSelection()
-
-    if @rangeCrossesChunks(chunk_range)
-      alert("NO! don't select the red bits")
-    else
+  createChunkFrom: (chunk_range) =>
       pre = new Chunk content: @getTextBeforeRange(chunk_range)
       chunk = new Chunk content: @getTextFromRange(chunk_range), anonymize: true
       post = new Chunk content: @getTextAfterRange(chunk_range)
 
       @chunk.replaceWith( ( i for i in [pre,chunk,post] when i.get("content") isnt '') )
       @remove
+      chunk
 
   remove: =>
     @$(@el).remove()

@@ -11492,8 +11492,8 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
           router: this
         });
         $('body').empty();
-        $('body').html(baseView.render().el);
-        return $('body').append(view.render().el);
+        $('body').html(view.render().el);
+        return $('body').append(baseView.render().el);
       }
     };
 
@@ -11970,19 +11970,22 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     __extends(ChunkEditView, _super);
 
     function ChunkEditView() {
+      this.getAlias = __bind(this.getAlias, this);
       this.getPassThrough = __bind(this.getPassThrough, this);
       this.getOptional = __bind(this.getOptional, this);
       this.getType = __bind(this.getType, this);
-      this.noOp = __bind(this.noOp, this);
       this.close = __bind(this.close, this);
+      this.deleteAndClose = __bind(this.deleteAndClose, this);
       this.saveAndClose = __bind(this.saveAndClose, this);
       this.setOptions = __bind(this.setOptions, this);
+      this.setAlias = __bind(this.setAlias, this);
       this.setPassThrough = __bind(this.setPassThrough, this);
       this.setOptional = __bind(this.setOptional, this);
       this.setType = __bind(this.setType, this);
       this.handleGetOptionsFail = __bind(this.handleGetOptionsFail, this);
       this.handleGetOptionsSuccess = __bind(this.handleGetOptionsSuccess, this);
       this.handleTypeChange = __bind(this.handleTypeChange, this);
+      this.handleKeypress = __bind(this.handleKeypress, this);
       this.safeRender = __bind(this.safeRender, this);
       this.render = __bind(this.render, this);
       this.initialize = __bind(this.initialize, this);
@@ -11994,9 +11997,9 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     ChunkEditView.prototype.tagName = 'form';
 
     ChunkEditView.prototype.events = {
-      'click': 'noOp',
+      'click #screen': 'close',
       'click .save': 'saveAndClose',
-      'click .cancel': 'close',
+      'click .delete': 'deleteAndClose',
       'submit': 'saveAndClose',
       'click input:radio[name=type]': 'handleTypeChange'
     };
@@ -12008,15 +12011,17 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       this.options = this.chunk.get("options");
       this.optional = this.chunk.get("optional");
       this.pass_through = this.chunk.get("pass_through");
-      return this.state = 'idle';
+      this.alias = this.chunk.get("alias");
+      this.state = 'idle';
+      return $('body').keypress(this.handleKeypress);
     };
 
     ChunkEditView.prototype.render = function() {
-      console.log("rendering edit view");
       this.$(this.el).html(chunkEditTemplate({
         type: this.type,
         options: this.options,
-        state: this.state
+        state: this.state,
+        alias: this.alias
       }));
       this.$("input:radio[name=type][value=" + this.type + "]").attr("checked", true);
       this.$("input[name=optional]").attr("checked", this.optional);
@@ -12028,7 +12033,17 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       this.type = this.getType();
       this.optional = this.getOptional();
       this.pass_through = this.getPassThrough();
+      this.alias = this.getAlias();
       return this.render();
+    };
+
+    ChunkEditView.prototype.handleKeypress = function(e) {
+      switch (e.keyCode) {
+        case 13:
+          return this.saveAndClose();
+        case 27:
+          return this.close();
+      }
     };
 
     ChunkEditView.prototype.handleTypeChange = function() {
@@ -12046,8 +12061,6 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
 
     ChunkEditView.prototype.handleGetOptionsSuccess = function(results) {
-      console.log("options callback " + results['results']);
-      console.log("type: " + this.type);
       this.options = results['results'];
       this.state = 'received';
       return this.safeRender();
@@ -12077,18 +12090,32 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       });
     };
 
+    ChunkEditView.prototype.setAlias = function() {
+      return this.chunk.set({
+        alias: this.getAlias()
+      });
+    };
+
     ChunkEditView.prototype.setOptions = function() {
       return this.chunk.set({
         options: this.options
       });
     };
 
-    ChunkEditView.prototype.saveAndClose = function() {
+    ChunkEditView.prototype.saveAndClose = function(e) {
+      if (e) e.preventDefault();
       this.setType();
       this.setOptional();
       this.setPassThrough();
+      this.setAlias();
       this.setOptions();
       return this.close();
+    };
+
+    ChunkEditView.prototype.deleteAndClose = function() {
+      return this.chunk.set({
+        anonymize: false
+      });
     };
 
     ChunkEditView.prototype.close = function() {
@@ -12096,8 +12123,6 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
         trigger: true
       });
     };
-
-    ChunkEditView.prototype.noOp = function() {};
 
     ChunkEditView.prototype.getType = function() {
       return this.$('input[name=type]:checked').val();
@@ -12109,6 +12134,10 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     ChunkEditView.prototype.getPassThrough = function() {
       return this.$('input[name=pass_through]').is(":checked");
+    };
+
+    ChunkEditView.prototype.getAlias = function() {
+      return this.$('input[name=alias]').val() || this.chunk.get('alias');
     };
 
     return ChunkEditView;
@@ -12194,13 +12223,14 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 
     function ChunkView() {
       this.remove = __bind(this.remove, this);
-      this.createChunk = __bind(this.createChunk, this);
+      this.createChunkFrom = __bind(this.createChunkFrom, this);
       this.getTextAfterRange = __bind(this.getTextAfterRange, this);
       this.getTextBeforeRange = __bind(this.getTextBeforeRange, this);
       this.getTextFromRange = __bind(this.getTextFromRange, this);
       this.rangeCrossesChunks = __bind(this.rangeCrossesChunks, this);
       this.clearSelection = __bind(this.clearSelection, this);
       this.getRangeFromSelection = __bind(this.getRangeFromSelection, this);
+      this.rangeIsEmpty = __bind(this.rangeIsEmpty, this);
       this.handleMouseUp = __bind(this.handleMouseUp, this);
       this.render = __bind(this.render, this);
       this.initialize = __bind(this.initialize, this);
@@ -12234,14 +12264,29 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
 
     ChunkView.prototype.handleMouseUp = function() {
+      var chunk, chunk_range;
       if (this.chunk.get('anonymize')) {
-        app.router.navigate("/edit/chunk/" + (this.chunk.index()), {
+        this.router.navigate("/edit/chunk/" + (this.chunk.index()), {
           trigger: true
         });
         return false;
       } else {
-        return this.createChunk();
+        chunk_range = this.getRangeFromSelection();
+        if (this.rangeIsEmpty(chunk_range)) {
+          return false;
+        } else if (this.rangeCrossesChunks(chunk_range)) {
+          return alert("NO! don't select the red bits");
+        } else {
+          chunk = this.createChunkFrom(chunk_range);
+          return this.router.navigate("/edit/chunk/" + (chunk.index()), {
+            trigger: true
+          });
+        }
       }
+    };
+
+    ChunkView.prototype.rangeIsEmpty = function(range) {
+      return !this.rangeCrossesChunks(range) && range.startOffset === range.endOffset;
     };
 
     ChunkView.prototype.getRangeFromSelection = function() {
@@ -12276,34 +12321,30 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       return this.getTextFromRange(post_range);
     };
 
-    ChunkView.prototype.createChunk = function() {
-      var chunk, chunk_range, i, post, pre;
-      chunk_range = this.getRangeFromSelection();
-      if (this.rangeCrossesChunks(chunk_range)) {
-        return alert("NO! don't select the red bits");
-      } else {
-        pre = new Chunk({
-          content: this.getTextBeforeRange(chunk_range)
-        });
-        chunk = new Chunk({
-          content: this.getTextFromRange(chunk_range),
-          anonymize: true
-        });
-        post = new Chunk({
-          content: this.getTextAfterRange(chunk_range)
-        });
-        this.chunk.replaceWith((function() {
-          var _i, _len, _ref, _results;
-          _ref = [pre, chunk, post];
-          _results = [];
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            i = _ref[_i];
-            if (i.get("content") !== '') _results.push(i);
-          }
-          return _results;
-        })());
-        return this.remove;
-      }
+    ChunkView.prototype.createChunkFrom = function(chunk_range) {
+      var chunk, i, post, pre;
+      pre = new Chunk({
+        content: this.getTextBeforeRange(chunk_range)
+      });
+      chunk = new Chunk({
+        content: this.getTextFromRange(chunk_range),
+        anonymize: true
+      });
+      post = new Chunk({
+        content: this.getTextAfterRange(chunk_range)
+      });
+      this.chunk.replaceWith((function() {
+        var _i, _len, _ref, _results;
+        _ref = [pre, chunk, post];
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          i = _ref[_i];
+          if (i.get("content") !== '') _results.push(i);
+        }
+        return _results;
+      })());
+      this.remove;
+      return chunk;
     };
 
     ChunkView.prototype.remove = function() {
@@ -12319,49 +12360,42 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "views/edit/templates/test/_waiting": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
+  "initialize": function(exports, require, module) {
     (function() {
-    
-      _print(_safe('<tr>\n  <td>Testing on server <img src="/images/loader_inline.gif"/></td>\n</tr>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
+  var BrunchApplication, MainRouter, Sample, TestResults,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  BrunchApplication = require('helpers').BrunchApplication;
+
+  MainRouter = require('routers/main_router').MainRouter;
+
+  Sample = require('collections/sample').Sample;
+
+  TestResults = require('collections/test_results').TestResults;
+
+  exports.Application = (function(_super) {
+
+    __extends(Application, _super);
+
+    function Application() {
+      Application.__super__.constructor.apply(this, arguments);
+    }
+
+    Application.prototype.initialize = function() {
+      this.router = new MainRouter;
+      this.sample = new Sample;
+      return this.test_results = new TestResults(this.sample);
+    };
+
+    return Application;
+
+  })(BrunchApplication);
+
+  window.app = new exports.Application;
+
+}).call(this);
+
   }
 }));
 (this.require.define({
@@ -12484,7 +12518,8 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     StringView.prototype.addOne = function(chunk) {
       var view;
       view = new ChunkView({
-        chunk: chunk
+        chunk: chunk,
+        router: this.router
       });
       return this.$(this.el).append(view.render().el);
     };
@@ -12757,10 +12792,18 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
     };
     (function() {
     
-      _print(_safe('<div id="container">\n  <h1>Edit Filter</h1>\n\n  <hr/>\n\n  <p>\n    <input id="type_glob" type="radio" name="type" value="glob"/> <label for="type_glob"> Match Anything <span class="example">(.*)</span></label>\n  </p>\n\n  <p>\n    <input id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>\n    '));
+      _print(_safe('<div id="screen"></div>\n<div id="container">\n  <h1>Edit Filter</h1>\n\n  <hr/>\n\n  <p>\n    <input id="type_glob" type="radio" name="type" value="glob"/> <label for="type_glob"> Match Anything <span class="example">(.*)</span></label>\n    '));
+    
+      if (this.type === 'glob') {
+        _print(_safe('\n      <p class="indent">Replace with: <input name="alias" value="'));
+        _print(this.alias);
+        _print(_safe('"/></p>\n    '));
+      }
+    
+      _print(_safe('\n  </p>\n\n  <p>\n    <input id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>\n    '));
     
       if (this.type === 'set') {
-        _print(_safe('\n      '));
+        _print(_safe('\n      <p class="indent"><input name="optional" type="checkbox"> <label for="optional">Match if omitted</label></p>\n      <p class="indent"><input name="pass_through" type="checkbox"> <label for="pass_through">Include matched option in redaction</label></p>\n      '));
         if (this.state === 'waiting') {
           _print(_safe('\n        <p class="indent">Guessing options <img src="/images/loader_inline.gif"/></p>\n      '));
         } else if (this.state === 'received') {
@@ -12773,7 +12816,7 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
         _print(_safe('\n    '));
       }
     
-      _print(_safe('        \n  </p>\n\n  <p>\n    <input id="type_char-set" type="radio" name="type" value="char-set"/> <label for="type_car-set"> Match a set of characters <span class="example">(f|b)</span></label>\n    '));
+      _print(_safe('        \n  </p>\n\n  <p>\n    <input disabled id="type_char-set" type="radio" name="type" value="char-set"/> <label for="type_car-set"> Match a set of characters <span class="example">(f|b)</span></label>\n    '));
     
       if (this.type === 'char-set') {
         _print(_safe('\n      '));
@@ -12789,7 +12832,29 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
         _print(_safe('\n    '));
       }
     
-      _print(_safe('        \n  </p>\n\n  <p>\n    <input id="type_literal" type="radio" name="type" value="literal"/> <label for="type_literal"> Match a specific value <span class="example">"foo"</span></label>\n  </p>\n\n  <p>\n    <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numbers <span class="example">1.23</span></label>\n  </p>\n\n  <p>\n    <input id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!\')\'</span></label>\n  </p>\n\n  <hr/>\n\n  <p class="options">\n    <input name="optional" type="checkbox"> <label for="optional">Optional</label>\n    <input name="pass_through" type="checkbox"> <label for="pass_through">Include matched content in redaction</label>\n  </p>\n\n  <hr/>\n\n  <p class="controls">\n    <a href="#/edit" class="save bold">Save Changes</a>\n    or\n    <a href="#/edit" class="cancel">Cancel</a>\n  </p>\n</div>\n'));
+      _print(_safe('        \n  </p>\n\n  <p>\n    <input id="type_literal" type="radio" name="type" value="literal"/> <label for="type_literal"> Match a specific value <span class="example">"foo"</span></label>\n    '));
+    
+      if (this.type === 'literal') {
+        _print(_safe('\n      <p class="indent"><input name="optional" type="checkbox"> <label for="optional">Match if omitted</label></p>\n      <p class="indent"><input name="pass_through" type="checkbox"> <label for="pass_through">Include matched option in redaction</label></p>\n    '));
+      }
+    
+      _print(_safe('\n  </p>\n\n  <p>\n    <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numbers <span class="example">1.23</span></label>\n    '));
+    
+      if (this.type === 'numeric') {
+        _print(_safe('\n      <p class="indent">Replace with: <input name="alias" value="'));
+        _print(this.alias);
+        _print(_safe('"/></p>\n    '));
+      }
+    
+      _print(_safe('\n  </p>\n\n  <p>\n    <input disabled id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!\')\'</span></label>\n    '));
+    
+      if (this.type === 'glob-excl') {
+        _print(_safe('\n      <p class="indent">Replace with: <input name="alias" value="'));
+        _print(this.alias);
+        _print(_safe('"/></p>\n    '));
+      }
+    
+      _print(_safe('\n  </p>\n\n  <hr/>\n\n  <p class="controls">\n    <a href="#/edit" class="save bold">Save Changes</a>\n    or\n    <a href="#/edit" class="delete">Delete</a>\n  </p>\n</div>\n\n'));
     
     }).call(this);
     
@@ -12838,9 +12903,9 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       if (!this.chunk.get('collapse')) {
         _print(_safe('\n  '));
         if (this.chunk.get('anonymize') && !this.chunk.get('pass_through')) {
-          _print(_safe('\n    &lt;<input value=\''));
+          _print(_safe('\n    &lt;'));
           _print(this.chunk.get('alias'));
-          _print(_safe('\'/>&gt;\n  '));
+          _print(_safe('&gt;\n  '));
         } else {
           _print(_safe('\n    '));
           _print(this.chunk.replaceText());
@@ -12850,6 +12915,56 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       }
     
       _print(_safe('\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "views/edit/templates/_search": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(_safe('/'));
+    
+      _print(this.sample.searchText());
+    
+      _print(_safe('/\n'));
     
     }).call(this);
     
@@ -12904,56 +13019,6 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
       _print(this.test_result.get('redacted'));
     
       _print(_safe('</td>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
-  }
-}));
-(this.require.define({
-  "views/edit/templates/_search": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
-    (function() {
-    
-      _print(_safe('/'));
-    
-      _print(this.sample.searchText());
-    
-      _print(_safe('/\n'));
     
     }).call(this);
     
@@ -13076,52 +13141,6 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "views/edit/templates/test/_error": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
-    (function() {
-    
-      _print(_safe('<tr>\n  <td class="error">There was an error while testing this string on the server.</td>\n</tr>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
-  }
-}));
-(this.require.define({
   "views/edit/templates/test/_empty": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
@@ -13168,41 +13187,94 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
   }
 }));
 (this.require.define({
-  "initialize": function(exports, require, module) {
-    (function() {
-  var BrunchApplication, MainRouter, Sample, TestResults,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  BrunchApplication = require('helpers').BrunchApplication;
-
-  MainRouter = require('routers/main_router').MainRouter;
-
-  Sample = require('collections/sample').Sample;
-
-  TestResults = require('collections/test_results').TestResults;
-
-  exports.Application = (function(_super) {
-
-    __extends(Application, _super);
-
-    function Application() {
-      Application.__super__.constructor.apply(this, arguments);
-    }
-
-    Application.prototype.initialize = function() {
-      this.router = new MainRouter;
-      this.sample = new Sample;
-      return this.test_results = new TestResults(this.sample);
+  "views/edit/templates/test/_error": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
     };
-
-    return Application;
-
-  })(BrunchApplication);
-
-  window.app = new exports.Application;
-
-}).call(this);
-
+    (function() {
+    
+      _print(_safe('<tr>\n  <td class="error">There was an error while testing this string on the server.</td>\n</tr>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "views/edit/templates/test/_waiting": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(_safe('<tr>\n  <td>Testing on server <img src="/images/loader_inline.gif"/></td>\n</tr>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
   }
 }));

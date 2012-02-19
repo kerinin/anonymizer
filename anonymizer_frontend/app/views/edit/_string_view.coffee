@@ -13,7 +13,7 @@ class exports.StringView extends Backbone.View
     this
 
   addOne: (chunk) =>
-    view = new ChunkView chunk: chunk
+    view = new ChunkView chunk: chunk, router: @router
     @$(@el).append view.render().el
 
   addAll: =>

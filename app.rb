@@ -53,9 +53,9 @@ before do
   end
 end
 
-before /^(?!\/(request|auth))/ do
-  redirect "/request" unless user_authorized?
-end
+#before /^(?!\/(request|auth))/ do
+#  redirect "/request" unless user_authorized?
+#end
 
 get "/request" do
   @request_token = @consumer.get_request_token(:oauth_callback => "#{request.scheme}://#{request.host}:#{request.port}/auth")

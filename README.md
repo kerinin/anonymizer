@@ -30,3 +30,24 @@ To get a development server running:
     ruby app.js
 
 (in different terminals)
+
+To do
+-----
+
+=== Now
+- provide examples of matches or statistics for all types
+- sync queue for 'clear' operation?
+
+=== Later
+- tests
+- hash filter into a unique identifier, use as a URI (update in history without adding to history)
+- tiered search context
+- '#next' route should first check for conflicting searches (async conflict checking?)
+- conflict resolution view
+
+
+=== Eventually
+- LESS templates
+- arbitrary metadata (language, tags, etc)
+- LocalStorage keyed to UID, only get from server in conflict resolution if not stored locally
+- Filter overview w/ delete/compare/edit buttons

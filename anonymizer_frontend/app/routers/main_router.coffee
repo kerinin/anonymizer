@@ -34,5 +34,5 @@ class exports.MainRouter extends Backbone.Router
       # This view is intended to be a 'pop-up', so render the 'base view'
       # for context, then render this view
       $('body').empty()
-      $('body').html baseView.render().el
-      $('body').append view.render().el
+      $('body').html view.render().el
+      $('body').append baseView.render().el

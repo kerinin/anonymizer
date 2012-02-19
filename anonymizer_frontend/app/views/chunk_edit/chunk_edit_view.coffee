@@ -5,12 +5,11 @@ class exports.ChunkEditView extends Backbone.View
   tagName: 'form'
 
   events:
-    'click': 'noOp'
+    'click #screen': 'close'
     'click .save': 'saveAndClose'
-    'click .cancel': 'close'
+    'click .delete': 'deleteAndClose'
     'submit': 'saveAndClose'
     'click input:radio[name=type]': 'handleTypeChange'
-
 
   initialize: =>
     @router = @options['router']
@@ -19,11 +18,13 @@ class exports.ChunkEditView extends Backbone.View
     @options = @chunk.get "options"
     @optional = @chunk.get "optional"
     @pass_through = @chunk.get "pass_through"
+    @alias = @chunk.get "alias"
     @state = 'idle'
 
+    $('body').keypress @handleKeypress
+
   render: =>
-    console.log "rendering edit view"
-    @$(@el).html chunkEditTemplate type: @type, options: @options, state: @state
+    @$(@el).html chunkEditTemplate type: @type, options: @options, state: @state, alias: @alias
     @$("input:radio[name=type][value=#{@type}]").attr("checked", true)
     @$("input[name=optional]").attr("checked", @optional)
     @$("input[name=pass_through]").attr("checked", @pass_through)
@@ -33,7 +34,13 @@ class exports.ChunkEditView extends Backbone.View
     @type = @getType()
     @optional = @getOptional()
     @pass_through = @getPassThrough()
+    @alias = @getAlias()
     @render()
+
+  handleKeypress: (e) =>
+    switch e.keyCode
+      when 13 then @saveAndClose()  # Enter
+      when 27 then @close()         # Esc
 
   handleTypeChange: =>
     @type = @getType()
@@ -46,8 +53,6 @@ class exports.ChunkEditView extends Backbone.View
     @safeRender()
 
   handleGetOptionsSuccess: (results) =>
-    console.log "options callback #{results['results']}"
-    console.log "type: #{@type}"
     @options = results['results']
     @state = 'received'
     @safeRender()
@@ -66,20 +71,26 @@ class exports.ChunkEditView extends Backbone.View
   setPassThrough: =>
     @chunk.set pass_through: @getPassThrough()
 
+  setAlias: =>
+    @chunk.set alias: @getAlias()
+
   setOptions: =>
     @chunk.set options: @options
 
-  saveAndClose: =>
+  saveAndClose: (e) =>
+    e.preventDefault() if e
     @setType()
     @setOptional()
     @setPassThrough()
+    @setAlias()
     @setOptions()
     @close()
 
+  deleteAndClose: =>
+    @chunk.set anonymize: false
+
   close: =>
     @router.navigate("/edit", {trigger: true})  # NOTE: this is going to reset the sample
-
-  noOp: =>
 
   getType: =>
     @$('input[name=type]:checked').val()
@@ -89,3 +100,6 @@ class exports.ChunkEditView extends Backbone.View
 
   getPassThrough: =>
     @$('input[name=pass_through]').is(":checked")
+
+  getAlias: =>
+    @$('input[name=alias]').val() or @chunk.get 'alias'
