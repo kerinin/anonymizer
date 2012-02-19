@@ -38,6 +38,7 @@ class exports.Chunk extends Backbone.Model
         when 'numeric' then '([\\.|\\d]*)'
         # -> ([^A|b|\$]*)
         when 'glob-excl' then "([^#{(XRegExp.escape match for match in @get("options")).join('|')}]*)"
+        when 'char' then '(.)'
         else '(.*)'
       if @get("optional") then "#{matcher}?" else matcher
     else if not @get 'anonymize'
@@ -55,7 +56,30 @@ class exports.Chunk extends Backbone.Model
   anonymizedIndex: =>
     (i for i in @collection.models when i.get("anonymize")).indexOf this
 
-  replaceWith: (chunks) ->
+  replaceWith: (chunks) =>
     @collection.add chunks.reverse(), {at: @index(), silent: true}
     @collection.remove this
  
+  getOptionsFor: (type, callback, failback) =>
+    # cache the current type and set for extracting samples
+    # from the database
+    cache_type = @get 'type'
+    switch type
+      when 'set' then @set type: 'glob', {silent: true}
+      when 'char-set' then @set type: 'char', {silent: true}
+      else return false
+    @post
+      search: @collection.searchText(),
+    , "/get_matches/#{@index()}", callback, failback
+    @set type: cache_type, {silent: true}
+
+  post: (data, url, callback, failback) =>
+    $.ajax
+      type: "POST",
+      url: url,
+      data: JSON.stringify(data),
+      contentType: "application/json; charset=utf-8",
+      dataType: "json",
+      success: callback,
+      failure: failback
+

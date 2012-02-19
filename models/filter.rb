@@ -22,6 +22,15 @@ class Filter
     }
   end
 
+  def get_matches(index)
+    query = Subject.where(:text => regex)
+    {
+      :results => query.limit(10).map{|subject| subject.text.match(regex)[index]}.uniq,
+      :regex => regex.source,
+      :total => query.count
+    }
+  end
+
   def redact(string)
     string.sub(regex, replace)
   end

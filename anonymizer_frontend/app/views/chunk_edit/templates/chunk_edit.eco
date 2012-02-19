@@ -9,10 +9,32 @@
 
   <p>
     <input id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>
+    <% if @type == 'set': %>
+      <% if @state == 'waiting': %>
+        <p class="indent">Guessing options <img src="/images/loader_inline.gif"/></p>
+      <% else if @state == 'received': %>
+        <p class="indent">
+          <%= @options.join(', ') %>
+        </p>
+      <% else if @state == 'error': %>
+        <p class="indent">There was an error :(</p>
+      <% end %>
+    <% end %>        
   </p>
 
   <p>
     <input id="type_char-set" type="radio" name="type" value="char-set"/> <label for="type_car-set"> Match a set of characters <span class="example">(f|b)</span></label>
+    <% if @type == 'char-set': %>
+      <% if @state == 'waiting': %>
+        <p class="indent">Guessing options <img src="/images/loader_inline.gif"/></p>
+      <% else if @state == 'received': %>
+        <p class="indent">
+          <%= @options.join(', ') %>
+        </p>
+      <% else if @state == 'error': %>
+        <p class="indent">There was an error :(</p>
+      <% end %>
+    <% end %>        
   </p>
 
   <p>
@@ -20,7 +42,7 @@
   </p>
 
   <p>
-    <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numers <span class="example">1.23</span></label>
+    <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numbers <span class="example">1.23</span></label>
   </p>
 
   <p>

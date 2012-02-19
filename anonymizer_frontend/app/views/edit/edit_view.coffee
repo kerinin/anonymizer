@@ -21,7 +21,7 @@ class exports.EditView extends Backbone.View
 
     @stringView = new StringView sample: @sample, router: @router
     @searchView = new SearchView sample: @sample, router: @router
-    @replaceView = new ReplaceView sample: @sample, router: @router
+    @replaceView = new ReplaceView sample: @sample, test_results: @test_results, router: @router
     @testView = new TestView test_results: @test_results, sample: @sample, router: @router
 
     @sample.bind 'reset', @render

@@ -114,6 +114,15 @@ post '/test_filter' do
   filter.test_results.to_json
 end
 
+post '/get_matches/:index' do |index|
+  data = JSON.parse(request.body.read)
+  filter = Filter.new(:search => data['search'])
+  
+  content_type :json
+  filter.get_matches(index.to_i).to_json
+end
+
+
 private
 
 def user_authorized?

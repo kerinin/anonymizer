@@ -9,31 +9,71 @@ class exports.ChunkEditView extends Backbone.View
     'click .save': 'saveAndClose'
     'click .cancel': 'close'
     'submit': 'saveAndClose'
+    'click input:radio[name=type]': 'handleTypeChange'
+
 
   initialize: =>
     @router = @options['router']
     @chunk = @options['chunk']
+    @type = @chunk.get "type"
+    @options = @chunk.get "options"
+    @optional = @chunk.get "optional"
+    @pass_through = @chunk.get "pass_through"
+    @state = 'idle'
 
   render: =>
-    @$(@el).html chunkEditTemplate()
-    @$("input:radio[name=type][value=#{@chunk.get("type")}]").attr("checked", true)
-    @$("input[name=optional]").attr("checked", @chunk.get("optional"))
-    @$("input[name=pass_through]").attr("checked", @chunk.get("pass_through"))
+    console.log "rendering edit view"
+    @$(@el).html chunkEditTemplate type: @type, options: @options, state: @state
+    @$("input:radio[name=type][value=#{@type}]").attr("checked", true)
+    @$("input[name=optional]").attr("checked", @optional)
+    @$("input[name=pass_through]").attr("checked", @pass_through)
     this
 
+  safeRender: =>
+    @type = @getType()
+    @optional = @getOptional()
+    @pass_through = @getPassThrough()
+    @render()
+
+  handleTypeChange: =>
+    @type = @getType()
+    switch @type
+      when 'set', 'char-set'
+        @chunk.getOptionsFor @getType(), @handleGetOptionsSuccess, @handleGetOptionsFail
+        @state = 'waiting'
+      else
+        @state = 'idle'
+    @safeRender()
+
+  handleGetOptionsSuccess: (results) =>
+    console.log "options callback #{results['results']}"
+    console.log "type: #{@type}"
+    @options = results['results']
+    @state = 'received'
+    @safeRender()
+
+  handleGetOptionsFail: (results) =>
+    console.log results
+    @state = 'error'
+    @safeRender()
+
   setType: =>
-    @chunk.set type: @$('input[name=type]:checked').val()
+    @chunk.set type: @type
 
   setOptional: =>
-    @chunk.set optional: @$('input[name=optional]').is(":checked")
+    @chunk.set optional: @getOptional()
 
   setPassThrough: =>
-    @chunk.set pass_through: @$('input[name=pass_through]').is(":checked")
+    @chunk.set pass_through: @getPassThrough()
+
+  setOptions: =>
+    @chunk.set options: @options
 
   saveAndClose: =>
     @setType()
     @setOptional()
     @setPassThrough()
+    @setOptions()
     @close()
 
   close: =>
@@ -41,3 +81,11 @@ class exports.ChunkEditView extends Backbone.View
 
   noOp: =>
 
+  getType: =>
+    @$('input[name=type]:checked').val()
+
+  getOptional: =>
+    @$('input[name=optional]').is(":checked")
+
+  getPassThrough: =>
+    @$('input[name=pass_through]').is(":checked")

@@ -3,9 +3,13 @@
 class exports.ReplaceView extends Backbone.View
   id: "replace"
 
+  events:
+    'blur input': 'handleBlur'
+
   initialize: =>
     @router = @options['router']
     @sample = @options['sample']
+    @test_results = @options['test_results']
 
     @sample.bind 'all', @render
 
@@ -15,3 +19,7 @@ class exports.ReplaceView extends Backbone.View
       view = new ChunkReplaceView chunk: chunk
       @$(@el).children("span").append view.render().el
     this
+
+  handleBlur: =>
+    if not @$(':focus').length
+      @test_results.testSample()
