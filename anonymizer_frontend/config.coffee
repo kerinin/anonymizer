@@ -31,6 +31,7 @@ exports.config =
           'vendor/scripts/xregexp-min.js'
           'vendor/scripts/backbone.modelbinding.min.js'
           'vendor/scripts/backbone.memento.min.js'
+          'vendor/scripts/keyboard.0.2.2.js'
         ]
 
     'styles/app.css':

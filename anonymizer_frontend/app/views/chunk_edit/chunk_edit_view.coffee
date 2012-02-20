@@ -7,7 +7,7 @@ class exports.ChunkEditView extends Backbone.View
     'click #screen': 'cancelAndClose'
     'click .save': 'saveAndClose'
     'click .delete': 'deleteAndClose'
-    'submit': 'saveAndClose'
+    #'submit': 'saveAndClose'
     'click input:radio[name=type]': 'handleTypeChange'
 
   initialize: =>
@@ -16,6 +16,8 @@ class exports.ChunkEditView extends Backbone.View
     @state = 'idle'
 
     @chunk.store()
+    KeyboardJS.bind.key 'esc', null, @cancelAndClose
+    KeyboardJS.bind.key 'enter', null, @saveAndClose
 
   render: =>
     @$(@el).html chunkEditTemplate chunk: @chunk
@@ -45,6 +47,7 @@ class exports.ChunkEditView extends Backbone.View
     @render()
 
   saveAndClose: (e) =>
+    console.log 'save and close'
     @unbind()
     @close()
 
@@ -53,8 +56,11 @@ class exports.ChunkEditView extends Backbone.View
     @close()
 
   cancelAndClose: =>
+    console.log 'cancel and close'
     @chunk.restore()
     @close()
 
   close: =>
+    KeyboardJS.unbind.key 'esc'
+    KeyboardJS.unbind.key 'enter'
     @router.navigate("/edit", {trigger: true})  # NOTE: this is going to reset the sample
