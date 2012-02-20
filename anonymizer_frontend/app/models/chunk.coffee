@@ -22,6 +22,13 @@ class exports.Chunk extends Backbone.Model
     #   in brackets.
     pass_through: false
 
+  initialize: =>
+    memento = new Backbone.Memento(this)
+    _.extend(this, memento)
+
+  typeIs: (value) =>
+    @get('type') is value
+
   toggleAnonymize: =>
     @set anonymize: not @get 'anonymize'
 

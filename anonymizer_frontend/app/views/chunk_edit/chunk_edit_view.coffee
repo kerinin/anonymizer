@@ -2,10 +2,9 @@ chunkEditTemplate = require('./templates/chunk_edit')
 
 class exports.ChunkEditView extends Backbone.View
   id: 'chunk_edit_view'
-  tagName: 'form'
 
   events:
-    'click #screen': 'close'
+    'click #screen': 'cancelAndClose'
     'click .save': 'saveAndClose'
     'click .delete': 'deleteAndClose'
     'submit': 'saveAndClose'
@@ -13,93 +12,49 @@ class exports.ChunkEditView extends Backbone.View
 
   initialize: =>
     @router = @options['router']
-    @chunk = @options['chunk']
-    @type = @chunk.get "type"
-    @options = @chunk.get "options"
-    @optional = @chunk.get "optional"
-    @pass_through = @chunk.get "pass_through"
-    @alias = @chunk.get "alias"
+    @model = @chunk = @options['chunk']
     @state = 'idle'
 
-    $('body').keypress @handleKeypress
+    @chunk.store()
 
   render: =>
-    @$(@el).html chunkEditTemplate type: @type, options: @options, state: @state, alias: @alias
-    @$("input:radio[name=type][value=#{@type}]").attr("checked", true)
-    @$("input[name=optional]").attr("checked", @optional)
-    @$("input[name=pass_through]").attr("checked", @pass_through)
+    @$(@el).html chunkEditTemplate chunk: @chunk
+
+    Backbone.ModelBinding.bind(this, {all: "name"})
     this
 
-  safeRender: =>
-    @type = @getType()
-    @optional = @getOptional()
-    @pass_through = @getPassThrough()
-    @alias = @getAlias()
-    @render()
-
-  handleKeypress: (e) =>
-    switch e.keyCode
-      when 13 then @saveAndClose()  # Enter
-      when 27 then @close()         # Esc
-
+  # This may still require some caching or refactoring
   handleTypeChange: =>
-    @type = @getType()
-    switch @type
+    switch @chunk.get 'type'
       when 'set', 'char-set'
-        @chunk.getOptionsFor @getType(), @handleGetOptionsSuccess, @handleGetOptionsFail
+        # This should be a different type?
+        @chunk.getOptionsFor @chunk.get('type'), @handleGetOptionsSuccess, @handleGetOptionsFail
         @state = 'waiting'
       else
         @state = 'idle'
-    @safeRender()
+    @render()
 
   handleGetOptionsSuccess: (results) =>
     @options = results['results']
     @state = 'received'
-    @safeRender()
+    @render()
 
   handleGetOptionsFail: (results) =>
     console.log results
     @state = 'error'
-    @safeRender()
-
-  setType: =>
-    @chunk.set type: @type
-
-  setOptional: =>
-    @chunk.set optional: @getOptional()
-
-  setPassThrough: =>
-    @chunk.set pass_through: @getPassThrough()
-
-  setAlias: =>
-    @chunk.set alias: @getAlias()
-
-  setOptions: =>
-    @chunk.set options: @options
+    @render()
 
   saveAndClose: (e) =>
-    e.preventDefault() if e
-    @setType()
-    @setOptional()
-    @setPassThrough()
-    @setAlias()
-    @setOptions()
+    @unbind()
     @close()
 
   deleteAndClose: =>
     @chunk.set anonymize: false
+    @close()
+
+  cancelAndClose: =>
+    @chunk.restore()
+    @close()
 
   close: =>
     @router.navigate("/edit", {trigger: true})  # NOTE: this is going to reset the sample
-
-  getType: =>
-    @$('input[name=type]:checked').val()
-
-  getOptional: =>
-    @$('input[name=optional]').is(":checked")
-
-  getPassThrough: =>
-    @$('input[name=pass_through]').is(":checked")
-
-  getAlias: =>
-    @$('input[name=alias]').val() or @chunk.get 'alias'

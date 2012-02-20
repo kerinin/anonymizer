@@ -29,6 +29,8 @@ exports.config =
           'vendor/scripts/underscore-1.1.7.js'
           'vendor/scripts/backbone-0.5.3.js'
           'vendor/scripts/xregexp-min.js'
+          'vendor/scripts/backbone.modelbinding.min.js'
+          'vendor/scripts/backbone.memento.min.js'
         ]
 
     'styles/app.css':
