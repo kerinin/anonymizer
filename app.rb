@@ -31,27 +31,27 @@ Mongoid.logger = Logger.new($stdout)
 #Mongoid.logger.level = 3
 
 
-before do
-  session[:oauth] ||= {}  
-  
-  consumer_key = ENV["CONSUMER_KEY"] || ENV["consumer_key"] || "anonymous"
-  consumer_secret = ENV["CONSUMER_SECRET"] || ENV["consumer_secret"] || "anonymous"
-  
-  @consumer ||= OAuth::Consumer.new(consumer_key, consumer_secret,
-    :site => "https://www.google.com",
-    :request_token_path => '/accounts/OAuthGetRequestToken?scope=https://mail.google.com/%20https://www.googleapis.com/auth/userinfo%23email',
-    :access_token_path => '/accounts/OAuthGetAccessToken',
-    :authorize_path => '/accounts/OAuthAuthorizeToken'
-  )
-  
-  if !session[:oauth][:request_token].nil? && !session[:oauth][:request_token_secret].nil?
-    @request_token = OAuth::RequestToken.new(@consumer, session[:oauth][:request_token], session[:oauth][:request_token_secret])
-  end
-  
-  if !session[:oauth][:access_token].nil? && !session[:oauth][:access_token_secret].nil?
-    @access_token = OAuth::AccessToken.new(@consumer, session[:oauth][:access_token], session[:oauth][:access_token_secret])
-  end
-end
+#before do
+#  session[:oauth] ||= {}  
+#  
+#  consumer_key = ENV["CONSUMER_KEY"] || ENV["consumer_key"] || "anonymous"
+#  consumer_secret = ENV["CONSUMER_SECRET"] || ENV["consumer_secret"] || "anonymous"
+#  
+#  @consumer ||= OAuth::Consumer.new(consumer_key, consumer_secret,
+#    :site => "https://www.google.com",
+#    :request_token_path => '/accounts/OAuthGetRequestToken?scope=https://mail.google.com/%20https://www.googleapis.com/auth/userinfo%23email',
+#    :access_token_path => '/accounts/OAuthGetAccessToken',
+#    :authorize_path => '/accounts/OAuthAuthorizeToken'
+#  )
+#  
+#  if !session[:oauth][:request_token].nil? && !session[:oauth][:request_token_secret].nil?
+#    @request_token = OAuth::RequestToken.new(@consumer, session[:oauth][:request_token], session[:oauth][:request_token_secret])
+#  end
+#  
+#  if !session[:oauth][:access_token].nil? && !session[:oauth][:access_token_secret].nil?
+#    @access_token = OAuth::AccessToken.new(@consumer, session[:oauth][:access_token], session[:oauth][:access_token_secret])
+#  end
+#end
 
 #before /^(?!\/(request|auth))/ do
 #  redirect "/request" unless user_authorized?
@@ -78,7 +78,6 @@ end
 get '/next' do
   query = Subject.where(:matched.ne => true)
   line = query.skip( rand(query.count) ).first.text
-  #chunks = line.split(' ').map {|text| {:content => text}}
 
   puts "#{query.count} in query, #{Subject.count} total"
 

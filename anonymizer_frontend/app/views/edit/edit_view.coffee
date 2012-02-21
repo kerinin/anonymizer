@@ -25,6 +25,20 @@ class exports.EditView extends Backbone.View
     @testView = new TestView test_results: @test_results, sample: @sample, router: @router
 
     @sample.bind 'reset', @render
+    @bindKeys()
+
+  bindKeys: =>
+    KeyboardJS.bind.key 'esc', null, @resetString
+    KeyboardJS.bind.key 'enter', null, @saveString
+    KeyboardJS.bind.key 'right,space', null, @nextString
+
+  unbindKeys: =>
+    KeyboardJS.unbind.key 'esc'
+    KeyboardJS.unbind.key 'enter'
+    KeyboardJS.unbind.key 'right,space'
+    
+  remove: =>
+    @unbindKeys()
 
   render: =>
     $(@el).html editTemplate sample: @sample

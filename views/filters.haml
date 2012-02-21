@@ -15,9 +15,9 @@
         %table
           -@filters.each do |filter|
             %tr
-              %td.search= filter.search
-              %td.divider &rArr;
-              %td.replace= filter.replace
+              %td.search.console= "/#{filter.search}/"
+              %td.divider => 
+              %td.replace.console= "\"#{filter.replace}\","
 
       #controls
         %a{:id => 'add', :href => '/'}add more

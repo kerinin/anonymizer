@@ -12,5 +12,6 @@ class exports.Application extends BrunchApplication
     @router = new MainRouter
     @sample = new Sample
     @test_results = new TestResults @sample
+    @current_views = []
 
 window.app = new exports.Application

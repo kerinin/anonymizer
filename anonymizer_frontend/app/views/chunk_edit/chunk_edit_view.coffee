@@ -62,7 +62,6 @@ class exports.ChunkEditView extends Backbone.View
     @render()
 
   saveAndClose: (e) =>
-    console.log 'save and close'
     @unbind()
     @close()
 
@@ -71,7 +70,6 @@ class exports.ChunkEditView extends Backbone.View
     @close()
 
   cancelAndClose: =>
-    console.log 'cancel and close'
     @chunk.restore()
     @close()
 
