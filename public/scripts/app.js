@@ -12768,8 +12768,9 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     };
 
     EditView.prototype.nextString = function() {
-      this.sample.fetch();
-      return false;
+      return this.router.navigate("/new", {
+        trigger: true
+      });
     };
 
     EditView.prototype.saveString = function() {
@@ -13493,7 +13494,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     };
     (function() {
     
-      _print(_safe('<h2>Getting a new sample from the server...</h2>\n<img src="/images/loader_large.gif"/>\n\n'));
+      _print(_safe('<img src="/images/loader_large.gif"/>\n\n'));
     
     }).call(this);
     

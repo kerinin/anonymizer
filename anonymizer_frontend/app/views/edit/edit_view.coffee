@@ -58,9 +58,7 @@ class exports.EditView extends Backbone.View
     return false
 
   nextString: =>
-    @sample.fetch()
-
-    return false
+    @router.navigate("/new", {trigger: true})
   
   saveString: =>
     @sample.save()
