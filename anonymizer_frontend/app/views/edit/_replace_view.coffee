@@ -14,10 +14,10 @@ class exports.ReplaceView extends Backbone.View
     @sample.bind 'all', @render
 
   render: =>
-    @$(@el).html '<span>'
+    @$(@el).html '<span class="label">redact with:</span> <span class="console"></span'
     @sample.models.forEach (chunk) =>
       view = new ChunkReplaceView chunk: chunk
-      @$(@el).children("span").append view.render().el
+      @$(@el).children("span:last").append view.render().el
     this
 
   handleBlur: =>

@@ -6,62 +6,79 @@
 
   <p>
     <input id="type_glob" type="radio" name="type" value="glob"/> <label for="type_glob"> Match Anything <span class="example">(.*)</span></label>
+
     <% if @chunk.typeIs('glob'): %>
       <p class="indent">Replace with: <input name="alias"/></p>
+
+      <% if @state == 'waiting': %>
+        <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>
+      <% else if @state == 'received': %>
+        <p class="indent">Example Redactions: <span class="example"><%= @chunk.get('matches').join(', ') %></span></p>
+      <% else if @state == 'error': %>
+        <p class="indent">There was an error :(</p>
+      <% end %>
+    <% end %>
+  </p>
+
+    <p>
+    <input disabled id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!')'</span></label>
+
+    <% if @chunk.typeIs('glob-excl'): %>
+      <p class="indent">Replace with: <input name="alias"/></p>
+
+      <% if @state == 'waiting': %>
+        <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>
+      <% else if @state == 'received': %>
+        <p class="indent">Example Redactions: <span class="example"><%= @chunk.get('matches').join(', ') %></span></p>
+      <% else if @state == 'error': %>
+        <p class="indent">There was an error :(</p>
+      <% end %>
     <% end %>
   </p>
 
   <p>
-    <input id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>
+    <input disabled id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>
+
     <% if @chunk.typeIs('set'): %>
       <p class="indent"><input name="optional" type="checkbox"> <label for="optional">Match if omitted</label></p>
       <p class="indent"><input name="pass_through" type="checkbox"> <label for="pass_through">Include matched option in redaction</label></p>
+
       <% if @state == 'waiting': %>
-        <p class="indent">Guessing options <img src="/images/loader_inline.gif"/></p>
+        <p class="indent">Getting options from server <img src="/images/loader_inline.gif"/></p>
       <% else if @state == 'received': %>
         <p class="indent">
-          <%= @chunk.get('options').join(', ') %>
+          <% for option in @chunk.get('options'): %>
+            <input id="option_<%= option %>" name="options[<%=option%>]" value="<%= option %>" type="checkbox"/> <label for="option_<%= option %>"><%= option %></label>
+          <% end %>
         </p>
       <% else if @state == 'error': %>
         <p class="indent">There was an error :(</p>
       <% end %>
     <% end %>        
-  </p>
-
-  <p>
-    <input disabled id="type_char-set" type="radio" name="type" value="char-set"/> <label for="type_car-set"> Match a set of characters <span class="example">(f|b)</span></label>
-    <% if @chunk.typeIs('char-set'): %>
-      <% if @state == 'waiting': %>
-        <p class="indent">Guessing options <img src="/images/loader_inline.gif"/></p>
-      <% else if @state == 'received': %>
-        <p class="indent">
-          <%= @chunk.get('options').join(', ') %>
-        </p>
-      <% else if @state == 'error': %>
-        <p class="indent">There was an error :(</p>
-      <% end %>
-    <% end %>        
-  </p>
-
-  <p>
-    <input id="type_literal" type="radio" name="type" value="literal"/> <label for="type_literal"> Match a specific value <span class="example">"foo"</span></label>
-    <% if @chunk.typeIs('literal'): %>
-      <p class="indent"><input name="optional" type="checkbox"> <label for="optional">Match if omitted</label></p>
-      <p class="indent"><input name="pass_through" type="checkbox"> <label for="pass_through">Include matched option in redaction</label></p>
-    <% end %>
   </p>
 
   <p>
     <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numbers <span class="example">1.23</span></label>
+
     <% if @chunk.typeIs('numeric'): %>
       <p class="indent">Replace with: <input name="alias"/></p>
-    <% end %>
+
+      <% if @state == 'waiting': %>
+        <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>
+      <% else if @state == 'received': %>
+        <p class="indent">Example Redactions: <span class="example"><%= @chunk.get('matches').join(', ') %></span></p>
+      <% else if @state == 'error': %>
+        <p class="indent">There was an error :(</p>
+      <% end %>
+   <% end %>
   </p>
 
   <p>
-    <input disabled id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!')'</span></label>
-    <% if @chunk.typeIs('glob-excl'): %>
-      <p class="indent">Replace with: <input name="alias"/></p>
+    <input id="type_literal" type="radio" name="type" value="literal"/> <label for="type_literal"> Match a specific value <span class="example">"<%= @chunk.get('content') %>"</span></label>
+
+    <% if @chunk.typeIs('literal'): %>
+      <p class="indent"><input name="optional" type="checkbox"> <label for="optional">Match if omitted</label></p>
+      <p class="indent"><input name="pass_through" type="checkbox"> <label for="pass_through">Include matched option in redaction</label></p>
     <% end %>
   </p>
 

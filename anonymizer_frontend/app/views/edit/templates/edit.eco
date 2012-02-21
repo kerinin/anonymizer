@@ -6,7 +6,6 @@
   <div id="search">
     /this is a search/
   </div>
-  <div style="font-size: 40px">&dArr;</div>
   <div id="replace">
     'which will replace'
   </div>

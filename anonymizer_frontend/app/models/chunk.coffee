@@ -22,6 +22,8 @@ class exports.Chunk extends Backbone.Model
     #   in brackets.
     pass_through: false
 
+    matches: []
+
   initialize: =>
     memento = new Backbone.Memento(this)
     _.extend(this, memento)
@@ -67,18 +69,10 @@ class exports.Chunk extends Backbone.Model
     @collection.add chunks.reverse(), {at: @index(), silent: true}
     @collection.remove this
  
-  getOptionsFor: (type, callback, failback) =>
-    # cache the current type and set for extracting samples
-    # from the database
-    cache_type = @get 'type'
-    switch type
-      when 'set' then @set type: 'glob', {silent: true}
-      when 'char-set' then @set type: 'char', {silent: true}
-      else return false
+  getMatches: (callback, failback) =>
     @post
       search: @collection.searchText(),
-    , "/get_matches/#{@index()}", callback, failback
-    @set type: cache_type, {silent: true}
+    , "/get_matches/#{@anonymizedIndex()+1}", callback, failback
 
   post: (data, url, callback, failback) =>
     $.ajax

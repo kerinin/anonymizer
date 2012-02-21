@@ -1,1 +1,1 @@
-/<%= @sample.searchText() %>/
+<span class="label">search for:</span> <span class="console">/<%= @sample.searchText() %>/</span>

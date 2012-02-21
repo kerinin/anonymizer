@@ -8,7 +8,7 @@ class exports.ChunkEditView extends Backbone.View
     'click .save': 'saveAndClose'
     'click .delete': 'deleteAndClose'
     #'submit': 'saveAndClose'
-    'click input:radio[name=type]': 'handleTypeChange'
+    #'click input:radio[name=type]': 'handleTypeChange'
 
   initialize: =>
     @router = @options['router']
@@ -16,32 +16,47 @@ class exports.ChunkEditView extends Backbone.View
     @state = 'idle'
 
     @chunk.store()
+    @chunk.bind 'change:type', @getMatches
+    @chunk.bind 'all', @render
+    @getMatches()
     KeyboardJS.bind.key 'esc', null, @cancelAndClose
     KeyboardJS.bind.key 'enter', null, @saveAndClose
 
   render: =>
-    @$(@el).html chunkEditTemplate chunk: @chunk
+    @$(@el).html chunkEditTemplate chunk: @chunk, state: @state
 
     Backbone.ModelBinding.bind(this, {all: "name"})
     this
 
   # This may still require some caching or refactoring
-  handleTypeChange: =>
+  getMatches: =>
     switch @chunk.get 'type'
-      when 'set', 'char-set'
+      when 'set'
+        @chunk.set type: 'glob', {silent: true}
+        @chunk.getMatches @handleGetOptionsSuccess, @handleMatchesFailure
+        @chunk.set type: 'set', {silent: true}
+        @state = 'waiting'
+      when 'glob', 'numeric', 'glob-excl'
         # This should be a different type?
-        @chunk.getOptionsFor @chunk.get('type'), @handleGetOptionsSuccess, @handleGetOptionsFail
+        @chunk.getMatches @handleMatchesSuccess, @handleMatchesFailure
         @state = 'waiting'
       else
         @state = 'idle'
     @render()
 
+  handleMatchesSuccess: (results) =>
+    if results['regex'] == @chunk.collection.searchText()
+      @chunk.set matches: results['results']
+      @state = 'received'
+      @render()
+  
   handleGetOptionsSuccess: (results) =>
-    @options = results['results']
-    @state = 'received'
-    @render()
+    if @chunk.get('type') == 'set'
+      @chunk.set options: results['results']
+      @state = 'received'
+      @render()
 
-  handleGetOptionsFail: (results) =>
+  handleMatchesFailure: (results) =>
     console.log results
     @state = 'error'
     @render()
