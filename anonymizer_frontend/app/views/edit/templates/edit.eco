@@ -1,3 +1,8 @@
+<div id="instructions">
+  <p>Select the text to be anonymized</p>
+  <p>Key shortcuts: &lt;enter&gt;:save, &lt;space&gt;:next, &lt;esc&gt;:reset</p>
+</div>
+
 <div id="string">
   This is a string to be anonymized
 </div>
