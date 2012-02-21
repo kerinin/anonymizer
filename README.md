@@ -9,10 +9,6 @@ Installation
 
 You'll need `node` and `npm` installed before you start.  Google it.
 
-Install gem dependencies
-
-    bundle install
-
 Install brunch
 
     npm install brunch
@@ -20,16 +16,32 @@ Install brunch
 If you want growl notifications when the build fails, download and install `growlnotify`,
 which you can get [here](http://growl.info/downloads#generaldownloads)
 
-There are two scripts included in the main directory: `build_frontend.sh` builds
-the frontend and puts it in the `public` directory to be served by sinatra, 
-`watch_frontend.sh` watches for changes to the frontend and re-compiles when needed.
+There are some scripts included in the root directory:
+
+`build_frontend.sh`
+builds the frontend and puts it in the `public` directory to be served by sinatra 
+
+`watch_frontend.sh`
+watches for changes to the frontend and re-compiles when needed.
+
+`load_db.rb`
+Populates the MongoDB database.  Takes a file as an argument and creates a 'Subject'
+for each line in the file
+
+`fake_data.rb`
+Clears and populates the MongoDB database with fake Facebook notification email data.
+Takes an optional argument which is the upper limit on the number of random examples
+to generate for each template (defaults to 200)
 
 To get a development server running:
 
-    ./watch_frontend.sh
-    ruby app.js
+    bundle install
+    bundle exec ruby fake_data.rb
+    bundle exec ruby watch_frontend.sh
+    bundle exec ruby app.js
 
-(in different terminals)
+(those last two in different terminals)
+
 
 To do
 -----
