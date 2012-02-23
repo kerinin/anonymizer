@@ -13,8 +13,19 @@ class exports.TestView extends Backbone.View
     @router = @options['router']
     @sample = @options['sample']
     @test_results = @options['test_results']
+    @child_views = []
 
+    @bind() if @options['bind'] isnt false
+
+  bind: =>
     @test_results.bind 'all', @render
+
+  unbind: =>
+    @test_results.unbind 'all'
+
+  remove: =>
+    @unbind()
+    view.remove() for view in @child_views
 
   render: =>
     @$(@el).empty()
@@ -33,7 +44,8 @@ class exports.TestView extends Backbone.View
         else
           @$(@el).append $("<tr><td class='count', colspan=3>#{@test_results.resultCount} matches found, showing #{@test_results.length}</td></tr>")
         @test_results.models.forEach (test_result) =>
-          view = new ResultView test_result: test_result
+          view = new ResultView test_result: test_result, bind: @options['bind']
           @$(@el).append view.render().el
+          @child_views.push view
 
     this

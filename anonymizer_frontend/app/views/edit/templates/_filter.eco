@@ -1,0 +1,8 @@
+<div id="filter">
+  <div id="search">
+    <span class="label">search for:</span> <span class="console">/<%= @sample.searchText() %>/</span>
+  </div>
+  <div id="replace">
+    <span class="label">redact with:</span> <span class="console">'<%= @sample.replaceText() %>'</span>
+  </div>
+</div>

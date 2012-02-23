@@ -11878,41 +11878,82 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
 		}
 	}
 }));(this.require.define({
-  "views/edit/_result_view": function(exports, require, module) {
+  "views/edit/_replace_view": function(exports, require, module) {
     (function() {
-  var resultTemplate,
+  var ChunkReplaceView,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  resultTemplate = require('./templates/_result');
+  ChunkReplaceView = require('views/edit/_chunk_replace_view').ChunkReplaceView;
 
-  exports.ResultView = (function(_super) {
+  exports.ReplaceView = (function(_super) {
 
-    __extends(ResultView, _super);
+    __extends(ReplaceView, _super);
 
-    function ResultView() {
+    function ReplaceView() {
+      this.handleBlur = __bind(this.handleBlur, this);
       this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
       this.initialize = __bind(this.initialize, this);
-      ResultView.__super__.constructor.apply(this, arguments);
+      ReplaceView.__super__.constructor.apply(this, arguments);
     }
 
-    ResultView.prototype.tagName = 'tr';
+    ReplaceView.prototype.id = "replace";
 
-    ResultView.prototype.initialize = function() {
-      this.router = this.options['router'];
-      this.test_result = this.options['test_result'];
-      return this.test_result.bind('all', this.render);
+    ReplaceView.prototype.events = {
+      'blur input': 'handleBlur'
     };
 
-    ResultView.prototype.render = function() {
-      this.$(this.el).html(resultTemplate({
-        test_result: this.test_result
-      }));
+    ReplaceView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      this.test_results = this.options['test_results'];
+      this.child_views = [];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    ReplaceView.prototype.bind = function() {
+      return this.sample.bind('all', this.render);
+    };
+
+    ReplaceView.prototype.unbind = function() {
+      return this.sample.unbind('all');
+    };
+
+    ReplaceView.prototype.remove = function() {
+      var view, _i, _len, _ref;
+      this.unbind();
+      _ref = this.child_views;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        view = _ref[_i];
+        view.remove();
+      }
+      return this.$(this.el).remove();
+    };
+
+    ReplaceView.prototype.render = function() {
+      var _this = this;
+      this.$(this.el).html('<span class="label">redact with:</span> <span class="console"></span');
+      this.sample.models.forEach(function(chunk) {
+        var view;
+        view = new ChunkReplaceView({
+          chunk: chunk,
+          bind: _this.options['bind']
+        });
+        _this.$(_this.el).children("span:last").append(view.render().el);
+        return _this.child_views.push(view);
+      });
       return this;
     };
 
-    return ResultView;
+    ReplaceView.prototype.handleBlur = function() {
+      if (!this.$(':focus').length) return this.test_results.testSample();
+    };
+
+    return ReplaceView;
 
   })(Backbone.View);
 
@@ -12133,6 +12174,191 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
+  "models/chunk": function(exports, require, module) {
+    (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  exports.Chunk = (function(_super) {
+
+    __extends(Chunk, _super);
+
+    function Chunk() {
+      this.post = __bind(this.post, this);
+      this.getMatches = __bind(this.getMatches, this);
+      this.replaceWith = __bind(this.replaceWith, this);
+      this.index = __bind(this.index, this);
+      this.toggleAnonymize = __bind(this.toggleAnonymize, this);
+      this.typeIs = __bind(this.typeIs, this);
+      this.initialize = __bind(this.initialize, this);
+      Chunk.__super__.constructor.apply(this, arguments);
+    }
+
+    Chunk.prototype.defaults = {
+      content: '',
+      anonymize: false,
+      alias: 'redacted',
+      collapse: false,
+      type: 'glob',
+      options: [],
+      optional: false,
+      pass_through: false,
+      matches: []
+    };
+
+    Chunk.prototype.initialize = function() {
+      var memento;
+      memento = new Backbone.Memento(this);
+      return _.extend(this, memento);
+    };
+
+    Chunk.prototype.typeIs = function(value) {
+      return this.get('type') === value;
+    };
+
+    Chunk.prototype.toggleAnonymize = function() {
+      return this.set({
+        anonymize: !this.get('anonymize')
+      });
+    };
+
+    Chunk.prototype.searchText = function() {
+      var match, matcher;
+      if (this.get('anonymize') && this.get('collapse') !== true) {
+        matcher = (function() {
+          switch (this.get('type')) {
+            case 'set':
+              return "(" + (((function() {
+                var _i, _len, _ref, _results;
+                _ref = this.get("options");
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  match = _ref[_i];
+                  _results.push("(?:" + (XRegExp.escape(match)) + ")");
+                }
+                return _results;
+              }).call(this)).join('|')) + ")";
+            case 'char-set':
+              return "(" + (((function() {
+                var _i, _len, _ref, _results;
+                _ref = this.get("options");
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  match = _ref[_i];
+                  _results.push(XRegExp.escape(match));
+                }
+                return _results;
+              }).call(this)).join('|')) + ")";
+            case 'literal':
+              return "(?:" + (XRegExp.escape(this.get('content'))) + ")";
+            case 'numeric':
+              return '([\\.|\\d]*)';
+            case 'glob-excl':
+              return "([^" + (((function() {
+                var _i, _len, _ref, _results;
+                _ref = this.get("options");
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  match = _ref[_i];
+                  _results.push(XRegExp.escape(match));
+                }
+                return _results;
+              }).call(this)).join('|')) + "]*)";
+            case 'char':
+              return '(.)';
+            default:
+              return '(.*?)';
+          }
+        }).call(this);
+        if (this.get("optional")) {
+          return "" + matcher + "?";
+        } else {
+          return matcher;
+        }
+      } else if (!this.get('anonymize')) {
+        return "(" + (XRegExp.escape(this.get('content'))) + ")";
+      }
+    };
+
+    Chunk.prototype.replaceText = function() {
+      if (this.get('anonymize') && this.get('collapse') !== true) {
+        if (this.get("pass_through")) {
+          return "\\" + (this.index() + 1);
+        } else {
+          return "[" + (this.get("alias")) + "]";
+        }
+      } else if (!this.get('anonymize')) {
+        return "\\" + (this.index() + 1);
+      }
+    };
+
+    Chunk.prototype.index = function() {
+      return this.collection.models.indexOf(this);
+    };
+
+    Chunk.prototype.replaceWith = function(chunks) {
+      this.collection.add(chunks.reverse(), {
+        at: this.index(),
+        silent: true
+      });
+      return this.collection.remove(this);
+    };
+
+    Chunk.prototype.getMatches = function(callback, failback) {
+      return this.post({
+        search: this.collection.searchText()
+      }, "/get_matches/" + (this.index() + 1), callback, failback);
+    };
+
+    Chunk.prototype.post = function(data, url, callback, failback) {
+      return $.ajax({
+        type: "POST",
+        url: url,
+        data: JSON.stringify(data),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: callback,
+        failure: failback
+      });
+    };
+
+    return Chunk;
+
+  })(Backbone.Model);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "models/test_result": function(exports, require, module) {
+    (function() {
+  var __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  exports.TestResult = (function(_super) {
+
+    __extends(TestResult, _super);
+
+    function TestResult() {
+      TestResult.__super__.constructor.apply(this, arguments);
+    }
+
+    TestResult.prototype.defaults = {
+      raw: null,
+      redacted: null
+    };
+
+    return TestResult;
+
+  })(Backbone.Model);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
   "routers/main_router": function(exports, require, module) {
     (function() {
   var ChunkEditView, EditView, NewView,
@@ -12218,9 +12444,9 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
         baseView = new EditView({
           sample: app.sample,
           test_results: app.test_results,
-          router: this
+          router: this,
+          bind: false
         });
-        baseView.unbindKeys();
         view = new ChunkEditView({
           chunk: app.sample.at(id),
           router: this
@@ -12228,6 +12454,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
         $('body').empty();
         $('body').html(view.render().el);
         $('body').append(baseView.render().el);
+        $("#chunk_edit_view input[name=alias]").select();
         return app.current_views = [baseView, view];
       }
     };
@@ -12241,329 +12468,55 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "views/chunk_edit/chunk_edit_view": function(exports, require, module) {
+  "views/_filter_view": function(exports, require, module) {
     (function() {
-  var chunkEditTemplate,
+  var searchTemplate,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  chunkEditTemplate = require('./templates/chunk_edit');
+  searchTemplate = require('./templates/_search');
 
-  exports.ChunkEditView = (function(_super) {
+  exports.SearchView = (function(_super) {
 
-    __extends(ChunkEditView, _super);
+    __extends(SearchView, _super);
 
-    function ChunkEditView() {
-      this.close = __bind(this.close, this);
-      this.cancelAndClose = __bind(this.cancelAndClose, this);
-      this.deleteAndClose = __bind(this.deleteAndClose, this);
-      this.saveAndClose = __bind(this.saveAndClose, this);
-      this.handleMatchesFailure = __bind(this.handleMatchesFailure, this);
-      this.handleGetOptionsSuccess = __bind(this.handleGetOptionsSuccess, this);
-      this.handleMatchesSuccess = __bind(this.handleMatchesSuccess, this);
-      this.getMatches = __bind(this.getMatches, this);
+    function SearchView() {
       this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
       this.initialize = __bind(this.initialize, this);
-      ChunkEditView.__super__.constructor.apply(this, arguments);
+      SearchView.__super__.constructor.apply(this, arguments);
     }
 
-    ChunkEditView.prototype.id = 'chunk_edit_view';
-
-    ChunkEditView.prototype.events = {
-      'click #screen': 'cancelAndClose',
-      'click .save': 'saveAndClose',
-      'click .delete': 'deleteAndClose'
-    };
-
-    ChunkEditView.prototype.initialize = function() {
-      this.router = this.options['router'];
-      this.model = this.chunk = this.options['chunk'];
-      this.state = 'idle';
-      this.chunk.store();
-      this.chunk.bind('change:type', this.getMatches);
-      this.chunk.bind('all', this.render);
-      this.getMatches();
-      KeyboardJS.bind.key('esc', null, this.cancelAndClose);
-      return KeyboardJS.bind.key('enter', null, this.saveAndClose);
-    };
-
-    ChunkEditView.prototype.render = function() {
-      this.$(this.el).html(chunkEditTemplate({
-        chunk: this.chunk,
-        state: this.state
-      }));
-      Backbone.ModelBinding.bind(this, {
-        all: "name"
-      });
-      return this;
-    };
-
-    ChunkEditView.prototype.getMatches = function() {
-      switch (this.chunk.get('type')) {
-        case 'set':
-          this.chunk.set({
-            type: 'glob'
-          }, {
-            silent: true
-          });
-          this.chunk.getMatches(this.handleGetOptionsSuccess, this.handleMatchesFailure);
-          this.chunk.set({
-            type: 'set'
-          }, {
-            silent: true
-          });
-          this.state = 'waiting';
-          break;
-        case 'glob':
-        case 'numeric':
-        case 'glob-excl':
-          this.chunk.getMatches(this.handleMatchesSuccess, this.handleMatchesFailure);
-          this.state = 'waiting';
-          break;
-        default:
-          this.state = 'idle';
-      }
-      return this.render();
-    };
-
-    ChunkEditView.prototype.handleMatchesSuccess = function(results) {
-      if (results['regex'] === this.chunk.collection.searchText()) {
-        this.chunk.set({
-          matches: results['results']
-        });
-        this.state = 'received';
-        return this.render();
-      }
-    };
-
-    ChunkEditView.prototype.handleGetOptionsSuccess = function(results) {
-      if (this.chunk.get('type') === 'set') {
-        this.chunk.set({
-          options: results['results']
-        });
-        this.state = 'received';
-        return this.render();
-      }
-    };
-
-    ChunkEditView.prototype.handleMatchesFailure = function(results) {
-      console.log(results);
-      this.state = 'error';
-      return this.render();
-    };
-
-    ChunkEditView.prototype.saveAndClose = function(e) {
-      this.unbind();
-      return this.close();
-    };
-
-    ChunkEditView.prototype.deleteAndClose = function() {
-      this.chunk.set({
-        anonymize: false
-      });
-      return this.close();
-    };
-
-    ChunkEditView.prototype.cancelAndClose = function() {
-      this.chunk.restore();
-      return this.close();
-    };
-
-    ChunkEditView.prototype.close = function() {
-      KeyboardJS.unbind.key('esc');
-      KeyboardJS.unbind.key('enter');
-      return this.router.navigate("/edit", {
-        trigger: true
-      });
-    };
-
-    return ChunkEditView;
-
-  })(Backbone.View);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "models/test_result": function(exports, require, module) {
-    (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  exports.TestResult = (function(_super) {
-
-    __extends(TestResult, _super);
-
-    function TestResult() {
-      TestResult.__super__.constructor.apply(this, arguments);
-    }
-
-    TestResult.prototype.defaults = {
-      raw: null,
-      redacted: null
-    };
-
-    return TestResult;
-
-  })(Backbone.Model);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "initialize": function(exports, require, module) {
-    (function() {
-  var BrunchApplication, MainRouter, Sample, TestResults,
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  BrunchApplication = require('helpers').BrunchApplication;
-
-  MainRouter = require('routers/main_router').MainRouter;
-
-  Sample = require('collections/sample').Sample;
-
-  TestResults = require('collections/test_results').TestResults;
-
-  exports.Application = (function(_super) {
-
-    __extends(Application, _super);
-
-    function Application() {
-      Application.__super__.constructor.apply(this, arguments);
-    }
-
-    Application.prototype.initialize = function() {
-      this.router = new MainRouter;
-      this.sample = new Sample;
-      this.test_results = new TestResults(this.sample);
-      return this.current_views = [];
-    };
-
-    return Application;
-
-  })(BrunchApplication);
-
-  window.app = new exports.Application;
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "views/edit/_replace_view": function(exports, require, module) {
-    (function() {
-  var ChunkReplaceView,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  ChunkReplaceView = require('views/edit/_chunk_replace_view').ChunkReplaceView;
-
-  exports.ReplaceView = (function(_super) {
-
-    __extends(ReplaceView, _super);
-
-    function ReplaceView() {
-      this.handleBlur = __bind(this.handleBlur, this);
-      this.render = __bind(this.render, this);
-      this.initialize = __bind(this.initialize, this);
-      ReplaceView.__super__.constructor.apply(this, arguments);
-    }
-
-    ReplaceView.prototype.id = "replace";
-
-    ReplaceView.prototype.events = {
-      'blur input': 'handleBlur'
-    };
-
-    ReplaceView.prototype.initialize = function() {
+    SearchView.prototype.initialize = function() {
       this.router = this.options['router'];
       this.sample = this.options['sample'];
-      this.test_results = this.options['test_results'];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    SearchView.prototype.bind = function() {
       return this.sample.bind('all', this.render);
     };
 
-    ReplaceView.prototype.render = function() {
-      var _this = this;
-      this.$(this.el).html('<span class="label">redact with:</span> <span class="console"></span');
-      this.sample.models.forEach(function(chunk) {
-        var view;
-        view = new ChunkReplaceView({
-          chunk: chunk
-        });
-        return _this.$(_this.el).children("span:last").append(view.render().el);
-      });
-      return this;
+    SearchView.prototype.unbind = function() {
+      return this.sample.bind('all');
     };
 
-    ReplaceView.prototype.handleBlur = function() {
-      if (!this.$(':focus').length) return this.test_results.testSample();
+    SearchView.prototype.remove = function() {
+      this.unbind();
+      return this.$(this.el).remove();
     };
 
-    return ReplaceView;
-
-  })(Backbone.View);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "views/edit/_chunk_replace_view": function(exports, require, module) {
-    (function() {
-  var chunkReplaceTemplate,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  chunkReplaceTemplate = require('./templates/_replace_chunk');
-
-  exports.ChunkReplaceView = (function(_super) {
-
-    __extends(ChunkReplaceView, _super);
-
-    function ChunkReplaceView() {
-      this.updateAlias = __bind(this.updateAlias, this);
-      this.render = __bind(this.render, this);
-      this.initialize = __bind(this.initialize, this);
-      ChunkReplaceView.__super__.constructor.apply(this, arguments);
-    }
-
-    ChunkReplaceView.prototype.tagName = 'span';
-
-    ChunkReplaceView.prototype.events = {
-      'blur input': 'updateAlias'
-    };
-
-    ChunkReplaceView.prototype.initialize = function() {
-      this.router = this.options['router'];
-      this.chunk = this.options['chunk'];
-      this.tagName = (this.chunk.get('anonymize') ? 'input' : 'span');
-      return this.chunk.bind('all', this.render);
-    };
-
-    ChunkReplaceView.prototype.render = function() {
-      this.$(this.el).html(chunkReplaceTemplate({
-        chunk: this.chunk
+    SearchView.prototype.render = function() {
+      this.$(this.el).html(searchTemplate({
+        sample: this.sample
       }));
       return this;
     };
 
-    ChunkReplaceView.prototype.updateAlias = function() {
-      if (this.chunk.get('anonymize')) {
-        return this.chunk.set({
-          alias: this.$('input').val()
-        }, {
-          silent: true
-        });
-      }
-    };
-
-    return ChunkReplaceView;
+    return SearchView;
 
   })(Backbone.View);
 
@@ -12598,39 +12551,188 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "views/edit/_search_view": function(exports, require, module) {
+  "views/chunk_edit/chunk_edit_view": function(exports, require, module) {
     (function() {
-  var searchTemplate,
+  var chunkEditTemplate, viewStateMatchesTemplate, viewStateOptionsTemplate,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  searchTemplate = require('./templates/_search');
+  chunkEditTemplate = require('./templates/chunk_edit');
 
-  exports.SearchView = (function(_super) {
+  viewStateMatchesTemplate = require('./templates/_state_matches');
 
-    __extends(SearchView, _super);
+  viewStateOptionsTemplate = require('./templates/_state_options');
 
-    function SearchView() {
+  exports.ChunkEditView = (function(_super) {
+
+    __extends(ChunkEditView, _super);
+
+    function ChunkEditView() {
+      this.close = __bind(this.close, this);
+      this.cancelAndClose = __bind(this.cancelAndClose, this);
+      this.deleteAndClose = __bind(this.deleteAndClose, this);
+      this.saveAndClose = __bind(this.saveAndClose, this);
+      this.handleMatchesFailure = __bind(this.handleMatchesFailure, this);
+      this.handleGetOptionsSuccess = __bind(this.handleGetOptionsSuccess, this);
+      this.handleMatchesSuccess = __bind(this.handleMatchesSuccess, this);
+      this.getMatches = __bind(this.getMatches, this);
+      this.renderViewState = __bind(this.renderViewState, this);
       this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
       this.initialize = __bind(this.initialize, this);
-      SearchView.__super__.constructor.apply(this, arguments);
+      ChunkEditView.__super__.constructor.apply(this, arguments);
     }
 
-    SearchView.prototype.initialize = function() {
-      this.router = this.options['router'];
-      this.sample = this.options['sample'];
-      return this.sample.bind('all', this.render);
+    ChunkEditView.prototype.id = 'chunk_edit_view';
+
+    ChunkEditView.prototype.events = {
+      'click #screen': 'cancelAndClose',
+      'click .save': 'saveAndClose',
+      'click .delete': 'deleteAndClose'
     };
 
-    SearchView.prototype.render = function() {
-      this.$(this.el).html(searchTemplate({
-        sample: this.sample
+    ChunkEditView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.model = this.chunk = this.options['chunk'];
+      this.state = 'idle';
+      this.chunk.store();
+      this.getMatches();
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    ChunkEditView.prototype.bind = function() {
+      this.chunk.bind('change:type', this.getMatches);
+      KeyboardJS.bind.key('esc', null, this.cancelAndClose);
+      return KeyboardJS.bind.key('enter', null, this.saveAndClose);
+    };
+
+    ChunkEditView.prototype.unbind = function() {
+      this.chunk.unbind('change:type');
+      this.chunk.unbind('all');
+      KeyboardJS.unbind.key('esc');
+      return KeyboardJS.unbind.key('enter');
+    };
+
+    ChunkEditView.prototype.remove = function() {
+      return this.unbind();
+    };
+
+    ChunkEditView.prototype.render = function() {
+      this.$(this.el).html(chunkEditTemplate({
+        chunk: this.chunk,
+        state: this.state
       }));
+      Backbone.ModelBinding.bind(this, {
+        all: "name"
+      });
+      this.renderViewState();
       return this;
     };
 
-    return SearchView;
+    ChunkEditView.prototype.renderViewState = function() {
+      switch (this.chunk.get('type')) {
+        case 'set':
+        case 'char-set':
+          return this.$('#ajax').html(viewStateOptionsTemplate({
+            chunk: this.chunk,
+            state: this.state
+          }));
+        case 'glob':
+        case 'glob-excl':
+        case 'numeric':
+          return this.$('#ajax').html(viewStateMatchesTemplate({
+            chunk: this.chunk,
+            state: this.state
+          }));
+      }
+    };
+
+    ChunkEditView.prototype.getMatches = function() {
+      switch (this.chunk.get('type')) {
+        case 'set':
+          this.chunk.set({
+            type: 'glob'
+          }, {
+            silent: true
+          });
+          this.chunk.getMatches(this.handleGetOptionsSuccess, this.handleMatchesFailure);
+          this.chunk.set({
+            type: 'set'
+          }, {
+            silent: true
+          });
+          this.state = 'waiting';
+          break;
+        case 'glob':
+        case 'numeric':
+        case 'glob-excl':
+          this.chunk.getMatches(this.handleMatchesSuccess, this.handleMatchesFailure);
+          this.state = 'waiting';
+          break;
+        default:
+          this.state = 'idle';
+      }
+      return this.render();
+    };
+
+    ChunkEditView.prototype.handleMatchesSuccess = function(results) {
+      var focus_cache;
+      if (results['regex'] === this.chunk.collection.searchText()) {
+        focus_cache = this.$(':focus');
+        this.chunk.set({
+          matches: results['results']
+        });
+        this.state = 'received';
+        this.renderViewState();
+        return focus_cache.select();
+      }
+    };
+
+    ChunkEditView.prototype.handleGetOptionsSuccess = function(results) {
+      var focus_cache;
+      if (this.chunk.get('type') === 'set') {
+        focus_cache = this(':focus');
+        this.chunk.set({
+          options: results['results']
+        });
+        this.state = 'received';
+        this.renderViewState();
+        return focus_cache.select();
+      }
+    };
+
+    ChunkEditView.prototype.handleMatchesFailure = function(results) {
+      this.state = 'error';
+      return this.renderViewState();
+    };
+
+    ChunkEditView.prototype.saveAndClose = function(e) {
+      this.unbind();
+      return this.close();
+    };
+
+    ChunkEditView.prototype.deleteAndClose = function() {
+      this.chunk.set({
+        anonymize: false
+      });
+      return this.close();
+    };
+
+    ChunkEditView.prototype.cancelAndClose = function() {
+      this.chunk.restore();
+      return this.close();
+    };
+
+    ChunkEditView.prototype.close = function() {
+      return this.router.navigate("/edit", {
+        trigger: true
+      });
+    };
+
+    return ChunkEditView;
 
   })(Backbone.View);
 
@@ -12639,127 +12741,73 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "views/edit/edit_view": function(exports, require, module) {
+  "views/edit/_chunk_replace_view": function(exports, require, module) {
     (function() {
-  var ReplaceView, SearchView, StringView, TestView, editTemplate,
+  var chunkReplaceTemplate,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  StringView = require('views/edit/_string_view').StringView;
+  chunkReplaceTemplate = require('./templates/_replace_chunk');
 
-  SearchView = require('views/edit/_search_view').SearchView;
+  exports.ChunkReplaceView = (function(_super) {
 
-  ReplaceView = require('views/edit/_replace_view').ReplaceView;
+    __extends(ChunkReplaceView, _super);
 
-  TestView = require('views/edit/_test_view').TestView;
-
-  editTemplate = require('./templates/edit');
-
-  exports.EditView = (function(_super) {
-
-    __extends(EditView, _super);
-
-    function EditView() {
-      this.saveString = __bind(this.saveString, this);
-      this.nextString = __bind(this.nextString, this);
-      this.resetString = __bind(this.resetString, this);
+    function ChunkReplaceView() {
+      this.updateAlias = __bind(this.updateAlias, this);
       this.render = __bind(this.render, this);
       this.remove = __bind(this.remove, this);
-      this.unbindKeys = __bind(this.unbindKeys, this);
-      this.bindKeys = __bind(this.bindKeys, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
       this.initialize = __bind(this.initialize, this);
-      EditView.__super__.constructor.apply(this, arguments);
+      ChunkReplaceView.__super__.constructor.apply(this, arguments);
     }
 
-    EditView.prototype.id = 'home-view';
+    ChunkReplaceView.prototype.tagName = 'span';
 
-    EditView.prototype.tagName = 'form';
-
-    EditView.prototype.events = {
-      "click #reset": "resetString",
-      "click #save": "saveString",
-      "submit": "saveString"
+    ChunkReplaceView.prototype.events = {
+      'blur input': 'updateAlias'
     };
 
-    EditView.prototype.initialize = function() {
+    ChunkReplaceView.prototype.initialize = function() {
       this.router = this.options['router'];
-      this.sample = this.options['sample'];
-      this.test_results = this.options['test_results'];
-      this.stringView = new StringView({
-        sample: this.sample,
-        router: this.router
-      });
-      this.searchView = new SearchView({
-        sample: this.sample,
-        router: this.router
-      });
-      this.replaceView = new ReplaceView({
-        sample: this.sample,
-        test_results: this.test_results,
-        router: this.router
-      });
-      this.testView = new TestView({
-        test_results: this.test_results,
-        sample: this.sample,
-        router: this.router
-      });
-      this.sample.bind('reset', this.render);
-      return this.bindKeys();
+      this.chunk = this.options['chunk'];
+      this.tagName = (this.chunk.get('anonymize') ? 'input' : 'span');
+      if (this.options['bind'] !== false) return this.bind();
     };
 
-    EditView.prototype.bindKeys = function() {
-      KeyboardJS.bind.key('esc', null, this.resetString);
-      KeyboardJS.bind.key('enter', null, this.saveString);
-      return KeyboardJS.bind.key('right,space', null, this.nextString);
+    ChunkReplaceView.prototype.bind = function() {
+      return this.chunk.bind('all', this.render);
     };
 
-    EditView.prototype.unbindKeys = function() {
-      KeyboardJS.unbind.key('esc');
-      KeyboardJS.unbind.key('enter');
-      return KeyboardJS.unbind.key('right,space');
+    ChunkReplaceView.prototype.unbind = function() {
+      return this.chunk.unbind('all');
     };
 
-    EditView.prototype.remove = function() {
-      return this.unbindKeys();
+    ChunkReplaceView.prototype.remove = function() {
+      this.unbind();
+      return this.$(this.el).remove();
     };
 
-    EditView.prototype.render = function() {
-      $(this.el).html(editTemplate({
-        sample: this.sample
+    ChunkReplaceView.prototype.render = function() {
+      this.$(this.el).html(chunkReplaceTemplate({
+        chunk: this.chunk
       }));
-      this.$('#string').html(this.stringView.render().el);
-      this.$('#search').html(this.searchView.render().el);
-      this.$('#replace').replaceWith(this.replaceView.render().el);
-      this.$('#test').replaceWith(this.testView.render().el);
       return this;
     };
 
-    EditView.prototype.resetString = function() {
-      this.sample.models.forEach(function(chunk) {
-        chunk.set({
-          anonymize: false
+    ChunkReplaceView.prototype.updateAlias = function() {
+      if (this.chunk.get('anonymize')) {
+        return this.chunk.set({
+          alias: this.$('input').val()
+        }, {
+          silent: true
         });
-        return chunk.set({
-          collapse: false
-        });
-      });
-      return false;
+      }
     };
 
-    EditView.prototype.nextString = function() {
-      return this.router.navigate("/new", {
-        trigger: true
-      });
-    };
-
-    EditView.prototype.saveString = function() {
-      this.sample.save();
-      this.sample.fetch();
-      return false;
-    };
-
-    return EditView;
+    return ChunkReplaceView;
 
   })(Backbone.View);
 
@@ -12793,6 +12841,9 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
       this.rangeIsEmpty = __bind(this.rangeIsEmpty, this);
       this.handleMouseUp = __bind(this.handleMouseUp, this);
       this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
       this.initialize = __bind(this.initialize, this);
       ChunkView.__super__.constructor.apply(this, arguments);
     }
@@ -12808,9 +12859,22 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     ChunkView.prototype.initialize = function() {
       this.router = this.options['router'];
       this.chunk = this.options['chunk'];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    ChunkView.prototype.bind = function() {
       this.chunk.bind('all', this.render);
-      this.chunk.bind('remove', this.remove);
-      return this.chunk.view = this;
+      return this.chunk.bind('remove', this.remove);
+    };
+
+    ChunkView.prototype.unbind = function() {
+      this.chunk.unbind('all');
+      return this.chunk.unbind('remove');
+    };
+
+    ChunkView.prototype.remove = function() {
+      this.unbind();
+      return this.$(this.el).remove();
     };
 
     ChunkView.prototype.render = function() {
@@ -12920,6 +12984,227 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
+  "views/edit/templates/test/_waiting": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(_safe('<tr>\n  <td>Testing on server <img src="/images/loader_inline.gif"/></td>\n</tr>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "views/edit/_filter_view": function(exports, require, module) {
+    (function() {
+  var filterTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  filterTemplate = require('./templates/_filter');
+
+  exports.FilterView = (function(_super) {
+
+    __extends(FilterView, _super);
+
+    function FilterView() {
+      this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
+      this.initialize = __bind(this.initialize, this);
+      FilterView.__super__.constructor.apply(this, arguments);
+    }
+
+    FilterView.prototype.id = 'filter';
+
+    FilterView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    FilterView.prototype.bind = function() {
+      return this.sample.bind('all', this.render);
+    };
+
+    FilterView.prototype.unbind = function() {
+      return this.sample.bind('all');
+    };
+
+    FilterView.prototype.remove = function() {
+      this.unbind();
+      return this.$(this.el).remove();
+    };
+
+    FilterView.prototype.render = function() {
+      this.$(this.el).html(filterTemplate({
+        sample: this.sample
+      }));
+      return this;
+    };
+
+    return FilterView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/edit/_result_view": function(exports, require, module) {
+    (function() {
+  var resultTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  resultTemplate = require('./templates/_result');
+
+  exports.ResultView = (function(_super) {
+
+    __extends(ResultView, _super);
+
+    function ResultView() {
+      this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
+      this.initialize = __bind(this.initialize, this);
+      ResultView.__super__.constructor.apply(this, arguments);
+    }
+
+    ResultView.prototype.tagName = 'tr';
+
+    ResultView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.test_result = this.options['test_result'];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    ResultView.prototype.bind = function() {
+      return this.test_result.bind('all', this.render);
+    };
+
+    ResultView.prototype.unbind = function() {
+      return this.test_result.unbind('all');
+    };
+
+    ResultView.prototype.remove = function() {
+      this.unbind();
+      return this.$(this.el).remove();
+    };
+
+    ResultView.prototype.render = function() {
+      this.$(this.el).html(resultTemplate({
+        test_result: this.test_result
+      }));
+      return this;
+    };
+
+    return ResultView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/edit/_search_view": function(exports, require, module) {
+    (function() {
+  var filterTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  filterTemplate = require('./templates/_filter');
+
+  exports.SearchView = (function(_super) {
+
+    __extends(SearchView, _super);
+
+    function SearchView() {
+      this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
+      this.initialize = __bind(this.initialize, this);
+      SearchView.__super__.constructor.apply(this, arguments);
+    }
+
+    SearchView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    SearchView.prototype.bind = function() {
+      return this.sample.bind('all', this.render);
+    };
+
+    SearchView.prototype.unbind = function() {
+      return this.sample.bind('all');
+    };
+
+    SearchView.prototype.remove = function() {
+      this.unbind();
+      return this.$(this.el).remove();
+    };
+
+    SearchView.prototype.render = function() {
+      this.$(this.el).html(searchTemplate({
+        sample: this.sample
+      }));
+      return this;
+    };
+
+    return SearchView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
   "views/edit/_string_view": function(exports, require, module) {
     (function() {
   var ChunkView,
@@ -12937,6 +13222,9 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
       this.addAll = __bind(this.addAll, this);
       this.addOne = __bind(this.addOne, this);
       this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
       this.initialize = __bind(this.initialize, this);
       StringView.__super__.constructor.apply(this, arguments);
     }
@@ -12944,7 +13232,27 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     StringView.prototype.initialize = function() {
       this.router = this.options['router'];
       this.sample = this.options['sample'];
+      this.child_views = [];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    StringView.prototype.bind = function() {
       return this.sample.bind('all', this.addAll);
+    };
+
+    StringView.prototype.unbind = function() {
+      return this.sample.unbind('all');
+    };
+
+    StringView.prototype.remove = function() {
+      var view, _i, _len, _ref;
+      this.unbind();
+      _ref = this.child_views;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        view = _ref[_i];
+        view.remove();
+      }
+      return this.$(this.el).remove();
     };
 
     StringView.prototype.render = function() {
@@ -12956,9 +13264,11 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
       var view;
       view = new ChunkView({
         chunk: chunk,
-        router: this.router
+        router: this.router,
+        bind: this.options['bind']
       });
-      return this.$(this.el).append(view.render().el);
+      this.$(this.el).append(view.render().el);
+      return this.child_views.push(view);
     };
 
     StringView.prototype.addAll = function() {
@@ -12976,6 +13286,411 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
 
 }).call(this);
 
+  }
+}));
+(this.require.define({
+  "views/edit/_test_view": function(exports, require, module) {
+    (function() {
+  var ResultView, testEmptyTemplate, testErrorTemplate, testWaitingTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  ResultView = require('views/edit/_result_view').ResultView;
+
+  testWaitingTemplate = require('./templates/test/_waiting');
+
+  testEmptyTemplate = require('./templates/test/_empty');
+
+  testErrorTemplate = require('./templates/test/_error');
+
+  exports.TestView = (function(_super) {
+
+    __extends(TestView, _super);
+
+    function TestView() {
+      this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
+      this.initialize = __bind(this.initialize, this);
+      TestView.__super__.constructor.apply(this, arguments);
+    }
+
+    TestView.prototype.id = 'test';
+
+    TestView.prototype.tagName = 'table';
+
+    TestView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      this.test_results = this.options['test_results'];
+      this.child_views = [];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    TestView.prototype.bind = function() {
+      return this.test_results.bind('all', this.render);
+    };
+
+    TestView.prototype.unbind = function() {
+      return this.test_results.unbind('all');
+    };
+
+    TestView.prototype.remove = function() {
+      var view, _i, _len, _ref, _results;
+      this.unbind();
+      _ref = this.child_views;
+      _results = [];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        view = _ref[_i];
+        _results.push(view.remove());
+      }
+      return _results;
+    };
+
+    TestView.prototype.render = function() {
+      var _this = this;
+      this.$(this.el).empty();
+      switch (this.test_results.state) {
+        case 'waiting':
+          this.$(this.el).html(testWaitingTemplate());
+          break;
+        case 'empty':
+          this.$(this.el).html(testEmptyTemplate());
+          break;
+        case 'error':
+          this.$(this.el).html(testErrorTemplate());
+          break;
+        case 'recieved':
+          if (this.test_results.length === this.test_results.resultCount) {
+            this.$(this.el).append($("<tr><td class='count', colspan=3>" + this.test_results.resultCount + " matches found</td></tr>"));
+          } else {
+            this.$(this.el).append($("<tr><td class='count', colspan=3>" + this.test_results.resultCount + " matches found, showing " + this.test_results.length + "</td></tr>"));
+          }
+          this.test_results.models.forEach(function(test_result) {
+            var view;
+            view = new ResultView({
+              test_result: test_result,
+              bind: _this.options['bind']
+            });
+            _this.$(_this.el).append(view.render().el);
+            return _this.child_views.push(view);
+          });
+      }
+      return this;
+    };
+
+    return TestView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/edit/edit_view": function(exports, require, module) {
+    (function() {
+  var FilterView, StringView, TestView, editTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  StringView = require('views/edit/_string_view').StringView;
+
+  FilterView = require('views/edit/_filter_view').FilterView;
+
+  TestView = require('views/edit/_test_view').TestView;
+
+  editTemplate = require('./templates/edit');
+
+  exports.EditView = (function(_super) {
+
+    __extends(EditView, _super);
+
+    function EditView() {
+      this.saveString = __bind(this.saveString, this);
+      this.nextString = __bind(this.nextString, this);
+      this.resetString = __bind(this.resetString, this);
+      this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
+      this.initialize = __bind(this.initialize, this);
+      EditView.__super__.constructor.apply(this, arguments);
+    }
+
+    EditView.prototype.id = 'home-view';
+
+    EditView.prototype.tagName = 'form';
+
+    EditView.prototype.events = {
+      "click #reset": "resetString",
+      "click #save": "saveString",
+      "submit": "saveString"
+    };
+
+    EditView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.sample = this.options['sample'];
+      this.test_results = this.options['test_results'];
+      this.stringView = new StringView({
+        sample: this.sample,
+        router: this.router,
+        bind: this.options['bind']
+      });
+      this.filterView = new FilterView({
+        sample: this.sample,
+        router: this.router,
+        bind: this.options['bind']
+      });
+      this.testView = new TestView({
+        test_results: this.test_results,
+        sample: this.sample,
+        router: this.router,
+        bind: this.options['bind']
+      });
+      this.child_views = [this.stringView, this.filterView, this.testView];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    EditView.prototype.bind = function() {
+      this.sample.bind('reset', this.render);
+      KeyboardJS.bind.key('esc', null, this.resetString);
+      KeyboardJS.bind.key('enter', null, this.saveString);
+      return KeyboardJS.bind.key('right,space', null, this.nextString);
+    };
+
+    EditView.prototype.unbind = function() {
+      this.sample.unbind('reset');
+      KeyboardJS.unbind.key('esc');
+      KeyboardJS.unbind.key('enter');
+      return KeyboardJS.unbind.key('right,space');
+    };
+
+    EditView.prototype.remove = function() {
+      var view, _i, _len, _ref;
+      this.unbind();
+      _ref = this.child_views;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        view = _ref[_i];
+        view.remove;
+      }
+      return this.$(this.el).remove();
+    };
+
+    EditView.prototype.render = function() {
+      $(this.el).html(editTemplate({
+        sample: this.sample
+      }));
+      this.$('#string').html(this.stringView.render().el);
+      this.$('#filter').replaceWith(this.filterView.render().el);
+      this.$('#test').replaceWith(this.testView.render().el);
+      return this;
+    };
+
+    EditView.prototype.resetString = function() {
+      this.sample.models.forEach(function(chunk) {
+        chunk.set({
+          anonymize: false
+        });
+        return chunk.set({
+          collapse: false
+        });
+      });
+      return false;
+    };
+
+    EditView.prototype.nextString = function() {
+      return this.router.navigate("/new", {
+        trigger: true
+      });
+    };
+
+    EditView.prototype.saveString = function() {
+      this.sample.save();
+      this.sample.fetch();
+      return false;
+    };
+
+    return EditView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/new/new_view": function(exports, require, module) {
+    (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  exports.NewView = (function(_super) {
+
+    __extends(NewView, _super);
+
+    function NewView() {
+      this.navigateToEdit = __bind(this.navigateToEdit, this);
+      this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
+      this.initialize = __bind(this.initialize, this);
+      NewView.__super__.constructor.apply(this, arguments);
+    }
+
+    NewView.prototype.id = 'new-view';
+
+    NewView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    NewView.prototype.bind = function() {
+      return this.collection.bind('reset', this.navigateToEdit);
+    };
+
+    NewView.prototype.unbind = function() {
+      return this.collection.unbind('reset');
+    };
+
+    NewView.prototype.remove = function() {
+      return this.unbind();
+    };
+
+    NewView.prototype.render = function() {
+      this.$(this.el).html(require('./templates/new'));
+      return this;
+    };
+
+    NewView.prototype.navigateToEdit = function() {
+      return this.router.navigate('/edit', {
+        trigger: true
+      });
+    };
+
+    return NewView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/chunk_edit/templates/_state_options": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      if (this.state === 'waiting') {
+        _print(_safe('\n  <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>\n'));
+      } else if (this.state === 'received') {
+        _print(_safe('\n  <p class="indent">Example Redactions: <span class="example">'));
+        _print(this.chunk.get('matches').join(', '));
+        _print(_safe('</span></p>\n'));
+      } else if (this.state === 'error') {
+        _print(_safe('\n  <p class="indent">There was an error :(</p>\n'));
+      }
+    
+      _print(_safe('\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "views/chunk_edit/templates/_state_matches": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      if (this.state === 'waiting') {
+        _print(_safe('\n  <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>\n'));
+      } else if (this.state === 'received') {
+        _print(_safe('\n  <p class="indent">Example Redactions: <span class="example">'));
+        _print(this.chunk.get('matches').join(', '));
+        _print(_safe('</span></p>\n'));
+      } else if (this.state === 'error') {
+        _print(_safe('\n  <p class="indent">There was an error :(</p>\n'));
+      }
+    
+      _print(_safe('\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
   }
 }));
 (this.require.define({
@@ -13001,97 +13716,96 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
       return _safe(result);
     };
     (function() {
-      var option, _i, _len, _ref;
     
-      _print(_safe('<div id="screen"></div>\n<div id="container">\n  <h1>Edit Filter</h1>\n\n  <hr/>\n\n  <p>\n    <input id="type_glob" type="radio" name="type" value="glob"/> <label for="type_glob"> Match Anything <span class="example">(.*)</span></label>\n\n    '));
+      _print(_safe('<div id="screen"></div>\n<div id="container">\n  <h1>Edit Filter</h1>\n\n  <hr/>\n\n  <p>\n    <input tabindex=1000 id="type_glob" type="radio" name="type" value="glob"/> <label for="type_glob"> Match Anything <span class="example">(.*?)</span></label>\n\n    '));
     
       if (this.chunk.typeIs('glob')) {
-        _print(_safe('\n      <p class="indent">Replace with: <input name="alias"/></p>\n\n      '));
-        if (this.state === 'waiting') {
-          _print(_safe('\n        <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>\n      '));
-        } else if (this.state === 'received') {
-          _print(_safe('\n        <p class="indent">Example Redactions: <span class="example">'));
-          _print(this.chunk.get('matches').join(', '));
-          _print(_safe('</span></p>\n      '));
-        } else if (this.state === 'error') {
-          _print(_safe('\n        <p class="indent">There was an error :(</p>\n      '));
-        }
-        _print(_safe('\n    '));
+        _print(_safe('\n      <p class="indent">Replace with: <input tabindex=1 name="alias"/></p>\n\n      <div id="ajax"></div>\n    '));
       }
     
-      _print(_safe('\n  </p>\n\n    <p>\n    <input disabled id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!\')\'</span></label>\n\n    '));
+      _print(_safe('\n  </p>\n\n    <p>\n    <input tabindex=1010 disabled id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!\')\'</span></label>\n\n    '));
     
       if (this.chunk.typeIs('glob-excl')) {
-        _print(_safe('\n      <p class="indent">Replace with: <input name="alias"/></p>\n\n      '));
-        if (this.state === 'waiting') {
-          _print(_safe('\n        <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>\n      '));
-        } else if (this.state === 'received') {
-          _print(_safe('\n        <p class="indent">Example Redactions: <span class="example">'));
-          _print(this.chunk.get('matches').join(', '));
-          _print(_safe('</span></p>\n      '));
-        } else if (this.state === 'error') {
-          _print(_safe('\n        <p class="indent">There was an error :(</p>\n      '));
-        }
-        _print(_safe('\n    '));
+        _print(_safe('\n      <p class="indent">Replace with: <input tabindex=10 name="alias"/></p>\n\n      <div id="ajax"></div>\n    '));
       }
     
-      _print(_safe('\n  </p>\n\n  <p>\n    <input disabled id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>\n\n    '));
+      _print(_safe('\n  </p>\n\n  <p>\n    <input tabindex=1020 disabled id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>\n\n    '));
     
       if (this.chunk.typeIs('set')) {
-        _print(_safe('\n      <p class="indent"><input name="optional" type="checkbox"> <label for="optional">Match if omitted</label></p>\n      <p class="indent"><input name="pass_through" type="checkbox"> <label for="pass_through">Include matched option in redaction</label></p>\n\n      '));
-        if (this.state === 'waiting') {
-          _print(_safe('\n        <p class="indent">Getting options from server <img src="/images/loader_inline.gif"/></p>\n      '));
-        } else if (this.state === 'received') {
-          _print(_safe('\n        <p class="indent">\n          '));
-          _ref = this.chunk.get('options');
-          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-            option = _ref[_i];
-            _print(_safe('\n            <input id="option_'));
-            _print(option);
-            _print(_safe('" name="options['));
-            _print(option);
-            _print(_safe(']" value="'));
-            _print(option);
-            _print(_safe('" type="checkbox"/> <label for="option_'));
-            _print(option);
-            _print(_safe('">'));
-            _print(option);
-            _print(_safe('</label>\n          '));
-          }
-          _print(_safe('\n        </p>\n      '));
-        } else if (this.state === 'error') {
-          _print(_safe('\n        <p class="indent">There was an error :(</p>\n      '));
-        }
-        _print(_safe('\n    '));
+        _print(_safe('\n      <p class="indent"><input tabindex=20 name="optional" type="checkbox"> <label for="optional">Match if omitted</label></p>\n      <p class="indent"><input tabindex=21 name="pass_through" type="checkbox"> <label for="pass_through">Include matched option in redaction</label></p>\n\n      <div id="ajax"></div>\n    '));
       }
     
-      _print(_safe('        \n  </p>\n\n  <p>\n    <input id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numbers <span class="example">1.23</span></label>\n\n    '));
+      _print(_safe('        \n  </p>\n\n  <p>\n    <input tabindex=1030 id="type_numeric" type="radio" name="type" value="numeric"/> <label for="type_numeric"> Match numbers <span class="example">1.23</span></label>\n\n    '));
     
       if (this.chunk.typeIs('numeric')) {
-        _print(_safe('\n      <p class="indent">Replace with: <input name="alias"/></p>\n\n      '));
-        if (this.state === 'waiting') {
-          _print(_safe('\n        <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>\n      '));
-        } else if (this.state === 'received') {
-          _print(_safe('\n        <p class="indent">Example Redactions: <span class="example">'));
-          _print(this.chunk.get('matches').join(', '));
-          _print(_safe('</span></p>\n      '));
-        } else if (this.state === 'error') {
-          _print(_safe('\n        <p class="indent">There was an error :(</p>\n      '));
-        }
-        _print(_safe('\n   '));
+        _print(_safe('\n      <p class="indent">Replace with: <input tabindex=30 name="alias"/></p>\n\n      <div id="ajax"></div>\n   '));
       }
     
-      _print(_safe('\n  </p>\n\n  <p>\n    <input id="type_literal" type="radio" name="type" value="literal"/> <label for="type_literal"> Match a specific value <span class="example">"'));
+      _print(_safe('\n  </p>\n\n  <p>\n    <input tabindex=1040 id="type_literal" type="radio" name="type" value="literal"/> <label for="type_literal"> Match a specific value <span class="example">"'));
     
       _print(this.chunk.get('content'));
     
       _print(_safe('"</span></label>\n\n    '));
     
       if (this.chunk.typeIs('literal')) {
-        _print(_safe('\n      <p class="indent"><input name="optional" type="checkbox"> <label for="optional">Match if omitted</label></p>\n      <p class="indent"><input name="pass_through" type="checkbox"> <label for="pass_through">Include matched option in redaction</label></p>\n    '));
+        _print(_safe('\n      <p class="indent"><input tabindex=40 name="optional" type="checkbox"> <label for="optional">Match if omitted</label></p>\n      <p class="indent"><input tabindex=41 name="pass_through" type="checkbox"> <label for="pass_through">Include matched option in redaction</label></p>\n    '));
       }
     
-      _print(_safe('\n  </p>\n\n  <hr/>\n\n  <p class="controls">\n    <a href="#/edit" class="save bold">Save Changes</a>\n    or\n    <a href="#/edit" class="delete">Delete</a>\n  </p>\n</div>\n\n'));
+      _print(_safe('\n  </p>\n\n  <hr/>\n\n  <p class="controls">\n    <a tabindex=100 href="#/edit" class="save bold">Save Changes</a>\n    or\n    <a tabindex=110 href="#/edit" class="delete">Delete</a>\n  </p>\n</div>\n\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "views/edit/templates/_filter": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(_safe('<div id="filter">\n  <div id="search">\n    <span class="label">search for:</span> <span class="console">/'));
+    
+      _print(this.sample.searchText());
+    
+      _print(_safe('/</span>\n  </div>\n  <div id="replace">\n    <span class="label">redact with:</span> <span class="console">\''));
+    
+      _print(this.sample.replaceText());
+    
+      _print(_safe('\'</span>\n  </div>\n</div>\n'));
     
     }).call(this);
     
@@ -13174,56 +13888,6 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "views/edit/templates/_search": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
-    (function() {
-    
-      _print(_safe('<span class="label">search for:</span> <span class="console">/'));
-    
-      _print(this.sample.searchText());
-    
-      _print(_safe('/</span>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
-  }
-}));
-(this.require.define({
   "views/edit/templates/_result": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
@@ -13256,6 +13920,56 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
       _print(this.test_result.get('redacted'));
     
       _print(_safe('</td>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "views/edit/templates/_search": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(_safe('<span class="label">search for:</span> <span class="console">/'));
+    
+      _print(this.sample.searchText());
+    
+      _print(_safe('/</span>\n'));
     
     }).call(this);
     
@@ -13332,125 +14046,6 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "views/edit/_test_view": function(exports, require, module) {
-    (function() {
-  var ResultView, testEmptyTemplate, testErrorTemplate, testWaitingTemplate,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  ResultView = require('views/edit/_result_view').ResultView;
-
-  testWaitingTemplate = require('./templates/test/_waiting');
-
-  testEmptyTemplate = require('./templates/test/_empty');
-
-  testErrorTemplate = require('./templates/test/_error');
-
-  exports.TestView = (function(_super) {
-
-    __extends(TestView, _super);
-
-    function TestView() {
-      this.render = __bind(this.render, this);
-      this.initialize = __bind(this.initialize, this);
-      TestView.__super__.constructor.apply(this, arguments);
-    }
-
-    TestView.prototype.id = 'test';
-
-    TestView.prototype.tagName = 'table';
-
-    TestView.prototype.initialize = function() {
-      this.router = this.options['router'];
-      this.sample = this.options['sample'];
-      this.test_results = this.options['test_results'];
-      return this.test_results.bind('all', this.render);
-    };
-
-    TestView.prototype.render = function() {
-      var _this = this;
-      this.$(this.el).empty();
-      switch (this.test_results.state) {
-        case 'waiting':
-          this.$(this.el).html(testWaitingTemplate());
-          break;
-        case 'empty':
-          this.$(this.el).html(testEmptyTemplate());
-          break;
-        case 'error':
-          this.$(this.el).html(testErrorTemplate());
-          break;
-        case 'recieved':
-          if (this.test_results.length === this.test_results.resultCount) {
-            this.$(this.el).append($("<tr><td class='count', colspan=3>" + this.test_results.resultCount + " matches found</td></tr>"));
-          } else {
-            this.$(this.el).append($("<tr><td class='count', colspan=3>" + this.test_results.resultCount + " matches found, showing " + this.test_results.length + "</td></tr>"));
-          }
-          this.test_results.models.forEach(function(test_result) {
-            var view;
-            view = new ResultView({
-              test_result: test_result
-            });
-            return _this.$(_this.el).append(view.render().el);
-          });
-      }
-      return this;
-    };
-
-    return TestView;
-
-  })(Backbone.View);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "views/new/new_view": function(exports, require, module) {
-    (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  exports.NewView = (function(_super) {
-
-    __extends(NewView, _super);
-
-    function NewView() {
-      this.navigateToEdit = __bind(this.navigateToEdit, this);
-      this.render = __bind(this.render, this);
-      this.initialize = __bind(this.initialize, this);
-      NewView.__super__.constructor.apply(this, arguments);
-    }
-
-    NewView.prototype.id = 'new-view';
-
-    NewView.prototype.initialize = function() {
-      this.router = this.options['router'];
-      return this.collection.bind('reset', this.navigateToEdit);
-    };
-
-    NewView.prototype.render = function() {
-      this.$(this.el).html(require('./templates/new'));
-      return this;
-    };
-
-    NewView.prototype.navigateToEdit = function() {
-      return this.router.navigate('/edit', {
-        trigger: true
-      });
-    };
-
-    return NewView;
-
-  })(Backbone.View);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
   "views/new/templates/new": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
@@ -13475,271 +14070,6 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     (function() {
     
       _print(_safe('<img src="/images/loader_large.gif"/>\n\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
-  }
-}));
-(this.require.define({
-  "models/chunk": function(exports, require, module) {
-    (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  exports.Chunk = (function(_super) {
-
-    __extends(Chunk, _super);
-
-    function Chunk() {
-      this.post = __bind(this.post, this);
-      this.getMatches = __bind(this.getMatches, this);
-      this.replaceWith = __bind(this.replaceWith, this);
-      this.anonymizedIndex = __bind(this.anonymizedIndex, this);
-      this.index = __bind(this.index, this);
-      this.toggleAnonymize = __bind(this.toggleAnonymize, this);
-      this.typeIs = __bind(this.typeIs, this);
-      this.initialize = __bind(this.initialize, this);
-      Chunk.__super__.constructor.apply(this, arguments);
-    }
-
-    Chunk.prototype.defaults = {
-      content: '',
-      anonymize: false,
-      alias: 'redacted',
-      collapse: false,
-      type: 'glob',
-      options: [],
-      optional: false,
-      pass_through: false,
-      matches: []
-    };
-
-    Chunk.prototype.initialize = function() {
-      var memento;
-      memento = new Backbone.Memento(this);
-      return _.extend(this, memento);
-    };
-
-    Chunk.prototype.typeIs = function(value) {
-      return this.get('type') === value;
-    };
-
-    Chunk.prototype.toggleAnonymize = function() {
-      return this.set({
-        anonymize: !this.get('anonymize')
-      });
-    };
-
-    Chunk.prototype.searchText = function() {
-      var match, matcher;
-      if (this.get('anonymize') && this.get('collapse') !== true) {
-        matcher = (function() {
-          switch (this.get('type')) {
-            case 'set':
-              return "(" + (((function() {
-                var _i, _len, _ref, _results;
-                _ref = this.get("options");
-                _results = [];
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  match = _ref[_i];
-                  _results.push("(?:" + (XRegExp.escape(match)) + ")");
-                }
-                return _results;
-              }).call(this)).join('|')) + ")";
-            case 'char-set':
-              return "(" + (((function() {
-                var _i, _len, _ref, _results;
-                _ref = this.get("options");
-                _results = [];
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  match = _ref[_i];
-                  _results.push(XRegExp.escape(match));
-                }
-                return _results;
-              }).call(this)).join('|')) + ")";
-            case 'literal':
-              return "(?:" + (XRegExp.escape(this.get('content'))) + ")";
-            case 'numeric':
-              return '([\\.|\\d]*)';
-            case 'glob-excl':
-              return "([^" + (((function() {
-                var _i, _len, _ref, _results;
-                _ref = this.get("options");
-                _results = [];
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  match = _ref[_i];
-                  _results.push(XRegExp.escape(match));
-                }
-                return _results;
-              }).call(this)).join('|')) + "]*)";
-            case 'char':
-              return '(.)';
-            default:
-              return '(.*)';
-          }
-        }).call(this);
-        if (this.get("optional")) {
-          return "" + matcher + "?";
-        } else {
-          return matcher;
-        }
-      } else if (!this.get('anonymize')) {
-        return XRegExp.escape(this.get('content'));
-      }
-    };
-
-    Chunk.prototype.replaceText = function() {
-      if (this.get('anonymize') && this.get('collapse') !== true) {
-        if (this.get("pass_through")) {
-          return "\\" + (this.anonymizedIndex() + 1);
-        } else {
-          return "<" + (this.get("alias")) + ">";
-        }
-      } else if (!this.get('anonymize')) {
-        return this.get('content');
-      }
-    };
-
-    Chunk.prototype.index = function() {
-      return this.collection.models.indexOf(this);
-    };
-
-    Chunk.prototype.anonymizedIndex = function() {
-      var i;
-      return ((function() {
-        var _i, _len, _ref, _results;
-        _ref = this.collection.models;
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          i = _ref[_i];
-          if (i.get("anonymize")) _results.push(i);
-        }
-        return _results;
-      }).call(this)).indexOf(this);
-    };
-
-    Chunk.prototype.replaceWith = function(chunks) {
-      this.collection.add(chunks.reverse(), {
-        at: this.index(),
-        silent: true
-      });
-      return this.collection.remove(this);
-    };
-
-    Chunk.prototype.getMatches = function(callback, failback) {
-      return this.post({
-        search: this.collection.searchText()
-      }, "/get_matches/" + (this.anonymizedIndex() + 1), callback, failback);
-    };
-
-    Chunk.prototype.post = function(data, url, callback, failback) {
-      return $.ajax({
-        type: "POST",
-        url: url,
-        data: JSON.stringify(data),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: callback,
-        failure: failback
-      });
-    };
-
-    return Chunk;
-
-  })(Backbone.Model);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "views/edit/templates/test/_error": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
-    (function() {
-    
-      _print(_safe('<tr>\n  <td class="error">There was an error while testing this string on the server.</td>\n</tr>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
-  }
-}));
-(this.require.define({
-  "views/edit/templates/test/_waiting": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
-    (function() {
-    
-      _print(_safe('<tr>\n  <td>Testing on server <img src="/images/loader_inline.gif"/></td>\n</tr>\n'));
     
     }).call(this);
     
@@ -13805,5 +14135,91 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     return obj;
   })());
 };
+  }
+}));
+(this.require.define({
+  "views/edit/templates/test/_error": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(_safe('<tr>\n  <td class="error">There was an error while testing this string on the server.</td>\n</tr>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "initialize": function(exports, require, module) {
+    (function() {
+  var BrunchApplication, MainRouter, Sample, TestResults,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  BrunchApplication = require('helpers').BrunchApplication;
+
+  MainRouter = require('routers/main_router').MainRouter;
+
+  Sample = require('collections/sample').Sample;
+
+  TestResults = require('collections/test_results').TestResults;
+
+  exports.Application = (function(_super) {
+
+    __extends(Application, _super);
+
+    function Application() {
+      Application.__super__.constructor.apply(this, arguments);
+    }
+
+    Application.prototype.initialize = function() {
+      this.router = new MainRouter;
+      this.sample = new Sample;
+      this.test_results = new TestResults(this.sample);
+      return this.current_views = [];
+    };
+
+    return Application;
+
+  })(BrunchApplication);
+
+  window.app = new exports.Application;
+
+}).call(this);
+
   }
 }));

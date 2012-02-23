@@ -43,27 +43,24 @@ class exports.Chunk extends Backbone.Model
         when 'char-set' then "(#{(XRegExp.escape match for match in @get("options")).join('|')})"
         # -> (?:foo)
         when 'literal' then "(?:#{XRegExp.escape @get('content')})"
-        # -> (\d*)
+        # -> ([\.|\d]*)
         when 'numeric' then '([\\.|\\d]*)'
         # -> ([^A|b|\$]*)
         when 'glob-excl' then "([^#{(XRegExp.escape match for match in @get("options")).join('|')}]*)"
         when 'char' then '(.)'
-        else '(.*)'
+        else '(.*?)'
       if @get("optional") then "#{matcher}?" else matcher
     else if not @get 'anonymize'
-      XRegExp.escape @get 'content'
+      "(#{XRegExp.escape @get('content')})"
         
   replaceText: ->
     if @get('anonymize') and @get('collapse') isnt true
-      if @get("pass_through") then "\\#{@anonymizedIndex()+1}" else "<#{@get "alias"}>"
+      if @get("pass_through") then "\\#{@index()+1}" else "[#{@get "alias"}]"
     else if not @get 'anonymize'
-      @get 'content'
+      "\\#{@index()+1}"
 
   index: =>
     @collection.models.indexOf this
-
-  anonymizedIndex: =>
-    (i for i in @collection.models when i.get("anonymize")).indexOf this
 
   replaceWith: (chunks) =>
     @collection.add chunks.reverse(), {at: @index(), silent: true}
@@ -72,7 +69,7 @@ class exports.Chunk extends Backbone.Model
   getMatches: (callback, failback) =>
     @post
       search: @collection.searchText(),
-    , "/get_matches/#{@anonymizedIndex()+1}", callback, failback
+    , "/get_matches/#{@index()+1}", callback, failback
 
   post: (data, url, callback, failback) =>
     $.ajax

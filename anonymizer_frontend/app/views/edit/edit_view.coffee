@@ -1,6 +1,5 @@
 {StringView} = require 'views/edit/_string_view'
-{SearchView} = require 'views/edit/_search_view'
-{ReplaceView} = require 'views/edit/_replace_view'
+{FilterView} = require 'views/edit/_filter_view'
 {TestView} = require 'views/edit/_test_view'
 editTemplate = require('./templates/edit')
 
@@ -19,33 +18,36 @@ class exports.EditView extends Backbone.View
     @sample = @options['sample']
     @test_results = @options['test_results']
 
-    @stringView = new StringView sample: @sample, router: @router
-    @searchView = new SearchView sample: @sample, router: @router
-    @replaceView = new ReplaceView sample: @sample, test_results: @test_results, router: @router
-    @testView = new TestView test_results: @test_results, sample: @sample, router: @router
+    @stringView = new StringView sample: @sample, router: @router, bind: @options['bind']
+    @filterView = new FilterView sample: @sample, router: @router, bind: @options['bind']
+    @testView = new TestView test_results: @test_results, sample: @sample, router: @router, bind: @options['bind']
 
+    @child_views = [@stringView, @filterView, @testView]
+
+    @bind() if @options['bind'] isnt false
+
+  bind: =>
     @sample.bind 'reset', @render
-    @bindKeys()
-
-  bindKeys: =>
     KeyboardJS.bind.key 'esc', null, @resetString
     KeyboardJS.bind.key 'enter', null, @saveString
     KeyboardJS.bind.key 'right,space', null, @nextString
 
-  unbindKeys: =>
+  unbind: =>
+    @sample.unbind 'reset'
     KeyboardJS.unbind.key 'esc'
     KeyboardJS.unbind.key 'enter'
     KeyboardJS.unbind.key 'right,space'
     
   remove: =>
-    @unbindKeys()
+    @unbind()
+    view.remove for view in @child_views
+    @$(@el).remove()
 
   render: =>
     $(@el).html editTemplate sample: @sample
     
     @$('#string').html( @stringView.render().el )
-    @$('#search').html( @searchView.render().el )
-    @$('#replace').replaceWith( @replaceView.render().el )
+    @$('#filter').replaceWith( @filterView.render().el )
     @$('#test').replaceWith( @testView.render().el )
 
     this

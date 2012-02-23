@@ -4,7 +4,16 @@ class exports.NewView extends Backbone.View
   initialize: =>
     @router = @options['router']
     
+    @bind() if @options['bind'] isnt false
+
+  bind: =>
     @collection.bind 'reset', @navigateToEdit
+
+  unbind: =>
+    @collection.unbind 'reset'
+    
+  remove: =>
+    @unbind()
 
   render: =>
     @$(@el).html require('./templates/new')

@@ -1,0 +1,7 @@
+<% if @state == 'waiting': %>
+  <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>
+<% else if @state == 'received': %>
+  <p class="indent">Example Redactions: <span class="example"><%= @chunk.get('matches').join(', ') %></span></p>
+<% else if @state == 'error': %>
+  <p class="indent">There was an error :(</p>
+<% end %>

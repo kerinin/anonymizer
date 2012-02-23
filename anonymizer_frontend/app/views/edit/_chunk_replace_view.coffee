@@ -11,8 +11,18 @@ class exports.ChunkReplaceView extends Backbone.View
     @chunk = @options['chunk']
 
     @tagName = (if @chunk.get('anonymize') then 'input' else 'span')
+    @bind() if @options['bind'] isnt false
+
+  bind: =>
     @chunk.bind 'all', @render
 
+  unbind: =>
+    @chunk.unbind 'all'
+
+  remove: =>
+    @unbind()
+    @$(@el).remove()
+    
   render: =>
     @$(@el).html chunkReplaceTemplate chunk: @chunk
     this

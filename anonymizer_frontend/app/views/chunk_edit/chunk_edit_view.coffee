@@ -1,4 +1,6 @@
 chunkEditTemplate = require('./templates/chunk_edit')
+viewStateMatchesTemplate = require('./templates/_state_matches')
+viewStateOptionsTemplate = require('./templates/_state_options')
 
 class exports.ChunkEditView extends Backbone.View
   id: 'chunk_edit_view'
@@ -7,8 +9,6 @@ class exports.ChunkEditView extends Backbone.View
     'click #screen': 'cancelAndClose'
     'click .save': 'saveAndClose'
     'click .delete': 'deleteAndClose'
-    #'submit': 'saveAndClose'
-    #'click input:radio[name=type]': 'handleTypeChange'
 
   initialize: =>
     @router = @options['router']
@@ -16,17 +16,35 @@ class exports.ChunkEditView extends Backbone.View
     @state = 'idle'
 
     @chunk.store()
-    @chunk.bind 'change:type', @getMatches
-    @chunk.bind 'all', @render
     @getMatches()
+    @bind() if @options['bind'] isnt false
+
+  bind: =>
+    @chunk.bind 'change:type', @getMatches
     KeyboardJS.bind.key 'esc', null, @cancelAndClose
     KeyboardJS.bind.key 'enter', null, @saveAndClose
 
+  unbind: =>
+    @chunk.unbind 'change:type'
+    @chunk.unbind 'all'
+    KeyboardJS.unbind.key 'esc'
+    KeyboardJS.unbind.key 'enter'
+
+  remove: =>
+    @unbind()
+
   render: =>
     @$(@el).html chunkEditTemplate chunk: @chunk, state: @state
-
     Backbone.ModelBinding.bind(this, {all: "name"})
+    @renderViewState()
     this
+
+  renderViewState: =>
+    switch @chunk.get('type')
+      when 'set', 'char-set' 
+        @$('#ajax').html viewStateOptionsTemplate(chunk: @chunk, state: @state)
+      when 'glob', 'glob-excl', 'numeric' 
+        @$('#ajax').html viewStateMatchesTemplate(chunk: @chunk, state: @state)
 
   # This may still require some caching or refactoring
   getMatches: =>
@@ -46,20 +64,23 @@ class exports.ChunkEditView extends Backbone.View
 
   handleMatchesSuccess: (results) =>
     if results['regex'] == @chunk.collection.searchText()
+      focus_cache = @$(':focus')
       @chunk.set matches: results['results']
       @state = 'received'
-      @render()
+      @renderViewState()
+      focus_cache.select()
   
   handleGetOptionsSuccess: (results) =>
     if @chunk.get('type') == 'set'
+      focus_cache = @(':focus')
       @chunk.set options: results['results']
       @state = 'received'
-      @render()
+      @renderViewState()
+      focus_cache.select()
 
   handleMatchesFailure: (results) =>
-    console.log results
     @state = 'error'
-    @render()
+    @renderViewState()
 
   saveAndClose: (e) =>
     @unbind()
@@ -74,6 +95,4 @@ class exports.ChunkEditView extends Backbone.View
     @close()
 
   close: =>
-    KeyboardJS.unbind.key 'esc'
-    KeyboardJS.unbind.key 'enter'
     @router.navigate("/edit", {trigger: true})  # NOTE: this is going to reset the sample

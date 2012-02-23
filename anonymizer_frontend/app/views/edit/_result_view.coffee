@@ -8,7 +8,17 @@ class exports.ResultView extends Backbone.View
     @router = @options['router']
     @test_result = @options['test_result']
 
+    @bind() if @options['bind'] isnt false
+
+  bind: =>
     @test_result.bind 'all', @render
+
+  unbind: =>
+    @test_result.unbind 'all'
+
+  remove: =>
+    @unbind()
+    @$(@el).remove()
 
   render: =>
     @$(@el).html resultTemplate test_result: @test_result

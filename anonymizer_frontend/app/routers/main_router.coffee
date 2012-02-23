@@ -37,8 +37,7 @@ class exports.MainRouter extends Backbone.Router
     else
       view.remove() for view in app.current_views
 
-      baseView = new EditView sample: app.sample, test_results: app.test_results, router: this
-      baseView.unbindKeys()
+      baseView = new EditView sample: app.sample, test_results: app.test_results, router: this, bind: false
       view = new ChunkEditView chunk: app.sample.at(id), router: this
 
       # This view is intended to be a 'pop-up', so render the 'base view'
@@ -46,5 +45,6 @@ class exports.MainRouter extends Backbone.Router
       $('body').empty()
       $('body').html view.render().el
       $('body').append baseView.render().el
+      $("#chunk_edit_view input[name=alias]").select()
 
       app.current_views = [baseView,view]

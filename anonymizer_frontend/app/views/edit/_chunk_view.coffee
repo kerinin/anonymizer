@@ -12,9 +12,19 @@ class exports.ChunkView extends Backbone.View
     @router = @options['router']
     @chunk = @options['chunk']
 
+    @bind() if @options['bind'] isnt false
+
+  bind: =>
     @chunk.bind 'all', @render
     @chunk.bind 'remove', @remove
-    @chunk.view = this
+
+  unbind: =>
+    @chunk.unbind 'all'
+    @chunk.unbind 'remove'
+
+  remove: =>
+    @unbind()
+    @$(@el).remove()
 
   render: =>
     @$(@el).text @chunk.get("content")
