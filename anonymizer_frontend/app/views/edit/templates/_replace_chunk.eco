@@ -1,7 +1,0 @@
-<% if !@chunk.get('collapse'): %>
-  <% if @chunk.get('anonymize') and not @chunk.get('pass_through'): %>
-    &lt;<%= @chunk.get('alias') %>&gt;
-  <% else: %>
-    <%= @chunk.replaceText() %>
-  <% end %>
-<% end %>
