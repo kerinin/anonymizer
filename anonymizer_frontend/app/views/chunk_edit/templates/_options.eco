@@ -1,0 +1,12 @@
+<% if @state == 'waiting': %>
+  <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>
+<% else if @state == 'received' or @state == 'idle': %>
+  <p class="indent">Match: <span class="example">
+    <% for match in @chunk.get('matches'): %>
+      <input id="option_<%= @chunk.get('matches').indexOf(match) %>" type="checkbox" name="options[]" value="<%= match %>"/>
+      <label for="option_<%= @chunk.get('matches').indexOf(match) %>"><%= match %></label>
+    <% end %>
+  </span></p>
+<% else if @state == 'error': %>
+  <p class="indent">There was an error :(</p>
+<% end %>

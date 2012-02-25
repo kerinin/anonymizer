@@ -13,7 +13,7 @@ class exports.StringView extends Backbone.View
     @sample.bind 'all', @addAll
 
   unbind: =>
-    @sample.unbind 'all'
+    @sample.unbind 'all', @addAll
 
   remove: =>
     @unbind()

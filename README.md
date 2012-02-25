@@ -47,8 +47,6 @@ To do
 -----
 
 === Now
-- escape quotes and #{ in replace strings
-- provide examples of matches or statistics for all types
 - sync queue for 'clear' operation?
 
 === Later

@@ -11367,20 +11367,561 @@ var XRegExp;if(XRegExp){throw Error("can't load XRegExp twice in the same frame"
 // ----------------------------
 // Backbone.ModelBinding
 // ----------------------------
-(function(m){var p=function(j,l,r){var c={version:"0.5.0",bind:function(a,b){a.modelBinder=new m(a,b);a.modelBinder.bind()},unbind:function(a){a.modelBinder&&a.modelBinder.unbind()}},m=function(a,b){this.config=new c.Configuration(b);this.modelBindings=[];this.elementBindings=[];this.bind=function(){var q=c.Conventions,b;for(b in q)if(q.hasOwnProperty(b)){var f=q[b];f.handler.bind.call(this,f.selector,a,a.model,this.config)}};this.unbind=function(){l.each(this.elementBindings,function(b){b.element.unbind(b.eventName,
-b.callback)});l.each(this.modelBindings,function(b){b.model.unbind(b.eventName,b.callback)})};this.registerModelBinding=function(b,a,c){a="change:"+a;b.bind(a,c);this.modelBindings.push({model:b,eventName:a,callback:c})};this.registerDataBinding=function(b,a,c){b.bind(a,c);this.modelBindings.push({model:b,eventName:a,callback:c})};this.registerElementBinding=function(b,a){b.bind("change",a);this.elementBindings.push({element:b,eventName:"change",callback:a})}};c.Configuration=function(a){this.bindingAttrConfig=
-{};l.extend(this.bindingAttrConfig,c.Configuration.bindindAttrConfig,a);if(this.bindingAttrConfig.all){a=this.bindingAttrConfig.all;delete this.bindingAttrConfig.all;for(var b in this.bindingAttrConfig)this.bindingAttrConfig.hasOwnProperty(b)&&(this.bindingAttrConfig[b]=a)}this.getBindingAttr=function(b){return this.bindingAttrConfig[b]};this.getBindingValue=function(b,a){var c=this.getBindingAttr(a);return b.attr(c)}};c.Configuration.bindindAttrConfig={text:"id",textarea:"id",password:"id",radio:"name",
-checkbox:"id",select:"id",number:"id",range:"id",tel:"id",search:"id",url:"id",email:"id"};c.Configuration.store=function(){c.Configuration.originalConfig=l.clone(c.Configuration.bindindAttrConfig)};c.Configuration.restore=function(){c.Configuration.bindindAttrConfig=c.Configuration.originalConfig};c.Configuration.configureBindingAttributes=function(a){a.all&&(this.configureAllBindingAttributes(a.all),delete a.all);l.extend(c.Configuration.bindindAttrConfig,a)};c.Configuration.configureAllBindingAttributes=
-function(a){var b=c.Configuration.bindindAttrConfig;b.text=a;b.textarea=a;b.password=a;b.radio=a;b.checkbox=a;b.select=a;b.number=a;b.range=a;b.tel=a;b.search=a;b.url=a;b.email=a};var k=function(){var a={},b=function(b){var a=b[0].tagName.toLowerCase();if("input"==a&&(a=b.attr("type"),void 0==a||""==a))a="text";return a};a.bind=function(a,c,f,n){var g=this;c.$(a).each(function(){var a=c.$(this),d=b(a),e=n.getBindingValue(a,d),o=function(a,b){var d={};d[a]=b;f.set(d)};g.registerModelBinding(f,e,function(b,
-d){a.val(d)});g.registerElementBinding(a,function(b){o(e,c.$(b.target).val())});d=f.get(e);"undefined"!==typeof d&&null!==d?a.val(d):(d=a.val())&&o(e,d)})};return a}(j),p=function(){return{bind:function(a,b,c,i){var f=this;b.$(a).each(function(){var a=b.$(this),g=i.getBindingValue(a,"select"),h=function(a,b,d){var e={};e[a]=b;e[a+"_text"]=d;c.set(e)};f.registerModelBinding(c,g,function(b,d){a.val(d)});f.registerElementBinding(a,function(a){var d=b.$(a.target),a=d.val(),d=d.find(":selected").text();
-h(g,a,d)});var d=c.get(g);"undefined"!==typeof d&&null!==d&&a.val(d);if(a.val()!=d){var d=a.val(),e=a.find(":selected").text();h(g,d,e)}})}}}(j),s=function(){return{bind:function(a,b,c,i){var f=this,n=[];b.$(a).each(function(){var a=b.$(this),h=i.getBindingValue(a,"radio");if(!n[h]){n[h]=!0;var d=i.getBindingAttr("radio");f.registerModelBinding(c,h,function(a,c){b.$("input[type=radio]["+d+"='"+h+"'][value='"+c+"']").attr("checked","checked")});var e=function(a,b){var d={};d[a]=b;c.set(d)},o=function(a){a=
-b.$(a.currentTarget);a.is(":checked")&&e(h,a.val())};b.$("input[type=radio]["+d+"='"+h+"']").each(function(){var a=r(this);f.registerElementBinding(a,o)});a=c.get(h);"undefined"!==typeof a&&null!==a?b.$("input[type=radio]["+d+"='"+h+"'][value='"+a+"']").attr("checked","checked"):(a=b.$("input[type=radio]["+d+"='"+h+"']:checked").val(),e(h,a))}})}}}(j),t=function(){return{bind:function(a,b,c,i){var f=this;b.$(a).each(function(){var a=b.$(this);i.getBindingAttr("checkbox");var g=i.getBindingValue(a,
-"checkbox"),h=function(a,b){var d={};d[a]=b;c.set(d)};f.registerModelBinding(c,g,function(b,d){d?a.attr("checked","checked"):a.removeAttr("checked")});f.registerElementBinding(a,function(a){a=b.$(a.target).is(":checked")?!0:!1;h(g,a)});if(c.attributes.hasOwnProperty(g)){var d=c.get(g);"undefined"!==typeof d&&null!==d&&!1!=d?a.attr("checked","checked"):a.removeAttr("checked")}else d=a.is(":checked")?!0:!1,h(g,d)})}}}(j),j=function(a,b,j){var i={"default":""};c.Configuration.dataBindSubst=function(a){this.storeDataBindSubstConfig();
-b.extend(i,a)};c.Configuration.storeDataBindSubstConfig=function(){c.Configuration._dataBindSubstConfig=b.clone(i)};c.Configuration.restoreDataBindSubstConfig=function(){c.Configuration._dataBindSubstConfig&&(i=c.Configuration._dataBindSubstConfig,delete c.Configuration._dataBindSubstConfig)};c.Configuration.getDataBindSubst=function(a,b){var c=b;void 0===b&&(c=i.hasOwnProperty(a)?i[a]:i["default"]);return c};var f=function(a,b,e){e=c.Configuration.getDataBindSubst(b,e);switch(b){case "html":a.html(e);
-break;case "text":a.text(e);break;case "enabled":a.attr("disabled",!e);break;case "displayed":a[e?"show":"hide"]();break;case "hidden":a[e?"hide":"show"]();break;default:a.attr(b,e)}},k=function(a){var d=[],e=c.Conventions.databind.selector.replace(/^(.*\[)([^\]]*)(].*)/g,"$2"),a=a.attr(e).split(";");b.each(a,function(a){a=j.trim(a).split(" ");1==a.length&&a.unshift("text");d.push({elementAttr:a[0],modelAttr:a[1]})});return d},g=function(a,b){var c={},g=b.modelAttr;0==g.indexOf("event:")?(c.name=
-g.substr(6),c.callback=function(c){f(a,b.elementAttr,c)}):(c.name="change:"+g,c.callback=function(c,e){f(a,b.elementAttr,e)});return c};return{bind:function(a,c,e){var i=this;c.$(a).each(function(){var a=c.$(this),h=k(a);b.each(h,function(b){var c=g(a,b);i.registerDataBinding(e,c.name,c.callback);f(a,b.elementAttr,e.get(b.modelAttr))})})}}}(j,l,r);c.Conventions={text:{selector:"input:text",handler:k},textarea:{selector:"textarea",handler:k},password:{selector:"input:password",handler:k},radio:{selector:"input:radio",
-handler:s},checkbox:{selector:"input:checkbox",handler:t},select:{selector:"select",handler:p},databind:{selector:"*[data-bind]",handler:j},number:{selector:"input[type=number]",handler:k},range:{selector:"input[type=range]",handler:k},tel:{selector:"input[type=tel]",handler:k},search:{selector:"input[type=search]",handler:k},url:{selector:"input[type=url]",handler:k},email:{selector:"input[type=email]",handler:k}};return c};"function"===typeof define&&define.amd?define(["backbone","underscore","jquery"],
-function(j,l,m){return p(j,l,m)}):(m.Backbone=Backbone||{},m.Backbone.ModelBinding=p(Backbone,_,jQuery))})(this);
+;(function(root){
+
+var modelbinding = (function(Backbone, _, $) {
+  var modelBinding = {
+    version: "0.5.0",
+
+    bind: function(view, options){
+      view.modelBinder = new ModelBinder(view, options);
+      view.modelBinder.bind();
+    },
+
+    unbind: function(view){
+      if (view.modelBinder){
+        view.modelBinder.unbind()
+      }
+    }
+  };
+
+  var ModelBinder = function(view, options){
+    this.config = new modelBinding.Configuration(options);
+    this.modelBindings = [];
+    this.elementBindings = [];
+
+    this.bind = function(){
+      var conventions = modelBinding.Conventions;
+      for (var conventionName in conventions){
+        if (conventions.hasOwnProperty(conventionName)){
+          var conventionElement = conventions[conventionName];
+          var handler = conventionElement.handler;
+          var conventionSelector = conventionElement.selector;
+          handler.bind.call(this, conventionSelector, view, view.model, this.config);
+        }
+      }
+    };
+
+    this.unbind = function(){
+      // unbind the html element bindings
+      _.each(this.elementBindings, function(binding){
+        binding.element.unbind(binding.eventName, binding.callback);
+      });
+
+      // unbind the model bindings
+      _.each(this.modelBindings, function(binding){
+        binding.model.unbind(binding.eventName, binding.callback);
+      });
+    };
+
+    this.registerModelBinding = function(model, attrName, callback){
+      // bind the model changes to the form elements
+      var eventName = "change:" + attrName;
+      model.bind(eventName, callback);
+      this.modelBindings.push({model: model, eventName: eventName, callback: callback});
+    };
+
+    this.registerDataBinding = function(model, eventName, callback){
+      // bind the model changes to the elements
+      
+      model.bind(eventName, callback);
+      this.modelBindings.push({model: model, eventName: eventName, callback: callback});
+    };
+
+    this.registerElementBinding = function(element, callback){
+      // bind the form changes to the model
+      element.bind("change", callback);
+      this.elementBindings.push({element: element, eventName: "change", callback: callback});
+    };
+  };
+
+  // ----------------------------
+  // Model Binding Configuration
+  // ----------------------------
+  modelBinding.Configuration = function(options){
+    this.bindingAttrConfig = {};
+
+    _.extend(this.bindingAttrConfig, 
+      modelBinding.Configuration.bindindAttrConfig,
+      options
+    );
+
+    if (this.bindingAttrConfig.all){
+      var attr = this.bindingAttrConfig.all;
+      delete this.bindingAttrConfig.all;
+      for (var inputType in this.bindingAttrConfig){
+        if (this.bindingAttrConfig.hasOwnProperty(inputType)){
+          this.bindingAttrConfig[inputType] = attr;
+        }
+      }
+    }
+
+    this.getBindingAttr = function(type){ 
+      return this.bindingAttrConfig[type]; 
+    };
+
+    this.getBindingValue = function(element, type){
+      var bindingAttr = this.getBindingAttr(type);
+      return element.attr(bindingAttr);
+    };
+
+  };
+
+  modelBinding.Configuration.bindindAttrConfig = {
+    text: "id",
+    textarea: "id",
+    password: "id",
+    radio: "name",
+    checkbox: "id",
+    select: "id",
+    number: "id",
+    range: "id",
+    tel: "id",
+    search: "id",
+    url: "id",
+    email: "id"
+  };
+
+  modelBinding.Configuration.store = function(){
+    modelBinding.Configuration.originalConfig = _.clone(modelBinding.Configuration.bindindAttrConfig);
+  };
+
+  modelBinding.Configuration.restore = function(){
+    modelBinding.Configuration.bindindAttrConfig = modelBinding.Configuration.originalConfig;
+  };
+
+  modelBinding.Configuration.configureBindingAttributes = function(options){
+    if (options.all){
+      this.configureAllBindingAttributes(options.all);
+      delete options.all;
+    }
+    _.extend(modelBinding.Configuration.bindindAttrConfig, options);
+  };
+
+  modelBinding.Configuration.configureAllBindingAttributes = function(attribute){
+    var config = modelBinding.Configuration.bindindAttrConfig;
+    config.text = attribute;
+    config.textarea = attribute;
+    config.password = attribute;
+    config.radio = attribute;
+    config.checkbox = attribute;
+    config.select = attribute;
+    config.number = attribute;
+    config.range = attribute;
+    config.tel = attribute;
+    config.search = attribute;
+    config.url = attribute;
+    config.email = attribute;
+  };
+
+  // ----------------------------
+  // Text, Textarea, and Password Bi-Directional Binding Methods
+  // ----------------------------
+  var StandardBinding = (function(Backbone){
+    var methods = {};
+
+    var _getElementType = function(element) {
+      var type = element[0].tagName.toLowerCase();
+      if (type == "input"){
+        type = element.attr("type");
+        if (type == undefined || type == ''){
+          type = 'text';
+        }
+      }
+      return type;
+    };
+
+    methods.bind = function(selector, view, model, config){
+      var modelBinder = this;
+
+      view.$(selector).each(function(index){
+        var element = view.$(this);
+        var elementType = _getElementType(element);
+        var attribute_name = config.getBindingValue(element, elementType);
+
+        var modelChange = function(changed_model, val){ element.val(val); };
+
+        var setModelValue = function(attr_name, value){
+          var data = {};
+          data[attr_name] = value;
+          model.set(data);
+        };
+
+        var elementChange = function(ev){
+          setModelValue(attribute_name, view.$(ev.target).val());
+        };
+
+        modelBinder.registerModelBinding(model, attribute_name, modelChange);
+        modelBinder.registerElementBinding(element, elementChange);
+
+        // set the default value on the form, from the model
+        var attr_value = model.get(attribute_name);
+        if (typeof attr_value !== "undefined" && attr_value !== null) {
+          element.val(attr_value);
+        } else {
+          var elVal = element.val();
+          if (elVal){
+            setModelValue(attribute_name, elVal);
+          }
+        }
+      });
+    };
+
+    return methods;
+  })(Backbone);
+
+  // ----------------------------
+  // Select Box Bi-Directional Binding Methods
+  // ----------------------------
+  var SelectBoxBinding = (function(Backbone){
+    var methods = {};
+
+    methods.bind = function(selector, view, model, config){
+      var modelBinder = this;
+
+      view.$(selector).each(function(index){
+        var element = view.$(this);
+        var attribute_name = config.getBindingValue(element, 'select');
+
+        var modelChange = function(changed_model, val){ element.val(val); };
+
+        var setModelValue = function(attr, val, text){
+          var data = {};
+          data[attr] = val;
+          data[attr + "_text"] = text;
+          model.set(data);
+        };
+
+        var elementChange = function(ev){
+          var targetEl = view.$(ev.target);
+          var value = targetEl.val();
+          var text = targetEl.find(":selected").text();
+          setModelValue(attribute_name, value, text);
+        };
+
+        modelBinder.registerModelBinding(model, attribute_name, modelChange);
+        modelBinder.registerElementBinding(element, elementChange);
+
+        // set the default value on the form, from the model
+        var attr_value = model.get(attribute_name);
+        if (typeof attr_value !== "undefined" && attr_value !== null) {
+          element.val(attr_value);
+        } 
+
+        // set the model to the form's value if there is no model value
+        if (element.val() != attr_value) {
+          var value = element.val();
+          var text = element.find(":selected").text();
+          setModelValue(attribute_name, value, text);
+        }
+      });
+    };
+
+    return methods;
+  })(Backbone);
+
+  // ----------------------------
+  // Radio Button Group Bi-Directional Binding Methods
+  // ----------------------------
+  var RadioGroupBinding = (function(Backbone){
+    var methods = {};
+
+    methods.bind = function(selector, view, model, config){
+      var modelBinder = this;
+
+      var foundElements = [];
+      view.$(selector).each(function(index){
+        var element = view.$(this);
+
+        var group_name = config.getBindingValue(element, 'radio');
+        if (!foundElements[group_name]) {
+          foundElements[group_name] = true;
+          var bindingAttr = config.getBindingAttr('radio');
+
+          var modelChange = function(model, val){
+            var value_selector = "input[type=radio][" + bindingAttr + "='" + group_name + "'][value='" + val + "']";
+            view.$(value_selector).attr("checked", "checked");
+          };
+          modelBinder.registerModelBinding(model, group_name, modelChange);
+
+          var setModelValue = function(attr, val){
+            var data = {};
+            data[attr] = val;
+            model.set(data);
+          };
+
+          // bind the form changes to the model
+          var elementChange = function(ev){
+            var element = view.$(ev.currentTarget);
+            if (element.is(":checked")){
+              setModelValue(group_name, element.val());
+            }
+          };
+
+          var group_selector = "input[type=radio][" + bindingAttr + "='" + group_name + "']";
+          view.$(group_selector).each(function(){
+            var groupEl = $(this);
+            modelBinder.registerElementBinding(groupEl, elementChange);
+          });
+
+          var attr_value = model.get(group_name);
+          if (typeof attr_value !== "undefined" && attr_value !== null) {
+            // set the default value on the form, from the model
+            var value_selector = "input[type=radio][" + bindingAttr + "='" + group_name + "'][value='" + attr_value + "']";
+            view.$(value_selector).attr("checked", "checked");
+          } else {
+            // set the model to the currently selected radio button
+            var value_selector = "input[type=radio][" + bindingAttr + "='" + group_name + "']:checked";
+            var value = view.$(value_selector).val();
+            setModelValue(group_name, value);
+          }
+        }
+      });
+    };
+
+    return methods;
+  })(Backbone);
+
+  // ----------------------------
+  // Checkbox Bi-Directional Binding Methods
+  // ----------------------------
+  var CheckboxBinding = (function(Backbone){
+    var methods = {};
+
+    methods.bind = function(selector, view, model, config){
+      var modelBinder = this;
+
+      view.$(selector).each(function(index){
+        var element = view.$(this);
+        var bindingAttr = config.getBindingAttr('checkbox');
+        // Does this attribute refer to an array? ('foo[]' => true, 'bar' => false)
+        var arrayAttr = config.getBindingValue(element, 'checkbox').substr(-2) == '[]'
+        // The name of the element in the DOM (ie 'foo[]')
+        var element_name = config.getBindingValue(element, 'checkbox')
+        // The name of the attribute on the model (ie 'foo')
+        var attribute_name = arrayAttr ? element_name.slice(0,-2) : element_name;
+        
+
+        // Update DOM
+        var modelChange = function(model, val){
+          if(arrayAttr) {
+            var test = val.indexOf(element.val()) > -1;  
+          } else {
+            var test = val;
+          }
+
+          if(test) {
+            element.attr('checked', 'checked');
+          } else {
+            element.removeAttr('checked');
+          }
+        };
+
+        // Update model
+        var setModelValue = function(attr_name, value){
+          var data = {};
+          data[attr_name] = value;
+          model.set(data);
+        };
+
+        // Get new value
+        var elementChange = function(ev){
+          var changedElement = view.$(ev.target || ev);
+          if (arrayAttr) {
+            var values = $.map(
+              view.$("input:checkbox["+bindingAttr+"="+attribute_name+"\\[\\]]:checked"), 
+              function(elem) { return $(elem).val(); }
+            )
+            setModelValue(attribute_name, values);
+          } else {
+            var checked = changedElement.is(":checked")? true : false;
+            setModelValue(attribute_name, checked);
+          }
+        };
+
+        // Bind model changes to DOM
+        modelBinder.registerModelBinding(model, attribute_name, modelChange);
+        // Bind DOM changes to element
+        modelBinder.registerElementBinding(element, elementChange);
+
+        var attr_exists = model.attributes.hasOwnProperty(attribute_name);
+        if (attr_exists) {
+          // set the default value on the form, from the model
+          var attr_value = model.get(attribute_name);
+          if (typeof attr_value !== "undefined" && attr_value !== null ) modelChange(model, attr_value)
+        } else {
+          // bind the form's value to the model
+          elementChange(element)
+        }
+      });
+    };
+
+    return methods;
+  })(Backbone);
+
+  // ----------------------------
+  // Data-Bind Binding Methods
+  // ----------------------------
+  var DataBindBinding = (function(Backbone, _, $){
+    var dataBindSubstConfig = {
+      "default": ""
+    };
+
+    modelBinding.Configuration.dataBindSubst = function(config){
+      this.storeDataBindSubstConfig();
+      _.extend(dataBindSubstConfig, config);
+    };
+
+    modelBinding.Configuration.storeDataBindSubstConfig = function(){
+      modelBinding.Configuration._dataBindSubstConfig = _.clone(dataBindSubstConfig);
+    };
+
+    modelBinding.Configuration.restoreDataBindSubstConfig = function(){
+      if (modelBinding.Configuration._dataBindSubstConfig){
+        dataBindSubstConfig = modelBinding.Configuration._dataBindSubstConfig;
+        delete modelBinding.Configuration._dataBindSubstConfig;
+      }
+    };
+
+    modelBinding.Configuration.getDataBindSubst = function(elementType, value){
+      var returnValue = value;
+      if (value === undefined){
+        if (dataBindSubstConfig.hasOwnProperty(elementType)){
+          returnValue = dataBindSubstConfig[elementType];
+        } else {
+          returnValue = dataBindSubstConfig["default"];
+        }
+      }
+      return returnValue;
+    };
+
+    var setOnElement = function(element, attr, val){
+      var valBefore = val;
+      val = modelBinding.Configuration.getDataBindSubst(attr, val);
+      switch(attr){
+        case "html":
+          element.html(val);
+          break;
+        case "text":
+          element.text(val);
+          break;
+        case "enabled":
+          element.attr("disabled", !val);
+          break;
+        case "displayed":
+          element[val? "show" : "hide"]();
+          break;
+        case "hidden":
+          element[val? "hide" : "show"]();
+          break;
+        default:
+          element.attr(attr, val);
+      }
+    };
+
+    var splitBindingAttr = function(element)
+    {
+      var dataBindConfigList = [];
+      var dataBindAttributeName = modelBinding.Conventions.databind.selector.replace(/^(.*\[)([^\]]*)(].*)/g, '$2');
+      var databindList = element.attr(dataBindAttributeName).split(";");
+      _.each(databindList, function(attrbind){
+        var databind = $.trim(attrbind).split(" ");
+
+        // make the default special case "text" if none specified
+        if( databind.length == 1 ) databind.unshift("text");
+
+        dataBindConfigList.push({
+          elementAttr: databind[0],
+          modelAttr: databind[1]
+        });
+      });
+      return dataBindConfigList;
+    };
+
+    var getEventConfiguration = function(element, databind){
+      var config = {};
+      var eventName = databind.modelAttr;
+      var index = eventName.indexOf("event:");
+
+      if (index == 0) {
+        // "event:foo" binding
+        config.name = eventName.substr(6);
+        config.callback = function(val){
+          setOnElement(element, databind.elementAttr, val);
+        };
+      } else {
+        // standard model attribute binding
+        config.name = "change:" + eventName;
+        config.callback = function(model, val){
+          setOnElement(element, databind.elementAttr, val);
+        };
+      }
+
+      return config;
+    }
+    var methods = {};
+
+    methods.bind = function(selector, view, model, config){
+      var modelBinder = this;
+
+      view.$(selector).each(function(index){
+        var element = view.$(this);
+        var databindList = splitBindingAttr(element);
+
+        _.each(databindList, function(databind){
+          var eventConfig = getEventConfiguration(element, databind);
+          modelBinder.registerDataBinding(model, eventConfig.name, eventConfig.callback);
+          // set default on data-bind element
+          setOnElement(element, databind.elementAttr, model.get(databind.modelAttr));
+        });
+
+      });
+    };
+
+    return methods;
+  })(Backbone, _, $);
+
+
+  // ----------------------------
+  // Binding Conventions
+  // ----------------------------
+  modelBinding.Conventions = {
+    text: {selector: "input:text", handler: StandardBinding},
+    textarea: {selector: "textarea", handler: StandardBinding},
+    password: {selector: "input:password", handler: StandardBinding},
+    radio: {selector: "input:radio", handler: RadioGroupBinding},
+    checkbox: {selector: "input:checkbox", handler: CheckboxBinding},
+    select: {selector: "select", handler: SelectBoxBinding},
+    databind: { selector: "*[data-bind]", handler: DataBindBinding},
+    // HTML5 input
+    number: {selector: "input[type=number]", handler: StandardBinding},
+    range: {selector: "input[type=range]", handler: StandardBinding},
+    tel: {selector: "input[type=tel]", handler: StandardBinding},
+    search: {selector: "input[type=search]", handler: StandardBinding},
+    url: {selector: "input[type=url]", handler: StandardBinding},
+    email: {selector: "input[type=email]", handler: StandardBinding}
+  };
+
+  return modelBinding;
+});
+
+// Backbone.Modelbinding AMD wrapper with namespace fallback
+if (typeof define === 'function' && define.amd) {
+    // AMD support
+    define([
+      'backbone',    // use Backbone 0.5.3-optamd3 branch (https://github.com/jrburke/backbone/tree/optamd3)
+      'underscore',  // AMD supported
+      'jquery'       // AMD supported
+      ], function (Backbone, _, jQuery) {
+        return modelbinding(Backbone, _, jQuery);
+      });
+} else {
+    // No AMD, use Backbone namespace
+    root.Backbone = Backbone || {};
+    root.Backbone.ModelBinding = modelbinding(Backbone, _, jQuery);
+}
+
+})(this);
 // Backbone.Memento v0.4.1a
 //
 // Copyright (C)2011 Derick Bailey, Muted Solutions, LLC
@@ -11878,168 +12419,355 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
 		}
 	}
 }));(this.require.define({
-  "views/edit/_chunk_view": function(exports, require, module) {
+  "views/chunk_edit/chunk_edit_view": function(exports, require, module) {
     (function() {
-  var Chunk,
+  var MatchesView, OptionsView, chunkEditTemplate,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  Chunk = require('models/chunk').Chunk;
+  OptionsView = require('views/chunk_edit/_options_view').OptionsView;
 
-  exports.ChunkView = (function(_super) {
+  MatchesView = require('views/chunk_edit/_matches_view').MatchesView;
 
-    __extends(ChunkView, _super);
+  chunkEditTemplate = require('./templates/chunk_edit');
 
-    function ChunkView() {
-      this.remove = __bind(this.remove, this);
-      this.createChunkFrom = __bind(this.createChunkFrom, this);
-      this.getTextAfterRange = __bind(this.getTextAfterRange, this);
-      this.getTextBeforeRange = __bind(this.getTextBeforeRange, this);
-      this.getTextFromRange = __bind(this.getTextFromRange, this);
-      this.rangeCrossesChunks = __bind(this.rangeCrossesChunks, this);
-      this.clearSelection = __bind(this.clearSelection, this);
-      this.getRangeFromSelection = __bind(this.getRangeFromSelection, this);
-      this.rangeIsEmpty = __bind(this.rangeIsEmpty, this);
-      this.handleMouseUp = __bind(this.handleMouseUp, this);
+  exports.ChunkEditView = (function(_super) {
+
+    __extends(ChunkEditView, _super);
+
+    function ChunkEditView() {
+      this.close = __bind(this.close, this);
+      this.cancelAndClose = __bind(this.cancelAndClose, this);
+      this.deleteAndClose = __bind(this.deleteAndClose, this);
+      this.saveAndClose = __bind(this.saveAndClose, this);
       this.render = __bind(this.render, this);
       this.remove = __bind(this.remove, this);
       this.unbind = __bind(this.unbind, this);
       this.bind = __bind(this.bind, this);
       this.initialize = __bind(this.initialize, this);
-      ChunkView.__super__.constructor.apply(this, arguments);
+      ChunkEditView.__super__.constructor.apply(this, arguments);
     }
 
-    ChunkView.prototype.tagName = 'span';
+    ChunkEditView.prototype.id = 'chunk_edit_view';
 
-    ChunkView.prototype.className = 'chunk';
-
-    ChunkView.prototype.events = {
-      'mouseup': 'handleMouseUp'
+    ChunkEditView.prototype.events = {
+      'click #screen': 'cancelAndClose',
+      'click .save': 'saveAndClose',
+      'click .delete': 'deleteAndClose'
     };
 
-    ChunkView.prototype.initialize = function() {
+    ChunkEditView.prototype.initialize = function() {
       this.router = this.options['router'];
-      this.chunk = this.options['chunk'];
+      this.model = this.chunk = this.options['chunk'];
+      this.chunk.store();
       if (this.options['bind'] !== false) return this.bind();
     };
 
-    ChunkView.prototype.bind = function() {
-      this.chunk.bind('all', this.render);
-      return this.chunk.bind('remove', this.remove);
+    ChunkEditView.prototype.bind = function() {
+      this.chunk.bind('change:type', this.render);
+      KeyboardJS.bind.key('esc', null, this.cancelAndClose);
+      return KeyboardJS.bind.key('enter', null, this.saveAndClose);
     };
 
-    ChunkView.prototype.unbind = function() {
-      this.chunk.unbind('all');
-      return this.chunk.unbind('remove');
+    ChunkEditView.prototype.unbind = function() {
+      this.chunk.unbind('change:type', this.render);
+      KeyboardJS.unbind.key('esc');
+      return KeyboardJS.unbind.key('enter');
     };
 
-    ChunkView.prototype.remove = function() {
-      this.unbind();
-      return this.$(this.el).remove();
+    ChunkEditView.prototype.remove = function() {
+      return this.unbind();
     };
 
-    ChunkView.prototype.render = function() {
-      this.$(this.el).text(this.chunk.get("content"));
-      if (this.chunk.get('anonymize')) {
-        this.$(this.el).addClass('anonymize');
-      } else {
-        this.$(this.el).removeClass('anonymize');
+    ChunkEditView.prototype.render = function() {
+      var view;
+      this.$(this.el).html(chunkEditTemplate({
+        chunk: this.chunk,
+        state: this.state
+      }));
+      Backbone.ModelBinding.bind(this, {
+        all: "name"
+      });
+      switch (this.chunk.get('type')) {
+        case 'set':
+          view = new OptionsView({
+            chunk: this.chunk,
+            router: this.router,
+            bind: this.options['bind']
+          });
+          this.$("#ajax").replaceWith(view.render().el);
+          break;
+        case 'glob':
+        case 'numeric':
+        case 'glob-excl':
+          view = new MatchesView({
+            chunk: this.chunk,
+            router: this.router,
+            bind: this.options['bind']
+          });
+          console.log(this.$('#ajax'));
+          this.$("#ajax").replaceWith(view.render().el);
+          console.log(view.el);
       }
       return this;
     };
 
-    ChunkView.prototype.handleMouseUp = function() {
-      var chunk, chunk_range;
-      if (this.chunk.get('anonymize')) {
-        this.router.navigate("/edit/chunk/" + (this.chunk.index()), {
-          trigger: true
-        });
-        return false;
-      } else {
-        chunk_range = this.getRangeFromSelection();
-        if (this.rangeIsEmpty(chunk_range)) {
-          return false;
-        } else if (this.rangeCrossesChunks(chunk_range)) {
-          return alert("NO! don't select the red bits");
+    ChunkEditView.prototype.saveAndClose = function(e) {
+      this.unbind();
+      return this.close();
+    };
+
+    ChunkEditView.prototype.deleteAndClose = function() {
+      this.chunk.set({
+        anonymize: false
+      });
+      return this.close();
+    };
+
+    ChunkEditView.prototype.cancelAndClose = function() {
+      this.chunk.restore();
+      return this.close();
+    };
+
+    ChunkEditView.prototype.close = function() {
+      return this.router.navigate("/edit", {
+        trigger: true
+      });
+    };
+
+    return ChunkEditView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "models/chunk": function(exports, require, module) {
+    (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  exports.Chunk = (function(_super) {
+
+    __extends(Chunk, _super);
+
+    function Chunk() {
+      this.post = __bind(this.post, this);
+      this.getMatches = __bind(this.getMatches, this);
+      this.replaceWith = __bind(this.replaceWith, this);
+      this.index = __bind(this.index, this);
+      this.toggleAnonymize = __bind(this.toggleAnonymize, this);
+      this.typeIs = __bind(this.typeIs, this);
+      this.initialize = __bind(this.initialize, this);
+      Chunk.__super__.constructor.apply(this, arguments);
+    }
+
+    Chunk.prototype.defaults = {
+      content: '',
+      anonymize: false,
+      alias: 'redacted',
+      collapse: false,
+      type: 'glob',
+      options: [],
+      optional: false,
+      pass_through: false,
+      matches: []
+    };
+
+    Chunk.prototype.initialize = function() {
+      var memento;
+      memento = new Backbone.Memento(this);
+      return _.extend(this, memento);
+    };
+
+    Chunk.prototype.typeIs = function(value) {
+      return this.get('type') === value;
+    };
+
+    Chunk.prototype.toggleAnonymize = function() {
+      return this.set({
+        anonymize: !this.get('anonymize')
+      });
+    };
+
+    Chunk.prototype.searchText = function() {
+      var match, matcher;
+      if (this.get('anonymize') && this.get('collapse') !== true) {
+        matcher = (function() {
+          switch (this.get('type')) {
+            case 'set':
+              return "(" + (((function() {
+                var _i, _len, _ref, _results;
+                _ref = this.get("options");
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  match = _ref[_i];
+                  _results.push("(?:" + (XRegExp.escape(match)) + ")");
+                }
+                return _results;
+              }).call(this)).join('|')) + ")";
+            case 'char-set':
+              return "(" + (((function() {
+                var _i, _len, _ref, _results;
+                _ref = this.get("options");
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  match = _ref[_i];
+                  _results.push(XRegExp.escape(match));
+                }
+                return _results;
+              }).call(this)).join('|')) + ")";
+            case 'literal':
+              return "(" + (XRegExp.escape(this.get('content'))) + ")";
+            case 'numeric':
+              return '([\\.|\\d]*)';
+            case 'glob-excl':
+              return "([^" + (((function() {
+                var _i, _len, _ref, _results;
+                _ref = this.get("options");
+                _results = [];
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  match = _ref[_i];
+                  _results.push(XRegExp.escape(match));
+                }
+                return _results;
+              }).call(this)).join('|')) + "]*)";
+            case 'char':
+              return '(.)';
+            default:
+              return '(.*?)';
+          }
+        }).call(this);
+        if (this.get("optional")) {
+          return "" + matcher + "?";
         } else {
-          chunk = this.createChunkFrom(chunk_range);
-          return this.router.navigate("/edit/chunk/" + (chunk.index()), {
-            trigger: true
-          });
+          return matcher;
         }
+      } else if (!this.get('anonymize')) {
+        return "(" + (XRegExp.escape(this.get('content'))) + ")";
       }
     };
 
-    ChunkView.prototype.rangeIsEmpty = function(range) {
-      return !this.rangeCrossesChunks(range) && range.startOffset === range.endOffset;
-    };
-
-    ChunkView.prototype.getRangeFromSelection = function() {
-      return window.getSelection().getRangeAt(0);
-    };
-
-    ChunkView.prototype.clearSelection = function() {
-      return window.getSelection().empty();
-    };
-
-    ChunkView.prototype.rangeCrossesChunks = function(range) {
-      return range.startContainer !== range.endContainer;
-    };
-
-    ChunkView.prototype.getTextFromRange = function(range) {
-      return range.cloneContents().textContent;
-    };
-
-    ChunkView.prototype.getTextBeforeRange = function(range) {
-      var pre_range;
-      pre_range = range.cloneRange();
-      pre_range.setStartBefore(range.startContainer);
-      pre_range.setEnd(range.startContainer, range.startOffset);
-      return this.getTextFromRange(pre_range);
-    };
-
-    ChunkView.prototype.getTextAfterRange = function(range) {
-      var post_range;
-      post_range = range.cloneRange();
-      post_range.setEndAfter(range.endContainer);
-      post_range.setStart(range.endContainer, range.endOffset);
-      return this.getTextFromRange(post_range);
-    };
-
-    ChunkView.prototype.createChunkFrom = function(chunk_range) {
-      var chunk, i, post, pre;
-      pre = new Chunk({
-        content: this.getTextBeforeRange(chunk_range)
-      });
-      chunk = new Chunk({
-        content: this.getTextFromRange(chunk_range),
-        anonymize: true
-      });
-      post = new Chunk({
-        content: this.getTextAfterRange(chunk_range)
-      });
-      this.chunk.replaceWith((function() {
-        var _i, _len, _ref, _results;
-        _ref = [pre, chunk, post];
-        _results = [];
-        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-          i = _ref[_i];
-          if (i.get("content") !== '') _results.push(i);
+    Chunk.prototype.replaceText = function() {
+      if (this.get('anonymize') && this.get('collapse') !== true) {
+        if (this.get("type") === 'literal' && !this.get("pass_through")) {
+          return "";
+        } else {
+          if (this.get("pass_through")) {
+            return "\\" + (this.index() + 1);
+          } else {
+            return "[" + (this.get("alias")) + "]";
+          }
         }
-        return _results;
-      })());
-      this.remove;
-      return chunk;
+      } else if (!this.get('anonymize')) {
+        return "\\" + (this.index() + 1);
+      }
     };
 
-    ChunkView.prototype.remove = function() {
-      return this.$(this.el).remove();
+    Chunk.prototype.index = function() {
+      return this.collection.models.indexOf(this);
     };
 
-    return ChunkView;
+    Chunk.prototype.replaceWith = function(chunks) {
+      this.collection.add(chunks.reverse(), {
+        at: this.index(),
+        silent: true
+      });
+      return this.collection.remove(this);
+    };
 
-  })(Backbone.View);
+    Chunk.prototype.getMatches = function(callback, failback) {
+      return this.post({
+        search: this.collection.searchText()
+      }, "/get_matches/" + (this.index() + 1), callback, failback);
+    };
+
+    Chunk.prototype.post = function(data, url, callback, failback) {
+      return $.ajax({
+        type: "POST",
+        url: url,
+        data: JSON.stringify(data),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: callback,
+        failure: failback
+      });
+    };
+
+    return Chunk;
+
+  })(Backbone.Model);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "models/test_result": function(exports, require, module) {
+    (function() {
+  var __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  exports.TestResult = (function(_super) {
+
+    __extends(TestResult, _super);
+
+    function TestResult() {
+      TestResult.__super__.constructor.apply(this, arguments);
+    }
+
+    TestResult.prototype.defaults = {
+      raw: null,
+      redacted: null
+    };
+
+    return TestResult;
+
+  })(Backbone.Model);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "initialize": function(exports, require, module) {
+    (function() {
+  var BrunchApplication, MainRouter, Sample, TestResults,
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  BrunchApplication = require('helpers').BrunchApplication;
+
+  MainRouter = require('routers/main_router').MainRouter;
+
+  Sample = require('collections/sample').Sample;
+
+  TestResults = require('collections/test_results').TestResults;
+
+  exports.Application = (function(_super) {
+
+    __extends(Application, _super);
+
+    function Application() {
+      Application.__super__.constructor.apply(this, arguments);
+    }
+
+    Application.prototype.initialize = function() {
+      this.router = new MainRouter;
+      this.sample = new Sample;
+      this.test_results = new TestResults(this.sample);
+      return this.current_views = [];
+    };
+
+    return Application;
+
+  })(BrunchApplication);
+
+  window.app = new exports.Application;
 
 }).call(this);
 
@@ -12161,288 +12889,6 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "collections/test_results": function(exports, require, module) {
-    (function() {
-  var TestResult,
-    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  TestResult = require('models/test_result').TestResult;
-
-  exports.TestResults = (function(_super) {
-
-    __extends(TestResults, _super);
-
-    function TestResults() {
-      this.testFailback = __bind(this.testFailback, this);
-      this.testCallback = __bind(this.testCallback, this);
-      this.testSample = __bind(this.testSample, this);
-      this.handleSampleEvent = __bind(this.handleSampleEvent, this);
-      this.initialize = __bind(this.initialize, this);
-      TestResults.__super__.constructor.apply(this, arguments);
-    }
-
-    TestResults.prototype.model = TestResult;
-
-    TestResults.prototype.initialize = function(sample) {
-      this.resultCount = null;
-      this.state = 'idle';
-      this.sample = sample;
-      return this.sample.bind('all', this.handleSampleEvent);
-    };
-
-    TestResults.prototype.handleSampleEvent = function() {
-      if (this.sample.length < 2) {
-        if (this.state !== 'idle') {
-          this.resultCount = null;
-          this.state = 'idle';
-          return this.trigger('toIdle');
-        }
-      } else {
-        return this.testSample();
-      }
-    };
-
-    TestResults.prototype.testSample = function() {
-      this.post({
-        search: this.sample.searchText(),
-        replace: this.sample.replaceText()
-      }, "test_filter", this.testCallback, this.testFailback);
-      this.resultCount = null;
-      this.state = 'waiting';
-      return this.trigger('toWaiting');
-    };
-
-    TestResults.prototype.testCallback = function(results) {
-      if (results['regex'] === ("" + (this.sample.searchText()))) {
-        this.reset(results['results'], {
-          silent: true
-        });
-        this.resultCount = results['total'];
-        if (this.length === 0) {
-          this.state = 'empty';
-          return this.trigger('toEmpty');
-        } else {
-          this.state = 'recieved';
-          return this.trigger('toRecieved');
-        }
-      }
-    };
-
-    TestResults.prototype.testFailback = function(results) {
-      console.log(results);
-      this.resultsCount = null;
-      this.state = 'error';
-      return this.trigger('toError');
-    };
-
-    TestResults.prototype.post = function(data, url, callback, failback) {
-      return $.ajax({
-        type: "POST",
-        url: url,
-        data: JSON.stringify(data),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: callback,
-        failure: failback
-      });
-    };
-
-    return TestResults;
-
-  })(Backbone.Collection);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "models/chunk": function(exports, require, module) {
-    (function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
-    __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  exports.Chunk = (function(_super) {
-
-    __extends(Chunk, _super);
-
-    function Chunk() {
-      this.post = __bind(this.post, this);
-      this.getMatches = __bind(this.getMatches, this);
-      this.replaceWith = __bind(this.replaceWith, this);
-      this.index = __bind(this.index, this);
-      this.toggleAnonymize = __bind(this.toggleAnonymize, this);
-      this.typeIs = __bind(this.typeIs, this);
-      this.initialize = __bind(this.initialize, this);
-      Chunk.__super__.constructor.apply(this, arguments);
-    }
-
-    Chunk.prototype.defaults = {
-      content: '',
-      anonymize: false,
-      alias: 'redacted',
-      collapse: false,
-      type: 'glob',
-      options: [],
-      optional: false,
-      pass_through: false,
-      matches: []
-    };
-
-    Chunk.prototype.initialize = function() {
-      var memento;
-      memento = new Backbone.Memento(this);
-      return _.extend(this, memento);
-    };
-
-    Chunk.prototype.typeIs = function(value) {
-      return this.get('type') === value;
-    };
-
-    Chunk.prototype.toggleAnonymize = function() {
-      return this.set({
-        anonymize: !this.get('anonymize')
-      });
-    };
-
-    Chunk.prototype.searchText = function() {
-      var match, matcher;
-      if (this.get('anonymize') && this.get('collapse') !== true) {
-        matcher = (function() {
-          switch (this.get('type')) {
-            case 'set':
-              return "(" + (((function() {
-                var _i, _len, _ref, _results;
-                _ref = this.get("options");
-                _results = [];
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  match = _ref[_i];
-                  _results.push("(?:" + (XRegExp.escape(match)) + ")");
-                }
-                return _results;
-              }).call(this)).join('|')) + ")";
-            case 'char-set':
-              return "(" + (((function() {
-                var _i, _len, _ref, _results;
-                _ref = this.get("options");
-                _results = [];
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  match = _ref[_i];
-                  _results.push(XRegExp.escape(match));
-                }
-                return _results;
-              }).call(this)).join('|')) + ")";
-            case 'literal':
-              return "(?:" + (XRegExp.escape(this.get('content'))) + ")";
-            case 'numeric':
-              return '([\\.|\\d]*)';
-            case 'glob-excl':
-              return "([^" + (((function() {
-                var _i, _len, _ref, _results;
-                _ref = this.get("options");
-                _results = [];
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  match = _ref[_i];
-                  _results.push(XRegExp.escape(match));
-                }
-                return _results;
-              }).call(this)).join('|')) + "]*)";
-            case 'char':
-              return '(.)';
-            default:
-              return '(.*?)';
-          }
-        }).call(this);
-        if (this.get("optional")) {
-          return "" + matcher + "?";
-        } else {
-          return matcher;
-        }
-      } else if (!this.get('anonymize')) {
-        return "(" + (XRegExp.escape(this.get('content'))) + ")";
-      }
-    };
-
-    Chunk.prototype.replaceText = function() {
-      if (this.get('anonymize') && this.get('collapse') !== true) {
-        if (this.get("pass_through")) {
-          return "\\" + (this.index() + 1);
-        } else {
-          return "[" + (this.get("alias")) + "]";
-        }
-      } else if (!this.get('anonymize')) {
-        return "\\" + (this.index() + 1);
-      }
-    };
-
-    Chunk.prototype.index = function() {
-      return this.collection.models.indexOf(this);
-    };
-
-    Chunk.prototype.replaceWith = function(chunks) {
-      this.collection.add(chunks.reverse(), {
-        at: this.index(),
-        silent: true
-      });
-      return this.collection.remove(this);
-    };
-
-    Chunk.prototype.getMatches = function(callback, failback) {
-      return this.post({
-        search: this.collection.searchText()
-      }, "/get_matches/" + (this.index() + 1), callback, failback);
-    };
-
-    Chunk.prototype.post = function(data, url, callback, failback) {
-      return $.ajax({
-        type: "POST",
-        url: url,
-        data: JSON.stringify(data),
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        success: callback,
-        failure: failback
-      });
-    };
-
-    return Chunk;
-
-  })(Backbone.Model);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
-  "models/test_result": function(exports, require, module) {
-    (function() {
-  var __hasProp = Object.prototype.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
-
-  exports.TestResult = (function(_super) {
-
-    __extends(TestResult, _super);
-
-    function TestResult() {
-      TestResult.__super__.constructor.apply(this, arguments);
-    }
-
-    TestResult.prototype.defaults = {
-      raw: null,
-      redacted: null
-    };
-
-    return TestResult;
-
-  })(Backbone.Model);
-
-}).call(this);
-
-  }
-}));
-(this.require.define({
   "routers/main_router": function(exports, require, module) {
     (function() {
   var ChunkEditView, EditView, NewView,
@@ -12552,214 +12998,180 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "helpers": function(exports, require, module) {
+  "collections/test_results": function(exports, require, module) {
     (function() {
+  var TestResult,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  exports.BrunchApplication = (function() {
+  TestResult = require('models/test_result').TestResult;
 
-    function BrunchApplication() {
-      var _this = this;
-      jQuery(function() {
-        _this.initialize(_this);
-        return Backbone.history.start();
-      });
+  exports.TestResults = (function(_super) {
+
+    __extends(TestResults, _super);
+
+    function TestResults() {
+      this.testFailback = __bind(this.testFailback, this);
+      this.testCallback = __bind(this.testCallback, this);
+      this.testSample = __bind(this.testSample, this);
+      this.handleSampleEvent = __bind(this.handleSampleEvent, this);
+      this.initialize = __bind(this.initialize, this);
+      TestResults.__super__.constructor.apply(this, arguments);
     }
 
-    BrunchApplication.prototype.initialize = function() {
-      return null;
+    TestResults.prototype.model = TestResult;
+
+    TestResults.prototype.initialize = function(sample) {
+      this.resultCount = null;
+      this.state = 'idle';
+      this.sample = sample;
+      return this.sample.bind('all', this.handleSampleEvent);
     };
 
-    return BrunchApplication;
+    TestResults.prototype.handleSampleEvent = function() {
+      if (this.sample.length < 2) {
+        if (this.state !== 'idle') {
+          this.resultCount = null;
+          this.state = 'idle';
+          return this.trigger('toIdle');
+        }
+      } else {
+        return this.testSample();
+      }
+    };
 
-  })();
+    TestResults.prototype.testSample = function() {
+      this.post({
+        search: this.sample.searchText(),
+        replace: this.sample.replaceText()
+      }, "test_filter", this.testCallback, this.testFailback);
+      this.resultCount = null;
+      this.state = 'waiting';
+      return this.trigger('toWaiting');
+    };
+
+    TestResults.prototype.testCallback = function(results) {
+      if (results['regex'] === ("" + (this.sample.searchText()))) {
+        this.reset(results['results'], {
+          silent: true
+        });
+        this.resultCount = results['total'];
+        if (this.length === 0) {
+          this.state = 'empty';
+          return this.trigger('toEmpty');
+        } else {
+          this.state = 'recieved';
+          return this.trigger('toRecieved');
+        }
+      }
+    };
+
+    TestResults.prototype.testFailback = function(results) {
+      console.log(results);
+      this.resultsCount = null;
+      this.state = 'error';
+      return this.trigger('toError');
+    };
+
+    TestResults.prototype.post = function(data, url, callback, failback) {
+      return $.ajax({
+        type: "POST",
+        url: url,
+        data: JSON.stringify(data),
+        contentType: "application/json; charset=utf-8",
+        dataType: "json",
+        success: callback,
+        failure: failback
+      });
+    };
+
+    return TestResults;
+
+  })(Backbone.Collection);
 
 }).call(this);
 
   }
 }));
 (this.require.define({
-  "views/chunk_edit/chunk_edit_view": function(exports, require, module) {
+  "views/chunk_edit/_matches_view": function(exports, require, module) {
     (function() {
-  var chunkEditTemplate, viewStateMatchesTemplate, viewStateOptionsTemplate,
+  var matchesTemplate,
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  chunkEditTemplate = require('./templates/chunk_edit');
+  matchesTemplate = require('./templates/_matches');
 
-  viewStateMatchesTemplate = require('./templates/_state_matches');
+  exports.MatchesView = (function(_super) {
 
-  viewStateOptionsTemplate = require('./templates/_state_options');
+    __extends(MatchesView, _super);
 
-  exports.ChunkEditView = (function(_super) {
-
-    __extends(ChunkEditView, _super);
-
-    function ChunkEditView() {
-      this.close = __bind(this.close, this);
-      this.cancelAndClose = __bind(this.cancelAndClose, this);
-      this.deleteAndClose = __bind(this.deleteAndClose, this);
-      this.saveAndClose = __bind(this.saveAndClose, this);
+    function MatchesView() {
       this.handleMatchesFailure = __bind(this.handleMatchesFailure, this);
-      this.handleGetOptionsSuccess = __bind(this.handleGetOptionsSuccess, this);
       this.handleMatchesSuccess = __bind(this.handleMatchesSuccess, this);
       this.getMatches = __bind(this.getMatches, this);
-      this.renderViewState = __bind(this.renderViewState, this);
       this.render = __bind(this.render, this);
       this.remove = __bind(this.remove, this);
       this.unbind = __bind(this.unbind, this);
       this.bind = __bind(this.bind, this);
       this.initialize = __bind(this.initialize, this);
-      ChunkEditView.__super__.constructor.apply(this, arguments);
+      MatchesView.__super__.constructor.apply(this, arguments);
     }
 
-    ChunkEditView.prototype.id = 'chunk_edit_view';
+    MatchesView.prototype.id = 'ajax';
 
-    ChunkEditView.prototype.events = {
-      'click #screen': 'cancelAndClose',
-      'click .save': 'saveAndClose',
-      'click .delete': 'deleteAndClose'
-    };
-
-    ChunkEditView.prototype.initialize = function() {
+    MatchesView.prototype.initialize = function() {
       this.router = this.options['router'];
       this.model = this.chunk = this.options['chunk'];
       this.state = 'idle';
-      this.chunk.store();
-      this.getMatches();
-      if (this.options['bind'] !== false) return this.bind();
+      if (this.options['bind'] !== false) this.bind();
+      return this.getMatches();
     };
 
-    ChunkEditView.prototype.bind = function() {
-      this.chunk.bind('change:type', this.getMatches);
-      KeyboardJS.bind.key('esc', null, this.cancelAndClose);
-      return KeyboardJS.bind.key('enter', null, this.saveAndClose);
+    MatchesView.prototype.bind = function() {
+      return this.chunk.bind('change:type', this.getMatches);
     };
 
-    ChunkEditView.prototype.unbind = function() {
-      this.chunk.unbind('change:type');
-      this.chunk.unbind('all');
-      KeyboardJS.unbind.key('esc');
-      return KeyboardJS.unbind.key('enter');
+    MatchesView.prototype.unbind = function() {
+      return this.chunk.unbind('change:type', this.getMatches);
     };
 
-    ChunkEditView.prototype.remove = function() {
+    MatchesView.prototype.remove = function() {
       return this.unbind();
     };
 
-    ChunkEditView.prototype.render = function() {
-      this.$(this.el).html(chunkEditTemplate({
+    MatchesView.prototype.render = function() {
+      this.$(this.el).html(matchesTemplate({
         chunk: this.chunk,
         state: this.state
       }));
-      Backbone.ModelBinding.bind(this, {
-        all: "name"
-      });
-      this.renderViewState();
       return this;
     };
 
-    ChunkEditView.prototype.renderViewState = function() {
-      switch (this.chunk.get('type')) {
-        case 'set':
-        case 'char-set':
-          return this.$('#ajax').html(viewStateOptionsTemplate({
-            chunk: this.chunk,
-            state: this.state
-          }));
-        case 'glob':
-        case 'glob-excl':
-        case 'numeric':
-          return this.$('#ajax').html(viewStateMatchesTemplate({
-            chunk: this.chunk,
-            state: this.state
-          }));
-      }
-    };
-
-    ChunkEditView.prototype.getMatches = function() {
-      switch (this.chunk.get('type')) {
-        case 'set':
-          this.chunk.set({
-            type: 'glob'
-          }, {
-            silent: true
-          });
-          this.chunk.getMatches(this.handleGetOptionsSuccess, this.handleMatchesFailure);
-          this.chunk.set({
-            type: 'set'
-          }, {
-            silent: true
-          });
-          this.state = 'waiting';
-          break;
-        case 'glob':
-        case 'numeric':
-        case 'glob-excl':
-          this.chunk.getMatches(this.handleMatchesSuccess, this.handleMatchesFailure);
-          this.state = 'waiting';
-          break;
-        default:
-          this.state = 'idle';
-      }
+    MatchesView.prototype.getMatches = function() {
+      this.chunk.getMatches(this.handleMatchesSuccess, this.handleMatchesFailure);
+      this.state = 'waiting';
       return this.render();
     };
 
-    ChunkEditView.prototype.handleMatchesSuccess = function(results) {
-      var focus_cache;
+    MatchesView.prototype.handleMatchesSuccess = function(results) {
       if (results['regex'] === this.chunk.collection.searchText()) {
-        focus_cache = this.$(':focus');
         this.chunk.set({
           matches: results['results']
         });
         this.state = 'received';
-        this.renderViewState();
-        return focus_cache.select();
+        return this.render();
       }
     };
 
-    ChunkEditView.prototype.handleGetOptionsSuccess = function(results) {
-      var focus_cache;
-      if (this.chunk.get('type') === 'set') {
-        focus_cache = this(':focus');
-        this.chunk.set({
-          options: results['results']
-        });
-        this.state = 'received';
-        this.renderViewState();
-        return focus_cache.select();
-      }
-    };
-
-    ChunkEditView.prototype.handleMatchesFailure = function(results) {
+    MatchesView.prototype.handleMatchesFailure = function(results) {
       this.state = 'error';
-      return this.renderViewState();
+      return this.render();
     };
 
-    ChunkEditView.prototype.saveAndClose = function(e) {
-      this.unbind();
-      return this.close();
-    };
-
-    ChunkEditView.prototype.deleteAndClose = function() {
-      this.chunk.set({
-        anonymize: false
-      });
-      return this.close();
-    };
-
-    ChunkEditView.prototype.cancelAndClose = function() {
-      this.chunk.restore();
-      return this.close();
-    };
-
-    ChunkEditView.prototype.close = function() {
-      return this.router.navigate("/edit", {
-        trigger: true
-      });
-    };
-
-    return ChunkEditView;
+    return MatchesView;
 
   })(Backbone.View);
 
@@ -12768,40 +13180,320 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "initialize": function(exports, require, module) {
+  "views/chunk_edit/_options_view": function(exports, require, module) {
     (function() {
-  var BrunchApplication, MainRouter, Sample, TestResults,
+  var optionsTemplate,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = Object.prototype.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
 
-  BrunchApplication = require('helpers').BrunchApplication;
+  optionsTemplate = require('./templates/_options');
 
-  MainRouter = require('routers/main_router').MainRouter;
+  exports.OptionsView = (function(_super) {
 
-  Sample = require('collections/sample').Sample;
+    __extends(OptionsView, _super);
 
-  TestResults = require('collections/test_results').TestResults;
-
-  exports.Application = (function(_super) {
-
-    __extends(Application, _super);
-
-    function Application() {
-      Application.__super__.constructor.apply(this, arguments);
+    function OptionsView() {
+      this.handleGetOptionsFailure = __bind(this.handleGetOptionsFailure, this);
+      this.handleGetOptionsSuccess = __bind(this.handleGetOptionsSuccess, this);
+      this.getOptions = __bind(this.getOptions, this);
+      this.handleTypeChange = __bind(this.handleTypeChange, this);
+      this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
+      this.initialize = __bind(this.initialize, this);
+      OptionsView.__super__.constructor.apply(this, arguments);
     }
 
-    Application.prototype.initialize = function() {
-      this.router = new MainRouter;
-      this.sample = new Sample;
-      this.test_results = new TestResults(this.sample);
-      return this.current_views = [];
+    OptionsView.prototype.id = 'ajax';
+
+    OptionsView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.model = this.chunk = this.options['chunk'];
+      this.state = 'idle';
+      if (this.options['bind'] !== false) this.bind();
+      return this.handleTypeChange();
     };
 
-    return Application;
+    OptionsView.prototype.bind = function() {
+      return this.chunk.bind('change:type', this.handleTypeChange);
+    };
 
-  })(BrunchApplication);
+    OptionsView.prototype.unbind = function() {
+      return this.chunk.unbind('change:type', this.handleTypeChange);
+    };
 
-  window.app = new exports.Application;
+    OptionsView.prototype.remove = function() {
+      return this.unbind();
+    };
+
+    OptionsView.prototype.render = function() {
+      this.$(this.el).html(optionsTemplate({
+        chunk: this.chunk,
+        state: this.state
+      }));
+      Backbone.ModelBinding.bind(this, {
+        all: "name"
+      });
+      return this;
+    };
+
+    OptionsView.prototype.handleTypeChange = function() {
+      if (this.chunk.get('options').length < 1) return this.getOptions();
+    };
+
+    OptionsView.prototype.getOptions = function() {
+      this.chunk.set({
+        type: 'glob'
+      }, {
+        silent: true
+      });
+      this.chunk.getMatches(this.handleGetOptionsSuccess, this.handleGetOptionsFailure);
+      this.chunk.set({
+        type: 'set'
+      }, {
+        silent: true
+      });
+      this.state = 'waiting';
+      return this.render();
+    };
+
+    OptionsView.prototype.handleGetOptionsSuccess = function(results) {
+      if (this.chunk.get('type') === 'set') {
+        this.chunk.set({
+          options: results['results']
+        });
+        this.chunk.set({
+          matches: results['results']
+        });
+        this.state = 'received';
+        return this.render();
+      }
+    };
+
+    OptionsView.prototype.handleGetOptionsFailure = function(results) {
+      this.state = 'error';
+      return this.render();
+    };
+
+    return OptionsView;
+
+  })(Backbone.View);
+
+}).call(this);
+
+  }
+}));
+(this.require.define({
+  "views/edit/templates/test/_waiting": function(exports, require, module) {
+    module.exports = function(__obj) {
+  var _safe = function(value) {
+    if (typeof value === 'undefined' && value == null)
+      value = '';
+    var result = new String(value);
+    result.ecoSafe = true;
+    return result;
+  };
+  return (function() {
+    var __out = [], __self = this, _print = function(value) {
+      if (typeof value !== 'undefined' && value != null)
+        __out.push(value.ecoSafe ? value : __self.escape(value));
+    }, _capture = function(callback) {
+      var out = __out, result;
+      __out = [];
+      callback.call(this);
+      result = __out.join('');
+      __out = out;
+      return _safe(result);
+    };
+    (function() {
+    
+      _print(_safe('<tr>\n  <td>Testing on server <img src="/images/loader_inline.gif"/></td>\n</tr>\n'));
+    
+    }).call(this);
+    
+    return __out.join('');
+  }).call((function() {
+    var obj = {
+      escape: function(value) {
+        return ('' + value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      },
+      safe: _safe
+    }, key;
+    for (key in __obj) obj[key] = __obj[key];
+    return obj;
+  })());
+};
+  }
+}));
+(this.require.define({
+  "views/edit/_chunk_view": function(exports, require, module) {
+    (function() {
+  var Chunk,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
+    __hasProp = Object.prototype.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor; child.__super__ = parent.prototype; return child; };
+
+  Chunk = require('models/chunk').Chunk;
+
+  exports.ChunkView = (function(_super) {
+
+    __extends(ChunkView, _super);
+
+    function ChunkView() {
+      this.remove = __bind(this.remove, this);
+      this.createChunkFrom = __bind(this.createChunkFrom, this);
+      this.getTextAfterRange = __bind(this.getTextAfterRange, this);
+      this.getTextBeforeRange = __bind(this.getTextBeforeRange, this);
+      this.getTextFromRange = __bind(this.getTextFromRange, this);
+      this.rangeCrossesChunks = __bind(this.rangeCrossesChunks, this);
+      this.clearSelection = __bind(this.clearSelection, this);
+      this.getRangeFromSelection = __bind(this.getRangeFromSelection, this);
+      this.rangeIsEmpty = __bind(this.rangeIsEmpty, this);
+      this.handleMouseUp = __bind(this.handleMouseUp, this);
+      this.render = __bind(this.render, this);
+      this.remove = __bind(this.remove, this);
+      this.unbind = __bind(this.unbind, this);
+      this.bind = __bind(this.bind, this);
+      this.initialize = __bind(this.initialize, this);
+      ChunkView.__super__.constructor.apply(this, arguments);
+    }
+
+    ChunkView.prototype.tagName = 'span';
+
+    ChunkView.prototype.className = 'chunk';
+
+    ChunkView.prototype.events = {
+      'mouseup': 'handleMouseUp'
+    };
+
+    ChunkView.prototype.initialize = function() {
+      this.router = this.options['router'];
+      this.chunk = this.options['chunk'];
+      if (this.options['bind'] !== false) return this.bind();
+    };
+
+    ChunkView.prototype.bind = function() {
+      this.chunk.bind('all', this.render);
+      return this.chunk.bind('remove', this.remove);
+    };
+
+    ChunkView.prototype.unbind = function() {
+      this.chunk.unbind('all', this.render);
+      return this.chunk.unbind('remove', this.remove);
+    };
+
+    ChunkView.prototype.remove = function() {
+      this.unbind();
+      return this.$(this.el).remove();
+    };
+
+    ChunkView.prototype.render = function() {
+      this.$(this.el).text(this.chunk.get("content"));
+      if (this.chunk.get('anonymize')) {
+        this.$(this.el).addClass('anonymize');
+      } else {
+        this.$(this.el).removeClass('anonymize');
+      }
+      return this;
+    };
+
+    ChunkView.prototype.handleMouseUp = function() {
+      var chunk, chunk_range;
+      if (this.chunk.get('anonymize')) {
+        this.router.navigate("/edit/chunk/" + (this.chunk.index()), {
+          trigger: true
+        });
+        return false;
+      } else {
+        chunk_range = this.getRangeFromSelection();
+        if (this.rangeIsEmpty(chunk_range)) {
+          return false;
+        } else if (this.rangeCrossesChunks(chunk_range)) {
+          return alert("NO! don't select the red bits");
+        } else {
+          chunk = this.createChunkFrom(chunk_range);
+          return this.router.navigate("/edit/chunk/" + (chunk.index()), {
+            trigger: true
+          });
+        }
+      }
+    };
+
+    ChunkView.prototype.rangeIsEmpty = function(range) {
+      return !this.rangeCrossesChunks(range) && range.startOffset === range.endOffset;
+    };
+
+    ChunkView.prototype.getRangeFromSelection = function() {
+      return window.getSelection().getRangeAt(0);
+    };
+
+    ChunkView.prototype.clearSelection = function() {
+      return window.getSelection().empty();
+    };
+
+    ChunkView.prototype.rangeCrossesChunks = function(range) {
+      return range.startContainer !== range.endContainer;
+    };
+
+    ChunkView.prototype.getTextFromRange = function(range) {
+      return range.cloneContents().textContent;
+    };
+
+    ChunkView.prototype.getTextBeforeRange = function(range) {
+      var pre_range;
+      pre_range = range.cloneRange();
+      pre_range.setStartBefore(range.startContainer);
+      pre_range.setEnd(range.startContainer, range.startOffset);
+      return this.getTextFromRange(pre_range);
+    };
+
+    ChunkView.prototype.getTextAfterRange = function(range) {
+      var post_range;
+      post_range = range.cloneRange();
+      post_range.setEndAfter(range.endContainer);
+      post_range.setStart(range.endContainer, range.endOffset);
+      return this.getTextFromRange(post_range);
+    };
+
+    ChunkView.prototype.createChunkFrom = function(chunk_range) {
+      var chunk, i, post, pre;
+      pre = new Chunk({
+        content: this.getTextBeforeRange(chunk_range)
+      });
+      chunk = new Chunk({
+        content: this.getTextFromRange(chunk_range),
+        anonymize: true
+      });
+      post = new Chunk({
+        content: this.getTextAfterRange(chunk_range)
+      });
+      this.chunk.replaceWith((function() {
+        var _i, _len, _ref, _results;
+        _ref = [pre, chunk, post];
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          i = _ref[_i];
+          if (i.get("content") !== '') _results.push(i);
+        }
+        return _results;
+      })());
+      this.remove;
+      return chunk;
+    };
+
+    ChunkView.prototype.remove = function() {
+      return this.$(this.el).remove();
+    };
+
+    return ChunkView;
+
+  })(Backbone.View);
 
 }).call(this);
 
@@ -12843,7 +13535,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     };
 
     FilterView.prototype.unbind = function() {
-      return this.sample.bind('all');
+      return this.sample.bind('all', this.render);
     };
 
     FilterView.prototype.remove = function() {
@@ -12902,7 +13594,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     };
 
     ResultView.prototype.unbind = function() {
-      return this.test_result.unbind('all');
+      return this.test_result.unbind('all', this.render);
     };
 
     ResultView.prototype.remove = function() {
@@ -12962,7 +13654,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     };
 
     StringView.prototype.unbind = function() {
-      return this.sample.unbind('all');
+      return this.sample.unbind('all', this.addAll);
     };
 
     StringView.prototype.remove = function() {
@@ -13055,7 +13747,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     };
 
     TestView.prototype.unbind = function() {
-      return this.test_results.unbind('all');
+      return this.test_results.unbind('all', this.render);
     };
 
     TestView.prototype.remove = function() {
@@ -13184,7 +13876,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     };
 
     EditView.prototype.unbind = function() {
-      this.sample.unbind('reset');
+      this.sample.unbind('reset', this.render);
       KeyboardJS.unbind.key('esc');
       KeyboardJS.unbind.key('enter');
       return KeyboardJS.unbind.key('right,space');
@@ -13276,7 +13968,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     };
 
     NewView.prototype.unbind = function() {
-      return this.collection.unbind('reset');
+      return this.collection.unbind('reset', this.navigateToEdit);
     };
 
     NewView.prototype.remove = function() {
@@ -13303,7 +13995,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "views/chunk_edit/templates/_state_matches": function(exports, require, module) {
+  "views/chunk_edit/templates/_matches": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
     if (typeof value === 'undefined' && value == null)
@@ -13328,7 +14020,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
     
       if (this.state === 'waiting') {
         _print(_safe('\n  <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>\n'));
-      } else if (this.state === 'received') {
+      } else if (this.state === 'received' || this.state === 'idle') {
         _print(_safe('\n  <p class="indent">Example Redactions: <span class="example">'));
         _print(this.chunk.get('matches').join(', '));
         _print(_safe('</span></p>\n'));
@@ -13359,7 +14051,7 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "views/chunk_edit/templates/_state_options": function(exports, require, module) {
+  "views/chunk_edit/templates/_options": function(exports, require, module) {
     module.exports = function(__obj) {
   var _safe = function(value) {
     if (typeof value === 'undefined' && value == null)
@@ -13381,13 +14073,26 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
       return _safe(result);
     };
     (function() {
+      var match, _i, _len, _ref;
     
       if (this.state === 'waiting') {
         _print(_safe('\n  <p class="indent">Getting example matches from server <img src="/images/loader_inline.gif"/></p>\n'));
-      } else if (this.state === 'received') {
-        _print(_safe('\n  <p class="indent">Example Redactions: <span class="example">'));
-        _print(this.chunk.get('matches').join(', '));
-        _print(_safe('</span></p>\n'));
+      } else if (this.state === 'received' || this.state === 'idle') {
+        _print(_safe('\n  <p class="indent">Match: <span class="example">\n    '));
+        _ref = this.chunk.get('matches');
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          match = _ref[_i];
+          _print(_safe('\n      <input id="option_'));
+          _print(this.chunk.get('matches').indexOf(match));
+          _print(_safe('" type="checkbox" name="options[]" value="'));
+          _print(match);
+          _print(_safe('"/>\n      <label for="option_'));
+          _print(this.chunk.get('matches').indexOf(match));
+          _print(_safe('">'));
+          _print(match);
+          _print(_safe('</label>\n    '));
+        }
+        _print(_safe('\n  </span></p>\n'));
       } else if (this.state === 'error') {
         _print(_safe('\n  <p class="indent">There was an error :(</p>\n'));
       }
@@ -13444,13 +14149,13 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
         _print(_safe('\n      <p class="indent">Replace with: <input tabindex=1 name="alias"/></p>\n\n      <div id="ajax"></div>\n    '));
       }
     
-      _print(_safe('\n  </p>\n\n    <p>\n    <input tabindex=1010 disabled id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!\')\'</span></label>\n\n    '));
+      _print(_safe('\n  </p>\n\n    <p>\n    <input disabled tabindex=1010 id="type_glob-excl" type="radio" name="type" value="glob-excl"/> <label for="type_glob-excl"> Match Anything (except a set of characters) <span class="example">!\')\'</span></label>\n\n    '));
     
       if (this.chunk.typeIs('glob-excl')) {
         _print(_safe('\n      <p class="indent">Replace with: <input tabindex=10 name="alias"/></p>\n\n      <div id="ajax"></div>\n    '));
       }
     
-      _print(_safe('\n  </p>\n\n  <p>\n    <input tabindex=1020 disabled id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>\n\n    '));
+      _print(_safe('\n  </p>\n\n  <p>\n    <input tabindex=1020 id="type_set" type="radio" name="type" value="set"/> <label for="type_set"> Match a set of values <span class="example">(foo|bar)</span></label>\n\n    '));
     
       if (this.chunk.typeIs('set')) {
         _print(_safe('\n      <p class="indent"><input tabindex=20 name="optional" type="checkbox"> <label for="optional">Match if omitted</label></p>\n      <p class="indent"><input tabindex=21 name="pass_through" type="checkbox"> <label for="pass_through">Include matched option in redaction</label></p>\n\n      <div id="ajax"></div>\n    '));
@@ -13795,48 +14500,28 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
   }
 }));
 (this.require.define({
-  "views/edit/templates/test/_waiting": function(exports, require, module) {
-    module.exports = function(__obj) {
-  var _safe = function(value) {
-    if (typeof value === 'undefined' && value == null)
-      value = '';
-    var result = new String(value);
-    result.ecoSafe = true;
-    return result;
-  };
-  return (function() {
-    var __out = [], __self = this, _print = function(value) {
-      if (typeof value !== 'undefined' && value != null)
-        __out.push(value.ecoSafe ? value : __self.escape(value));
-    }, _capture = function(callback) {
-      var out = __out, result;
-      __out = [];
-      callback.call(this);
-      result = __out.join('');
-      __out = out;
-      return _safe(result);
-    };
+  "helpers": function(exports, require, module) {
     (function() {
-    
-      _print(_safe('<tr>\n  <td>Testing on server <img src="/images/loader_inline.gif"/></td>\n</tr>\n'));
-    
-    }).call(this);
-    
-    return __out.join('');
-  }).call((function() {
-    var obj = {
-      escape: function(value) {
-        return ('' + value)
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/"/g, '&quot;');
-      },
-      safe: _safe
-    }, key;
-    for (key in __obj) obj[key] = __obj[key];
-    return obj;
-  })());
-};
+
+  exports.BrunchApplication = (function() {
+
+    function BrunchApplication() {
+      var _this = this;
+      jQuery(function() {
+        _this.initialize(_this);
+        return Backbone.history.start();
+      });
+    }
+
+    BrunchApplication.prototype.initialize = function() {
+      return null;
+    };
+
+    return BrunchApplication;
+
+  })();
+
+}).call(this);
+
   }
 }));

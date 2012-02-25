@@ -14,7 +14,7 @@ class exports.ResultView extends Backbone.View
     @test_result.bind 'all', @render
 
   unbind: =>
-    @test_result.unbind 'all'
+    @test_result.unbind 'all', @render
 
   remove: =>
     @unbind()

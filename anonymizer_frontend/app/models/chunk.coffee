@@ -42,7 +42,7 @@ class exports.Chunk extends Backbone.Model
         # -> (A|b|\$)
         when 'char-set' then "(#{(XRegExp.escape match for match in @get("options")).join('|')})"
         # -> (?:foo)
-        when 'literal' then "(?:#{XRegExp.escape @get('content')})"
+        when 'literal' then "(#{XRegExp.escape @get('content')})"
         # -> ([\.|\d]*)
         when 'numeric' then '([\\.|\\d]*)'
         # -> ([^A|b|\$]*)
@@ -55,7 +55,10 @@ class exports.Chunk extends Backbone.Model
         
   replaceText: ->
     if @get('anonymize') and @get('collapse') isnt true
-      if @get("pass_through") then "\\#{@index()+1}" else "[#{@get "alias"}]"
+      if @get("type") == 'literal' and not @get("pass_through")
+        ""
+      else
+        if @get("pass_through") then "\\#{@index()+1}" else "[#{@get "alias"}]"
     else if not @get 'anonymize'
       "\\#{@index()+1}"
 

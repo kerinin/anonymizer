@@ -13,7 +13,7 @@ class exports.FilterView extends Backbone.View
     @sample.bind 'all', @render
 
   unbind: =>
-    @sample.bind 'all'
+    @sample.bind 'all', @render
 
   remove: =>
     @unbind()

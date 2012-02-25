@@ -10,7 +10,7 @@ class exports.NewView extends Backbone.View
     @collection.bind 'reset', @navigateToEdit
 
   unbind: =>
-    @collection.unbind 'reset'
+    @collection.unbind 'reset', @navigateToEdit
     
   remove: =>
     @unbind()

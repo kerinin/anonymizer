@@ -33,7 +33,7 @@ class exports.EditView extends Backbone.View
     KeyboardJS.bind.key 'right,space', null, @nextString
 
   unbind: =>
-    @sample.unbind 'reset'
+    @sample.unbind 'reset', @render
     KeyboardJS.unbind.key 'esc'
     KeyboardJS.unbind.key 'enter'
     KeyboardJS.unbind.key 'right,space'

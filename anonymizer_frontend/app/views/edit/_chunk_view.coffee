@@ -19,8 +19,8 @@ class exports.ChunkView extends Backbone.View
     @chunk.bind 'remove', @remove
 
   unbind: =>
-    @chunk.unbind 'all'
-    @chunk.unbind 'remove'
+    @chunk.unbind 'all', @render
+    @chunk.unbind 'remove', @remove
 
   remove: =>
     @unbind()
