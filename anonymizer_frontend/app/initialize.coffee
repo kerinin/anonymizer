@@ -1,7 +1,7 @@
 {BrunchApplication} = require 'helpers'
 {MainRouter} = require 'routers/main_router'
 
-{Sample} = require 'collections/sample'
+{Sample} = require 'models/sample'
 {TestResults} = require 'collections/test_results'
 
 class exports.Application extends BrunchApplication

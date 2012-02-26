@@ -85,7 +85,7 @@ get '/next' do
   chunks = {:content => line}
   
   content_type :json
-  {:chunks => chunks, :percent_matched => percent_matched, :filter_count => Filter.count}.to_json
+  {:chunks => chunks}.to_json #, :percent_matched => percent_matched, :filter_count => Filter.count}.to_json
 end
 
 post '/filters' do

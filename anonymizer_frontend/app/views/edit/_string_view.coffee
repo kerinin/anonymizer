@@ -10,10 +10,10 @@ class exports.StringView extends Backbone.View
     @bind() if @options['bind'] isnt false
 
   bind: =>
-    @sample.bind 'all', @addAll
+    @sample.bind 'all', @render
 
   unbind: =>
-    @sample.unbind 'all', @addAll
+    @sample.unbind 'all', @render
 
   remove: =>
     @unbind()
@@ -21,17 +21,12 @@ class exports.StringView extends Backbone.View
     @$(@el).remove()
 
   render: =>
-    @addAll()
-    this
-
-  addOne: (chunk) =>
-    view = new ChunkView chunk: chunk, router: @router, bind: @options['bind']
-    @$(@el).append view.render().el
-    @child_views.push view
-
-  addAll: =>
     @remove()
-    @sample.models.forEach @addOne
+    @sample.get('chunks').forEach (chunk) =>
+      view = new ChunkView chunk: chunk, router: @router, bind: @options['bind']
+      @$(@el).append view.render().el
+      @child_views.push view
+    this
 
   remove: ->
     @$(@el).empty()

@@ -27,13 +27,13 @@ class exports.EditView extends Backbone.View
     @bind() if @options['bind'] isnt false
 
   bind: =>
-    @sample.bind 'reset', @render
+    @sample.bind 'all', @render
     KeyboardJS.bind.key 'esc', null, @resetString
     KeyboardJS.bind.key 'enter', null, @saveString
     KeyboardJS.bind.key 'right,space', null, @nextString
 
   unbind: =>
-    @sample.unbind 'reset', @render
+    @sample.unbind 'all', @render
     KeyboardJS.unbind.key 'esc'
     KeyboardJS.unbind.key 'enter'
     KeyboardJS.unbind.key 'right,space'
@@ -53,7 +53,7 @@ class exports.EditView extends Backbone.View
     this
 
   resetString: =>
-    @sample.models.forEach (chunk) ->
+    @sample.get('chunks').forEach (chunk) ->
       chunk.set anonymize: false
       chunk.set collapse: false
 

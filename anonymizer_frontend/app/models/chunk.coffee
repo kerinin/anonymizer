@@ -1,4 +1,4 @@
-class exports.Chunk extends Backbone.Model
+class exports.Chunk extends Backbone.RelationalModel
   defaults:
     content: ''
     anonymize: false
@@ -34,7 +34,7 @@ class exports.Chunk extends Backbone.Model
   toggleAnonymize: =>
     @set anonymize: not @get 'anonymize'
 
-  searchText: ->
+  searchText: =>
     if @get('anonymize') and @get('collapse') isnt true
       matcher = switch @get 'type'
         # -> ((?:foo)|(?:bar))
@@ -53,7 +53,7 @@ class exports.Chunk extends Backbone.Model
     else if not @get 'anonymize'
       "(#{XRegExp.escape @get('content')})"
         
-  replaceText: ->
+  replaceText: =>
     if @get('anonymize') and @get('collapse') isnt true
       if @get("type") == 'literal' and not @get("pass_through")
         ""

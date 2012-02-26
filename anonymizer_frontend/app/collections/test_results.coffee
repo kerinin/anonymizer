@@ -10,7 +10,7 @@ class exports.TestResults extends Backbone.Collection
     @state = 'idle'
     @sample = sample
 
-    @sample.bind 'all', @handleSampleEvent
+    @sample.get('chunks').bind 'all', @handleSampleEvent
 
   handleSampleEvent: =>
     if @sample.length < 2
@@ -23,8 +23,8 @@ class exports.TestResults extends Backbone.Collection
 
   testSample: =>
     @post
-      search: @sample.searchText(),
-      replace: @sample.replaceText()
+      search: @sample.get('chunks').searchText(),
+      replace: @sample.get('chunks').replaceText()
     , "test_filter", @testCallback, @testFailback
     @resultCount = null
     @state = 'waiting'
@@ -33,7 +33,7 @@ class exports.TestResults extends Backbone.Collection
   testCallback: (results) =>
     # This conditional is a sanity check to ensure that we don't
     # end up with stale responses being shown
-    if results['regex'] is "#{@sample.searchText()}"
+    if results['regex'] is "#{@sample.get('chunks').searchText()}"
       @reset(results['results'], {silent: true})
       @resultCount = results['total']
 

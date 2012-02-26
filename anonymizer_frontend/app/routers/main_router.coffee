@@ -12,14 +12,14 @@ class exports.MainRouter extends Backbone.Router
   new: =>
     view.remove() for view in app.current_views
 
-    view = new NewView(collection: app.sample, router: this)
+    view = new NewView(sample: app.sample, router: this)
     $('body').html view.render().el
-    app.sample.fetch()
+    app.sample.get('chunks').fetch()
 
     app.current_views = [view]
 
   edit: =>
-    if app.sample.length == 0
+    if app.sample.get('chunks').length == 0
       @navigate("/new", {trigger: true})
     else
       view.remove() for view in app.current_views
@@ -32,13 +32,13 @@ class exports.MainRouter extends Backbone.Router
 
   chunk_edit: (id) =>
     # Make sure the requested chunk can be edited
-    if not app.sample or not app.sample.at(id) or not app.sample.at(id).get("anonymize")
+    if not app.sample or not app.sample.get('chunks').at(id) or not app.sample.get('chunks').at(id).get("anonymize")
       @navigate("/edit", {trigger: true})
     else
       view.remove() for view in app.current_views
 
       baseView = new EditView sample: app.sample, test_results: app.test_results, router: this, bind: false
-      view = new ChunkEditView chunk: app.sample.at(id), router: this
+      view = new ChunkEditView chunk: app.sample.get('chunks').at(id), router: this
 
       # This view is intended to be a 'pop-up', so render the 'base view'
       # for context, then render this view
