@@ -64,6 +64,6 @@ class exports.EditView extends Backbone.View
   
   saveString: =>
     @redactor.save()
-    @redactor.fetch()
+    @nextString() 
 
     return false

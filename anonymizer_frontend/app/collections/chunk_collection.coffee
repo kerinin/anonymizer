@@ -29,6 +29,7 @@ class exports.ChunkCollection extends Backbone.Collection
         @remove @at(i)
 
   parse: (response) =>
-    @percentMatched = response['percent_matched']
-    @filterCount = response['filter_count']
+    #RM NOTE: HACK!!!  fix this shist
+    @redactor.get('scope').set percentMatched: response['percent_matched']
+    @redactor.get('scope').set filterCount: response['filter_count']
     response['chunks']
