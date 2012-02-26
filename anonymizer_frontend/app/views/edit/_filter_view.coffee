@@ -5,21 +5,21 @@ class exports.FilterView extends Backbone.View
 
   initialize: =>
     @router = @options['router']
-    @sample = @options['sample']
+    @redactor = @options['redactor']
 
     @bind() if @options['bind'] isnt false
 
   bind: =>
-    @sample.bind 'all', @render
+    @redactor.bind 'all', @render
 
   unbind: =>
-    @sample.bind 'all', @render
+    @redactor.bind 'all', @render
 
   remove: =>
     @unbind()
     @$(@el).remove()
 
   render: =>
-    @$(@el).html filterTemplate sample: @sample
+    @$(@el).html filterTemplate redactor: @redactor
     this
 

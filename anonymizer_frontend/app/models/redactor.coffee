@@ -1,7 +1,7 @@
 {Chunk} = require 'models/chunk'
 {ChunkCollection} = require 'collections/chunk_collection'
 
-class exports.Sample extends Backbone.RelationalModel
+class exports.Redactor extends Backbone.RelationalModel
 
   relations:
     [{
@@ -10,5 +10,5 @@ class exports.Sample extends Backbone.RelationalModel
       relatedModel: Chunk
       collectionType: ChunkCollection
       reverseRelation:
-        key: 'sample'
+        key: 'redactor'
     }]

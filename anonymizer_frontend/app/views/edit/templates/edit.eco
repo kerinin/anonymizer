@@ -22,6 +22,6 @@
   <a id="next" href="#/new">Next &rarr;</a>
 </div>
 
-<p id="stats"><%= @sample.percentMatched %> matched using <%= @sample.filterCount %> filters</span>
+<p id="stats"><%= @redactor.percentMatched %> matched using <%= @redactor.filterCount %> filters</span>
 
 <table id="test"></table>

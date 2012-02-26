@@ -1,7 +1,7 @@
 {BrunchApplication} = require 'helpers'
 {MainRouter} = require 'routers/main_router'
 
-{Sample} = require 'models/sample'
+{Redactor} = require 'models/redactor'
 {TestResults} = require 'collections/test_results'
 
 class exports.Application extends BrunchApplication
@@ -10,8 +10,8 @@ class exports.Application extends BrunchApplication
   # group things by their type e.g. `@views = {}; @views.home = new HomeView`.
   initialize: ->
     @router = new MainRouter
-    @sample = new Sample
-    @test_results = new TestResults @sample
+    @redactor = new Redactor
+    @test_results = new TestResults @redactor
     @current_views = []
 
 window.app = new exports.Application

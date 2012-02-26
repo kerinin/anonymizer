@@ -11,7 +11,7 @@ class exports.TestView extends Backbone.View
 
   initialize: =>
     @router = @options['router']
-    @sample = @options['sample']
+    @redactor = @options['redactor']
     @test_results = @options['test_results']
     @child_views = []
 

@@ -4,16 +4,16 @@ class exports.StringView extends Backbone.View
 
   initialize: =>
     @router = @options['router']
-    @sample = @options['sample']
+    @redactor = @options['redactor']
     @child_views = []
 
     @bind() if @options['bind'] isnt false
 
   bind: =>
-    @sample.bind 'all', @render
+    @redactor.bind 'all', @render
 
   unbind: =>
-    @sample.unbind 'all', @render
+    @redactor.unbind 'all', @render
 
   remove: =>
     @unbind()
@@ -22,7 +22,7 @@ class exports.StringView extends Backbone.View
 
   render: =>
     @remove()
-    @sample.get('chunks').forEach (chunk) =>
+    @redactor.get('chunks').forEach (chunk) =>
       view = new ChunkView chunk: chunk, router: @router, bind: @options['bind']
       @$(@el).append view.render().el
       @child_views.push view

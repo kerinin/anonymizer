@@ -2,16 +2,16 @@ class exports.NewView extends Backbone.View
   id: 'new-view'
 
   initialize: =>
-    @model = @sample = @options['sample']
+    @model = @redactor = @options['redactor']
     @router = @options['router']
     
     @bind() if @options['bind'] isnt false
 
   bind: =>
-    @sample.get('chunks').bind 'reset', @navigateToEdit
+    @redactor.get('chunks').bind 'reset', @navigateToEdit
 
   unbind: =>
-    @sample.get('chunks').unbind 'reset', @navigateToEdit
+    @redactor.get('chunks').unbind 'reset', @navigateToEdit
     
   remove: =>
     @unbind()

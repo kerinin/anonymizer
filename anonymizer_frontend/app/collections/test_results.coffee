@@ -3,28 +3,28 @@
 class exports.TestResults extends Backbone.Collection
   model: TestResult
 
-  # Should be initialized with a sample to bind with
-  initialize: (sample) =>
+  # Should be initialized with a redactor to bind with
+  initialize: (redactor) =>
     # [idle,waiting,recieved,empty,error]
     @resultCount = null
     @state = 'idle'
-    @sample = sample
+    @redactor = redactor
 
-    @sample.get('chunks').bind 'all', @handleSampleEvent
+    @redactor.get('chunks').bind 'all', @handleRedactorEvent
 
-  handleSampleEvent: =>
-    if @sample.length < 2
+  handleRedactorEvent: =>
+    if @redactor.length < 2
       if @state isnt 'idle'
         @resultCount = null
         @state = 'idle'
         @trigger('toIdle')
     else
-      @testSample()
+      @testRedactor()
 
-  testSample: =>
+  testRedactor: =>
     @post
-      search: @sample.get('chunks').searchText(),
-      replace: @sample.get('chunks').replaceText()
+      search: @redactor.get('chunks').searchText(),
+      replace: @redactor.get('chunks').replaceText()
     , "test_filter", @testCallback, @testFailback
     @resultCount = null
     @state = 'waiting'
@@ -33,7 +33,7 @@ class exports.TestResults extends Backbone.Collection
   testCallback: (results) =>
     # This conditional is a sanity check to ensure that we don't
     # end up with stale responses being shown
-    if results['regex'] is "#{@sample.get('chunks').searchText()}"
+    if results['regex'] is "#{@redactor.get('chunks').searchText()}"
       @reset(results['results'], {silent: true})
       @resultCount = results['total']
 

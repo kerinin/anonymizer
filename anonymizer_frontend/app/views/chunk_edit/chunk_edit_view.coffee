@@ -57,4 +57,4 @@ class exports.ChunkEditView extends Backbone.View
     @close()
 
   close: =>
-    @router.navigate("/edit", {trigger: true})  # NOTE: this is going to reset the sample
+    @router.navigate("/edit", {trigger: true})  # NOTE: this is going to reset the redactor
