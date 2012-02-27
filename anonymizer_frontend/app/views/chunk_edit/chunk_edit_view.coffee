@@ -29,6 +29,8 @@ class exports.ChunkEditView extends Backbone.View
 
   remove: =>
     @unbind()
+    view.remove() for view in @child_views
+    @$(@el).remove()
 
   render: =>
     @$(@el).html chunkEditTemplate chunk: @chunk, state: @state
@@ -36,12 +38,12 @@ class exports.ChunkEditView extends Backbone.View
     switch @chunk.get 'type'
       when 'set'
         view = new OptionsView chunk: @chunk, router: @router, bind: @options['bind']
+        @child_views = [view]
         @$("#ajax").replaceWith view.render().el
       when 'glob', 'numeric', 'glob-excl'
         view = new MatchesView chunk: @chunk, router: @router, bind: @options['bind']
-        console.log @$('#ajax')
+        @child_views = [view]
         @$("#ajax").replaceWith view.render().el
-        console.log view.el
     this
 
   saveAndClose: (e) =>

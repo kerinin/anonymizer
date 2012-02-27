@@ -19,20 +19,14 @@ end
 Mongoid.logger = Logger.new($stdout)
 Mongoid.logger.level = 3
 
-source = ARGV[0]
+destination_path = ARGV[0]
 
-if File.exists?(source)
-  puts "file found, purging existing Subjects"
-  Subject.delete_all
-  Filter.delete_all
+destination = File.open(destination_path, 'w')
 
-  puts "starting load"
-  lines = File.readlines(source)
-  lines.each do |line|
-    Subject.create! :text => line.chomp, :rand => rand()
-  end
-
-  puts "loaded, added #{Subject.count} subjects"
-else
-  puts "file not found"
+Filter.order_by([:search => :asc]).all.each do |filter|
+  # RM NOTE: this should be removed - fixing an oversight in file parsing...
+  puts "#{filter.search.gsub(/\n/,'')}"
+  puts "#{filter.replace}"
+  puts "----------------"
+  destination << "#{filter.search.gsub(/\n/,'')}\t#{filter.replace}\n"
 end

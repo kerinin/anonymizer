@@ -15,6 +15,7 @@ class exports.NewView extends Backbone.View
     
   remove: =>
     @unbind()
+    @$(@el).remove()
 
   render: =>
     @$(@el).html require('./templates/new')

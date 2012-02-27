@@ -122,7 +122,7 @@ filters.each_value do |value|
     new_value.gsub! '<event>', Faker::Company.catch_phrase
     new_value.gsub! '<comment>', Faker::Lorem.sentence
     new_value.gsub! '<ip>', Faker::Internet.ip_v4_address
-    Subject.create! :text => new_value
+    Subject.create! :text => new_value, :rand => rand()
   end
 end
 

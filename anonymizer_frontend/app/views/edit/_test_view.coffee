@@ -18,7 +18,7 @@ class exports.TestView extends Backbone.View
     @bind() if @options['bind'] isnt false
 
   bind: =>
-    @test_results.bind 'all', @render
+    #@test_results.bind 'all', @render
 
   unbind: =>
     @test_results.unbind 'all', @render
@@ -26,6 +26,7 @@ class exports.TestView extends Backbone.View
   remove: =>
     @unbind()
     view.remove() for view in @child_views
+    @$(@el).remove()
 
   render: =>
     @$(@el).empty()

@@ -76,10 +76,9 @@ get '/' do
 end
 
 get '/next' do
-  query = Subject.where(:matched.ne => true)
-  line = query.skip( rand(query.count) ).first.text
-
-  puts "#{query.count} in query, #{Subject.count} total"
+  query = Subject.where(:matched => {"$ne" => true})
+  line = Subject.order_by([[:rand, :asc]]).where(:matched => {"$ne" => true}, :rand => {"$gt" => rand()}).first.text
+  #line = query.skip( rand(query.count-1) ).first.text
 
   percent_matched = sprintf "%.1f%", 100 * ((Subject.count - query.count) / Subject.count.to_f)
   chunks = {:content => line}
@@ -90,14 +89,10 @@ end
 
 post '/filters' do
   data = JSON.parse( request.body.read )
-  filter = Filter.create!(:search => data['search'], :replace => data['replace'])
-
-  puts "#{Subject.where(:text => filter.regex).count} matches"
-  puts "#{Subject.where(:matched.ne => true).count} unmatched to start"
+  filter = Filter.create!(:search => data['search'], :replace => data['replace'], :chunks => data['chunks'])
 
   # mark any subject lines this matches
-  Subject.where(:text => filter.regex).update_all(:matched => true)
-  puts "#{Subject.where(:matched.ne => true).count} unmatched now"
+  Subject.where(:matched => {"$ne" => true}).where(:text => filter.regex).update_all(:matched => true)
 end
 
 get '/filters' do
@@ -121,6 +116,13 @@ post '/get_matches/:index' do |index|
   filter.get_matches(index.to_i).to_json
 end
 
+post '/get_options/:index' do |index|
+  data = JSON.parse(request.body.read)
+  filter = Filter.new(:search => data['search'])
+  
+  content_type :json
+  filter.get_options(index.to_i).to_json
+end
 
 private
 

@@ -3,13 +3,15 @@ matchesTemplate = require('./templates/_matches')
 class exports.MatchesView extends Backbone.View
   id: 'ajax'
 
+  events:
+    'click .get_matches': 'getMatches'
+
   initialize: =>
     @router = @options['router']
     @model = @chunk = @options['chunk']
     @state = 'idle'
 
     @bind() if @options['bind'] isnt false
-    @getMatches()
 
   bind: =>
     @chunk.bind 'change:type', @getMatches
@@ -19,6 +21,7 @@ class exports.MatchesView extends Backbone.View
 
   remove: =>
     @unbind()
+    @$(@el).remove()
 
   render: =>
     @$(@el).html matchesTemplate(chunk: @chunk, state: @state)

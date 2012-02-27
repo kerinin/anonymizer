@@ -5,5 +5,7 @@ class Subject
   
   field :text, :type => String
   field :matched, :type => Boolean, :default => false
+  field :rand, :type => Float
   index :matched
+  index :rand
 end

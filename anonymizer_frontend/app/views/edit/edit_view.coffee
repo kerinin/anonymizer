@@ -40,7 +40,7 @@ class exports.EditView extends Backbone.View
     
   remove: =>
     @unbind()
-    view.remove for view in @child_views
+    view.remove() for view in @child_views
     @$(@el).remove()
 
   render: =>

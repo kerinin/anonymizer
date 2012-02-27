@@ -19,6 +19,7 @@ class exports.OptionsView extends Backbone.View
 
   remove: =>
     @unbind()
+    @$(@el).remove()
 
   render: =>
     @$(@el).html optionsTemplate(chunk: @chunk, state: @state)
