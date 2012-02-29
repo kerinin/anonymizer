@@ -14134,16 +14134,21 @@ b&&d.deserialize(b,a)};this.restart=function(a){var b=f.rewind();b&&d.deserializ
         matcher = (function() {
           switch (this.get('type')) {
             case 'set':
-              return "(" + (((function() {
-                var _i, _len, _ref, _results;
-                _ref = this.get("options");
-                _results = [];
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  match = _ref[_i];
-                  _results.push("(?:" + (XRegExp.escape(match)) + ")");
-                }
-                return _results;
-              }).call(this)).join('|')) + ")";
+              if (this.get("options").length > 1) {
+                return "(" + (((function() {
+                  var _i, _len, _ref, _results;
+                  _ref = this.get("options");
+                  _results = [];
+                  for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                    match = _ref[_i];
+                    _results.push("(?:" + (XRegExp.escape(match)) + ")");
+                  }
+                  return _results;
+                }).call(this)).join('|')) + ")";
+              } else {
+                return "(" + (this.get("options")) + ")";
+              }
+              break;
             case 'char-set':
               return "(" + (((function() {
                 var _i, _len, _ref, _results;

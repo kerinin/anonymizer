@@ -38,7 +38,11 @@ class exports.Chunk extends Backbone.RelationalModel
     if @get('anonymize') and @get('collapse') isnt true
       matcher = switch @get 'type'
         # -> ((?:foo)|(?:bar))
-        when 'set' then "(#{("(?:#{XRegExp.escape match})" for match in @get("options")).join('|')})"
+        when 'set'
+          if @get("options").length > 1
+            "(#{("(?:#{XRegExp.escape match})" for match in @get("options")).join('|')})"
+          else
+            "(#{@get("options")})"
         # -> (A|b|\$)
         when 'char-set' then "(#{(XRegExp.escape match for match in @get("options")).join('|')})"
         # -> (?:foo)
