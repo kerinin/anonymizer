@@ -17,6 +17,7 @@ class exports.MainRouter extends Backbone.Router
     app.redactor.get('chunks').fetch()
 
     app.current_views = [view]
+    _gaq.push(['_trackEvent', 'Route', 'Load', 'New']);
 
   edit: =>
     if app.redactor.get('chunks').length == 0
@@ -29,6 +30,7 @@ class exports.MainRouter extends Backbone.Router
       $('body').html view.render().el
 
       app.current_views = [view]
+      _gaq.push(['_trackEvent', 'Route', 'Load', 'Edit']);
 
   chunk_edit: (id) =>
     # Make sure the requested chunk can be edited
@@ -48,3 +50,4 @@ class exports.MainRouter extends Backbone.Router
       $("#chunk_edit_view input[name=alias]").select()
 
       app.current_views = [baseView,view]
+      _gaq.push(['_trackEvent', 'Route', 'Load', 'ChunkEdit']);
